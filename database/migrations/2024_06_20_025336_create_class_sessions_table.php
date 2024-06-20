@@ -12,14 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('class_sessions', function (Blueprint $table) {
-            $table->id('session_id');
+            $table->id();
             $table->time('start_lesson');
             $table->time('end_lesson');
             $table->string('day_of_week', 20);
             $table->unsignedBigInteger('room_id');
-            $table->foreign('room_id')->references('room_id')->on('rooms');
             $table->unsignedBigInteger('class_id');
-            $table->foreign('class_id')->references('class_id')->on('classes');
+            $table->foreign('room_id')->references('id')->on('rooms');
+            $table->foreign('class_id')->references('id')->on('classes');
             $table->timestamps();
         });
     }

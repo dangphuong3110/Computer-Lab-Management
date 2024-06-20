@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('reports', function (Blueprint $table) {
-            $table->id('report_id');
+            $table->id();
             $table->text('content');
             $table->string('status', 100)->nullable()->default('pending');
             $table->dateTime('submitted_at')->nullable();
@@ -20,9 +20,9 @@ return new class extends Migration
             $table->unsignedBigInteger('student_id')->nullable();
             $table->unsignedBigInteger('lecturer_id')->nullable();
             $table->unsignedBigInteger('technician_id')->nullable();
-            $table->foreign('student_id')->references('student_id')->on('students');
-            $table->foreign('lecturer_id')->references('lecturer_id')->on('lecturers');
-            $table->foreign('technician_id')->references('technician_id')->on('technicians');
+            $table->foreign('student_id')->references('id')->on('students');
+            $table->foreign('lecturer_id')->references('id')->on('lecturers');
+            $table->foreign('technician_id')->references('id')->on('technicians');
             $table->timestamps();
         });
     }

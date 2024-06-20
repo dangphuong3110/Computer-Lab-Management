@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('class_session_lesson', function (Blueprint $table) {
             $table->unsignedBigInteger('session_id');
             $table->unsignedBigInteger('lesson_id');
-            $table->foreign('session_id')->references('session_id')->on('class_sessions')->onDelete('cascade');
-            $table->foreign('lesson_id')->references('lesson_id')->on('lessons')->onDelete('cascade');
+            $table->foreign('session_id')->references('id')->on('class_sessions')->onDelete('cascade');
+            $table->foreign('lesson_id')->references('id')->on('lessons')->onDelete('cascade');
             $table->timestamps();
         });
     }

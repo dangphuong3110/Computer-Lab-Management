@@ -16,9 +16,9 @@ return new class extends Migration
             $table->unsignedBigInteger('student_id');
             $table->unsignedBigInteger('session_id');
             $table->unsignedBigInteger('computer_id');
-            $table->foreign('student_id')->references('student_id')->on('students')->onDelete('cascade');
-            $table->foreign('session_id')->references('session_id')->on('class_sessions')->onDelete('cascade');
-            $table->foreign('computer_id')->references('computer_id')->on('computers')->onDelete('cascade');
+            $table->foreign('student_id')->references('id')->on('students')->onDelete('cascade');
+            $table->foreign('session_id')->references('id')->on('class_sessions')->onDelete('cascade');
+            $table->foreign('computer_id')->references('id')->on('computers')->onDelete('cascade');
             $table->timestamps();
         });
     }
