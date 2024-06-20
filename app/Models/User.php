@@ -7,6 +7,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\Role;
+use App\Models\Student;
+use App\Models\Lecturer;
+use App\Models\Technician;
 
 class User extends Authenticatable
 {
@@ -42,4 +46,29 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
+
+    public function student()
+    {
+        return $this->hasOne(Student::class);
+    }
+
+    public function lecturer()
+    {
+        return $this->hasOne(Lecturer::class);
+    }
+
+    public function technician()
+    {
+        return $this->hasOne(Technician::class);
+    }
+
+    public function manager()
+    {
+        return $this->hasOne(Manager::class);
+    }
 }
