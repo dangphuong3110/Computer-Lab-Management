@@ -31,7 +31,7 @@ class UsersTableSeeder extends Seeder
                 'role_id' => 2,
             ],
             [
-                'email' => 'sv1@gmail.com',
+                'email' => '2051063451',
                 'password' => Hash::make('123456'),
                 'phone' => $faker->phoneNumber,
                 'role_id' => 3,

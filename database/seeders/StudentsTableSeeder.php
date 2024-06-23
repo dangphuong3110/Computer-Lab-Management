@@ -18,7 +18,7 @@ class StudentsTableSeeder extends Seeder
 
         $student = [
             'full_name' => $faker->name,
-            'student_code' => '2051063453',
+            'student_code' => '2051063451',
             'class' => '62TH5',
             'gender' => 'Nam',
             'date_of_birth' => '2002-10-31',

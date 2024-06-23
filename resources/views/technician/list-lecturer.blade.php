@@ -259,7 +259,7 @@
 
             function submitFormCreateLecturer (form, overlay) {
                 const formDataObj = {};
-                form.find('input').each(function() {
+                form.find('input, select, textarea').each(function() {
                     formDataObj[$(this).attr('name')] = $(this).val();
                 });
 

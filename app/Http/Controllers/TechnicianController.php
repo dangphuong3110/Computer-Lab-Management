@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Imports\LecturersImport;
+use App\Imports\StudentsImport;
 use App\Models\Lecturer;
+use App\Models\Student;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -34,76 +37,21 @@ class TechnicianController extends Controller
         return view('technician.list-lecturer', compact('title','user', 'lecturers'));
     }
 
-    public function getListLecturerAPI()
+    public function getListStudent()
     {
-        $lecturers = Lecturer::orderBy('updated_at', 'desc')->paginate(7);
-
-//        return view('technician.test', compact('lecturers'));
-        response()->json(['lecturers' => $lecturers]);
-    }
-
-    public function createLecturer() {
-        $title = 'Thêm giảng viên';
+        $title = 'Sinh viên';
         $user = Auth::user();
 
-        return view('technician.form_lecturer', compact('title','user'));
-    }
+        $students = Student::orderBy('updated_at', 'desc')->paginate(7);
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-
-    }
-
-    public function storeLecturer(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'full-name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-        ], [
-            'full-name.required' => 'Vui lòng nhập họ và tên',
-            'full-name.string' => 'Họ và tên phải là chuỗi',
-            'full-name.max' => 'Họ và tên không được vượt quá 255 ký tự',
-            'email.required' => 'Vui lòng nhập địa chỉ email',
-            'email.email' => 'Địa chỉ email không hợp lệ',
-            'email.unique' => 'Địa chỉ email đã được sử dụng',
-            'email.max' => 'Địa chỉ email không được vượt quá 255 ký tự',
-        ]);
-
-        if ($validator->fails()) {
-            return redirect()->route('technician.create-lecturer')->withErrors($validator)->withInput();
-        }
-
-        $user = new User();
-
-        $user->email = $request->input('email');
-        $user->password = Hash::make('123456');
-        $user->role_id = '4';
-
-        $user->save();
-
-        $lecturer = new Lecturer();
-
-        $lecturer->full_name = $request->input('full-name');
-        $lecturer->academic_rank = $request->input('academic-rank');
-        $lecturer->department = $request->input('department');
-        $lecturer->faculty = $request->input('faculty');
-        $lecturer->position = $request->input('position');
-
-        $lecturer->user_id = $user->id;
-
-        $lecturer->save();
-
-        return redirect()->route('technician.list-lecturer')->with('success', 'Thêm giảng viên thành công!');
+        return view('technician.list-student', compact('title','user', 'students'));
     }
 
     public function storeLecturerAPI(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'full-name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
+            'email' => 'required|email|max:255|unique:users,email',
         ], [
             'full-name.required' => 'Vui lòng nhập họ và tên',
             'full-name.string' => 'Họ và tên phải là chuỗi',
@@ -144,75 +92,49 @@ class TechnicianController extends Controller
         return response()->json(['success' => 'Thêm giảng viên thành công!', 'table_lecturer' => $table_lecturer, 'links' => $lecturers->render('pagination::bootstrap-5')->toHtml()]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function storeStudentAPI(Request $request)
     {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    public function editLecturer(string $id)
-    {
-        $title = 'Chỉnh sửa giảng viên';
-        $user = Auth::user();
-
-        $lecturer = Lecturer::findOrFail($id);
-
-        return view('technician.form_lecturer', compact('title','user', 'lecturer'));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    public function updateLecturer(Request $request, string $id)
-    {
-        $lecturer = Lecturer::findOrFail($id);
-
         $validator = Validator::make($request->all(), [
             'full-name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $lecturer->user_id,
+            'student-code' => 'required|string|max:255|unique:students,student_code',
         ], [
             'full-name.required' => 'Vui lòng nhập họ và tên',
             'full-name.string' => 'Họ và tên phải là chuỗi',
             'full-name.max' => 'Họ và tên không được vượt quá 255 ký tự',
-            'email.required' => 'Vui lòng nhập địa chỉ email',
-            'email.email' => 'Địa chỉ email không hợp lệ',
-            'email.unique' => 'Địa chỉ email đã được sử dụng',
-            'email.max' => 'Địa chỉ email không được vượt quá 255 ký tự',
+            'student-code.required' => 'Vui lòng nhập mã sinh viên',
+            'student-code.string' => 'Mã sinh viên không phải là chuỗi',
+            'student-code.unique' => 'Mã sinh viên đã tồn tại',
+            'student-code.max' => 'Mã sinh viên không được vượt quá 255 ký tự',
         ]);
 
         if ($validator->fails()) {
-            return redirect()->route('technician.edit-lecturer', $lecturer->id)->withErrors($validator)->withInput();
+            return response()->json(['errors' => $validator->errors()]);
         }
 
-        $lecturer->full_name = $request->input('full-name');
-        $lecturer->academic_rank = $request->input('academic-rank');
-        $lecturer->department = $request->input('department');
-        $lecturer->faculty = $request->input('faculty');
-        $lecturer->position = $request->input('position');
+        $user = new User();
 
-        $lecturer->save();
-
-        $user = User::findOrFail($lecturer->user_id);
-        $user->email = $request->input('email');
+        $user->email = $request->input('student-code');
+        $user->password = Hash::make('123456');
+        $user->role_id = '3';
 
         $user->save();
 
-        return redirect()->route('technician.edit-lecturer', $lecturer->id)->with('success', 'Chỉnh sửa thông tin giảng viên thành công!');
+        $student = new Student();
+
+        $student->full_name = $request->input('full-name');
+        $student->student_code = $request->input('student-code');
+        $student->class = $request->input('class');
+        $student->gender = $request->input('gender');
+        $student->date_of_birth = $request->input('date-of-birth');
+
+        $student->user_id = $user->id;
+
+        $student->save();
+
+        $students = Student::orderBy('updated_at', 'desc')->paginate(7);
+        $table_student = view('technician.table-student', compact('students'))->render();
+
+        return response()->json(['success' => 'Thêm sinh viên thành công!', 'table_student' => $table_student, 'links' => $students->render('pagination::bootstrap-5')->toHtml()]);
     }
 
     public function updateLecturerAPI(Request $request, string $id)
@@ -221,7 +143,7 @@ class TechnicianController extends Controller
 
         $validator = Validator::make($request->all(), [
             'full-name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $lecturer->user_id,
+            'email' => 'required|email|max:255|unique:users,email,' . $lecturer->user_id,
         ], [
             'full-name.required' => 'Vui lòng nhập họ và tên',
             'full-name.string' => 'Họ và tên phải là chuỗi',
@@ -255,25 +177,44 @@ class TechnicianController extends Controller
         return response()->json(['success' => 'Chỉnh sửa thông tin giảng viên thành công!', 'table_lecturer' => $table_lecturer, 'links' => $lecturers->render('pagination::bootstrap-5')->toHtml()]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function updateStudentAPI(Request $request, string $id)
     {
-        //
-    }
+        $student = Student::findOrFail($id);
 
-    public function destroyLecturer(string $id)
-    {
-        $lecturer = Lecturer::findOrFail($id);
-        $userId = $lecturer->user_id;
+        $validator = Validator::make($request->all(), [
+            'full-name' => 'required|string|max:255',
+            'student-code' => 'required|string|max:255|unique:students,student_code,' . $student->id,
+        ], [
+            'full-name.required' => 'Vui lòng nhập họ và tên',
+            'full-name.string' => 'Họ và tên phải là chuỗi',
+            'full-name.max' => 'Họ và tên không được vượt quá 255 ký tự',
+            'student-code.required' => 'Vui lòng nhập mã sinh viên',
+            'student-code.string' => 'Mã sinh viên không phải là chuỗi',
+            'student-code.unique' => 'Mã sinh viên đã tồn tại',
+            'student-code.max' => 'Mã sinh viên không được vượt quá 255 ký tự',
+        ]);
 
-        $lecturer->delete();
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()]);
+        }
 
-        $user = User::findOrFail($userId);
-        $user->delete();
+        $user = User::findOrFail($student->user_id);
+        $user->email = $request->input('student-code');
 
-        return redirect()->route('technician.list-lecturer')->with('success', 'Xóa giảng viên thành công!');
+        $user->save();
+
+        $student->full_name = $request->input('full-name');
+        $student->student_code = $request->input('student-code');
+        $student->class = $request->input('class');
+        $student->gender = $request->input('gender');
+        $student->date_of_birth = $request->input('date-of-birth');
+
+        $student->save();
+
+        $students = Student::orderBy('updated_at', 'desc')->paginate(7);
+        $table_student = view('technician.table-student', compact('students'))->render();
+
+        return response()->json(['success' => 'Chỉnh sửa thông tin sinh viên thành công!', 'table_student' => $table_student, 'links' => $students->render('pagination::bootstrap-5')->toHtml()]);
     }
 
     public function destroyLecturerAPI(string $id)
@@ -292,12 +233,20 @@ class TechnicianController extends Controller
         return response()->json(['success' => 'Xóa giảng viên thành công!', 'table_lecturer' => $table_lecturer, 'links' => $lecturers->render('pagination::bootstrap-5')->toHtml()]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroyStudentAPI(string $id)
     {
-        //
+        $student = Student::findOrFail($id);
+        $userId = $student->user_id;
+
+        $student->delete();
+
+        $user = User::findOrFail($userId);
+        $user->delete();
+
+        $students = Student::orderBy('updated_at', 'desc')->paginate(7);
+        $table_student = view('technician.table-student', compact('students'))->render();
+
+        return response()->json(['success' => 'Xóa sinh viên thành công!', 'table_student' => $table_student, 'links' => $students->render('pagination::bootstrap-5')->toHtml()]);
     }
 
     public function importLecturerAPI(Request $request)
@@ -321,5 +270,28 @@ class TechnicianController extends Controller
         $table_lecturer = view('technician.table-lecturer', compact('lecturers'))->render();
 
         return response()->json(['success' => 'Nhập file giảng viên thành công!', 'table_lecturer' => $table_lecturer, 'links' => $lecturers->render('pagination::bootstrap-5')->toHtml()]);
+    }
+
+    public function importStudentAPI(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'student-file' => 'required|mimes:xlsx,xls',
+        ], [
+            'student-file.required' => 'Vui lòng nhập file',
+            'student-file.mimes' => 'Vui lòng nhập đúng định dạng file excel (.xlsx, .xls)',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()]);
+        }
+
+        $file = $request->file('student-file');
+        $import = new StudentsImport();
+        Excel::import($import, $file);
+
+        $students = Student::orderBy('updated_at', 'desc')->paginate(7);
+        $table_student = view('technician.table-student', compact('students'))->render();
+
+        return response()->json(['success' => 'Nhập file sinh viên thành công!', 'table_student' => $table_student, 'links' => $students->render('pagination::bootstrap-5')->toHtml()]);
     }
 }

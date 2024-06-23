@@ -45,14 +45,14 @@
                         <span class="text nav-text">Trang chủ</span>
                     </a>
                 </li>
-                <li class="nav-link {{ request()->routeIs('technician.get-list-lecturer-api', 'technician.get-list-lecturer', 'technician.create-lecturer', 'technician.edit-lecturer') ? 'active' : '' }}">
+                <li class="nav-link {{ request()->routeIs('technician.get-list-lecturer') ? 'active' : '' }}">
                     <a href="{{ route('technician.get-list-lecturer') }}">
                         <i class='bx bx-user icon'></i>
                         <span class="text nav-text">Giảng viên</span>
                     </a>
                 </li>
-                <li class="nav-link">
-                    <a href="#">
+                <li class="nav-link {{ request()->routeIs('technician.get-list-student') ? 'active' : '' }}">
+                    <a href="{{ route('technician.get-list-student') }}">
                         <i class='bx bx-group icon'></i>
                         <span class="text nav-text">Sinh viên</span>
                     </a>
