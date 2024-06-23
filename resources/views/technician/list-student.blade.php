@@ -67,7 +67,7 @@
                                         <div class="row mb-3 mt-4">
                                             <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Giới tính</label>
                                             <div class="col-md-7">
-                                                <select name="gender" class="form-control fs-6">
+                                                <select name="gender" class="form-select form-control fs-6">
                                                     <option value="Nam" selected>Nam</option>
                                                     <option value="Nữ">Nữ</option>
                                                 </select>
@@ -192,7 +192,7 @@
                                                         <div class="row mb-3 mt-4">
                                                             <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Giới tính</label>
                                                             <div class="col-md-7">
-                                                                <select name="gender" class="form-control fs-6">
+                                                                <select name="gender" class="form-select form-control fs-6" data-initial-value="{{ $student->gender }}">
                                                                     <option value="Nam" {{ $student->gender == 'Nam' ? 'selected' : '' }}>Nam</option>
                                                                     <option value="Nữ" {{ $student->gender == 'Nữ' ? 'selected' : '' }}>Nữ</option>
                                                                 </select>
@@ -505,7 +505,12 @@
             function resetInitialValue() {
                 $('.modal-update').find('input, select, textarea').each(function() {
                     const input = $(this);
-                    input.val(input.data('initial-value'));
+                    if (input.is('select')) {
+                        const initialValue = input.data('initial-value');
+                        input.val(initialValue).trigger('change');
+                    } else {
+                        input.val(input.data('initial-value'));
+                    }
                 });
             }
 
