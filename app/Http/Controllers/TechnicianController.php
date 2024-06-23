@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Imports\LecturersImport;
 use App\Models\Lecturer;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Maatwebsite\Excel\Facades\Excel;
 
 class TechnicianController extends Controller
 {
@@ -296,5 +298,26 @@ class TechnicianController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function importLecturerAPI(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'lecturer-file' => 'required|mimes:xlsx,xls',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()]);
+        }
+
+        $file = $request->file('lecturer-file');
+        $import = new LecturersImport();
+        Excel::import($import, $file);
+
+        if ($import->failures()->isNotEmpty()) {
+            return response()->json(['errors' => $import->failures()]);
+        }
+
+        return response()->json(['success' => 'Nhập file thành công!']);
     }
 }

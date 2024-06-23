@@ -97,7 +97,7 @@
                                     <h1 class="modal-title fs-5" id="exampleModalLabel">Nhập file giảng viên</h1>
                                 </div>
                                 <div class="modal-body">
-                                    <form method="post" action="#" enctype="multipart/form-data" id="add-lecturer-form">
+                                    <form method="post" action="{{ route('technician.import-lecturer-api') }}" enctype="multipart/form-data" id="import-lecturer-form">
                                         @csrf
                                         <div class="row mb-3 mt-4 d-flex justify-content-center align-items-center">
                                             <label class="col-md-3 col-label-form fs-6 fw-bold text-md-end">Chọn file</label>
@@ -374,6 +374,32 @@
                 });
             }
 
+            function submitFormImportLecturer (form, overlay) {
+                const formData = new FormData(form[0]);
+                $.ajax({
+                    type: 'POST',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    url: '{{ route("technician.import-lecturer-api") }}',
+                    success: function (response) {
+                        if (response.success) {
+                            $('#success-message').text(response.success).fadeIn();
+                            setTimeout(function() {
+                                $('#success-message').fadeOut();
+                            }, 4000);
+
+                            $('#import-lecturer-modal-').modal('hide');
+                        }
+
+                        overlay.classList.remove('show');
+                    },
+                    error: function (error) {
+                        console.error(error);
+                    }
+                });
+            }
+
             function updatePagination () {
                 const currentUrl = new URL(window.location.href);
                 const currentPath = currentUrl.pathname;
@@ -399,6 +425,16 @@
 
                 const form = $('#add-lecturer-form');
                 submitFormCreateLecturer(form, overlay);
+            });
+
+            $('#btn-import-lecturer').click(function(e) {
+                e.preventDefault();
+                const overlay = document.getElementById('overlay');
+                overlay.classList.add('show');
+                $('.modal-backdrop').remove();
+
+                const form = $('#import-lecturer-form');
+                submitFormImportLecturer(form, overlay);
             });
 
             function addEventForButtons () {
