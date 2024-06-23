@@ -21,7 +21,7 @@
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <div class="text fs-4">Danh sách giảng viên</div>
                 <div class="d-flex justify-content-end">
-                    <a href="{{ route('technician.create-lecturer') }}" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#add-lecturer-modal">Thêm</a>
+                    <a href="#" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#add-lecturer-modal">Thêm</a>
                     <!----- Modal thêm giảng viên ----->
                     <div class="modal fade" id="add-lecturer-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addLecturerModalLabel" aria-hidden="true">
                         <div class="modal-dialog modal-dialog-centered">
@@ -144,7 +144,7 @@
                                     <td class="text-center">{{ $lecturer->faculty }}</td>
                                     <td class="text-center">{{ $lecturer->position }}</td>
                                     <td class="text-center">
-                                        <a href="{{ route('technician.edit-lecturer', $lecturer->id) }}" class="btn btn-sm btn-primary my-auto" data-bs-toggle="modal" data-bs-target="#update-lecturer-modal-{{ $lecturer->id }}"><i class='bx bx-pencil'></i></a>
+                                        <a href="#" class="btn btn-sm btn-primary my-auto" data-bs-toggle="modal" data-bs-target="#update-lecturer-modal-{{ $lecturer->id }}"><i class='bx bx-pencil'></i></a>
                                         <!----- Modal sửa giảng viên ----->
                                         <div class="modal fade modal-update" id="update-lecturer-modal-{{ $lecturer->id }}" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addLecturerModalLabel" aria-hidden="true">
                                             <div class="modal-dialog modal-dialog-centered">
@@ -153,7 +153,7 @@
                                                         <h1 class="modal-title fs-5" id="exampleModalLabel">Chỉnh sửa thông tin giảng viên</h1>
                                                     </div>
                                                     <div class="modal-body">
-                                                        <form method="post" action="{{ route('technician.update-lecturer', $lecturer->id) }}" id="update-lecturer-form-{{ $lecturer->id }}">
+                                                        <form method="post" action="{{ route('technician.update-lecturer-api', $lecturer->id) }}" id="update-lecturer-form-{{ $lecturer->id }}">
                                                             @csrf
                                                             @method('PUT')
                                                             <div class="row mb-3 mt-4">
@@ -210,7 +210,7 @@
                                             </div>
                                         </div>
                                         <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#destroy-lecturer-modal-{{ $lecturer->id }}"><i class='bx bx-trash'></i></button>
-                                        <form method="post" action="{{ route('technician.destroy-lecturer', $lecturer->id) }}" id="destroy-lecturer-form-{{ $lecturer->id }}">
+                                        <form method="post" action="{{ route('technician.destroy-lecturer-api', $lecturer->id) }}" id="destroy-lecturer-form-{{ $lecturer->id }}">
                                             @csrf
                                             @method('DELETE')
                                             <!----- Modal xóa giảng viên ----->

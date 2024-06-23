@@ -2,7 +2,7 @@
 @section('css')
     <style>
         .wrapper{
-            width: 900px;
+            width: 100%;
             background: #fff;
             border-radius: 10px;
             box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
@@ -115,7 +115,7 @@
             </nav>
         </div>
     </div>
-    <div class="row p-4 ms-5 me-5 mb-0 d-flex justify-content-center">
+    <div class="row p-4 ms-5 me-5 mt-4 mb-0 d-flex justify-content-center">
         <div class="wrapper">
             <header>
                 <p class="current-date"></p>
