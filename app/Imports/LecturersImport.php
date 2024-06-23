@@ -39,6 +39,7 @@ class LecturersImport implements ToCollection, WithHeadingRow
                 $user = User::create([
                     'email' => $trimmedRow['email'],
                     'password' => Hash::make('123456'),
+                    'phone' => $trimmedRow['so_dien_thoai'],
                     'role_id' => 4,
                 ]);
                 Lecturer::create([

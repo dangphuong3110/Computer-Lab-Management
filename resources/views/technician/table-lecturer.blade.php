@@ -3,10 +3,9 @@
         <tr>
             <th scope="row" class="text-center">{{ $lecturers->firstItem() + $index }}</th>
             <td class="text-center">{{ $lecturer->full_name }}</td>
-            <td class="text-center">{{ $lecturer->academic_rank }}</td>
-            <td class="text-center">{{ $lecturer->department }}</td>
             <td class="text-center">{{ $lecturer->faculty }}</td>
-            <td class="text-center">{{ $lecturer->position }}</td>
+            <td class="text-center">{{ $lecturer->user->email }}</td>
+            <td class="text-center">{{ $lecturer->user->phone }}</td>
             <td class="text-center">
                 <a href="#" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#update-lecturer-modal-{{ $lecturer->id }}"><i class='bx bx-pencil'></i></a>
                 <!----- Modal sửa giảng viên ----->
@@ -25,9 +24,9 @@
                                         <div class="col-md-7">
                                             <input type="text" name="full-name" class="form-control fs-6" value="{{ $lecturer->full_name }}" data-initial-value="{{ $lecturer->full_name }}"/>
                                             <span role="alert" class="text-danger fs-6 d-flex align-items-center justify-content-center">
-                                        <br>
-                                        <strong id="error-message-full-name-update-{{ $lecturer->id }}"></strong>
-                                    </span>
+                                                <br>
+                                                <strong id="error-message-full-name-update-{{ $lecturer->id }}"></strong>
+                                            </span>
                                         </div>
                                     </div>
                                     <div class="row mb-3 mt-4">
@@ -35,9 +34,15 @@
                                         <div class="col-md-7">
                                             <input type="text" name="email" class="form-control fs-6" value="{{ $lecturer->user->email }}" data-initial-value="{{ $lecturer->user->email }}"/>
                                             <span role="alert" class="text-danger fs-6 d-flex align-items-center justify-content-center">
-                                        <br>
-                                        <strong id="error-message-email-update-{{ $lecturer->id }}"></strong>
-                                    </span>
+                                                <br>
+                                                <strong id="error-message-email-update-{{ $lecturer->id }}"></strong>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3 mt-4">
+                                        <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Số điện thoại</label>
+                                        <div class="col-md-7">
+                                            <input type="text" name="phone" class="form-control fs-6" value="{{ $lecturer->user->phone }}" data-initial-value="{{ $lecturer->user->phone }}"/>
                                         </div>
                                     </div>
                                     <div class="row mb-3 mt-4">
@@ -100,7 +105,7 @@
     @endforeach
 @else
     <tr>
-        <td colspan="7" class="text-center">No Data Found</td>
+        <td colspan="6" class="text-center">No Data Found</td>
     </tr>
 @endif
 

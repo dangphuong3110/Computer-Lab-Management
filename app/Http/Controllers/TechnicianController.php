@@ -70,6 +70,7 @@ class TechnicianController extends Controller
 
         $user->email = $request->input('email');
         $user->password = Hash::make('123456');
+        $user->phone = $request->input('phone');
         $user->role_id = '4';
 
         $user->save();
@@ -160,6 +161,7 @@ class TechnicianController extends Controller
 
         $user = User::findOrFail($lecturer->user_id);
         $user->email = $request->input('email');
+        $user->phone = $request->input('phone');
 
         $user->save();
 
