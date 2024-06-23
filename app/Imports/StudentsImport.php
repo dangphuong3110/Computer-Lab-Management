@@ -44,6 +44,7 @@ class StudentsImport implements ToCollection, WithHeadingRow
                 $user = User::create([
                     'email' => $trimmedRow['ma_sinh_vien'],
                     'password' => Hash::make('123456'),
+                    'phone' => $trimmedRow['so_dien_thoai'],
                     'role_id' => 3,
                 ]);
                 Student::create([

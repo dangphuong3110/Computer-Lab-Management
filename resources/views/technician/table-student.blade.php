@@ -5,7 +5,7 @@
             <td class="text-center">{{ $student->full_name }}</td>
             <td class="text-center">{{ $student->student_code }}</td>
             <td class="text-center">{{ $student->class }}</td>
-            <td class="text-center">{{ $student->gender }}</td>
+            <td class="text-center">{{ $student->user->phone }}</td>
             <td class="text-center">
                 <a href="#" class="btn btn-sm btn-primary my-auto" data-bs-toggle="modal" data-bs-target="#update-student-modal-{{ $student->id }}"><i class='bx bx-pencil'></i></a>
                 <!----- Modal sửa sinh viên ----->
@@ -37,6 +37,12 @@
                                                 <br>
                                                 <strong id="error-message-student-code-update-{{ $student->id }}"></strong>
                                             </span>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3 mt-4">
+                                        <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Số điện thoại</label>
+                                        <div class="col-md-7">
+                                            <input type="text" name="phone" class="form-control fs-6" value="{{ $student->user->phone }}" data-initial-value="{{ $student->user->phone }}"/>
                                         </div>
                                     </div>
                                     <div class="row mb-3 mt-4">
