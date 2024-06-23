@@ -19,28 +19,24 @@ class UsersTableSeeder extends Seeder
 
         $users = [
             [
-                'username' => 'cbql1',
                 'email' => 'cbql1@gmail.com',
                 'password' => Hash::make('123456'),
                 'phone' => $faker->phoneNumber,
                 'role_id' => 1,
             ],
             [
-                'username' => 'ktv1',
                 'email' => 'ktv1@gmail.com',
                 'password' => Hash::make('123456'),
                 'phone' => $faker->phoneNumber,
                 'role_id' => 2,
             ],
             [
-                'username' => 'sv1',
                 'email' => 'sv1@gmail.com',
                 'password' => Hash::make('123456'),
                 'phone' => $faker->phoneNumber,
                 'role_id' => 3,
             ],
             [
-                'username' => 'gv1',
                 'email' => 'gv1@gmail.com',
                 'password' => Hash::make('123456'),
                 'phone' => $faker->phoneNumber,
