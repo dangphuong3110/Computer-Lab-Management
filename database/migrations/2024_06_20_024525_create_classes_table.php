@@ -18,6 +18,8 @@ return new class extends Migration
             $table->date('end_date');
             $table->string('class_code');
             $table->string('status')->nullable()->default('active');
+            $table->unsignedBigInteger('lecturer_id');
+            $table->foreign('lecturer_id')->references('id')->on('lecturers');
             $table->timestamps();
         });
     }

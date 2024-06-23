@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\CreditClass;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -19,6 +20,11 @@ class DatabaseSeeder extends Seeder
             LecturersTableSeeder::class,
             TechniciansTableSeeder::class,
             ManagersTableSeeder::class,
+            BuildingsTableSeeder::class,
+            RoomsTableSeeder::class,
+            CreditClassesTableSeeder::class,
+            LessonsTableSeeder::class,
+            ClassSessionsTableSeeder::class,
         ]);
 
         // \App\Models\User::factory(10)->create();
