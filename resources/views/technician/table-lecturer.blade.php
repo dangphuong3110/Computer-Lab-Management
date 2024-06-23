@@ -23,45 +23,45 @@
                                     <div class="row mb-3 mt-4">
                                         <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Họ và tên<span class="required">*</span></label>
                                         <div class="col-md-7">
-                                            <input type="text" name="full-name" class="form-control fs-6" value="{{ $lecturer->full_name }}"/>
+                                            <input type="text" name="full-name" class="form-control fs-6" value="{{ $lecturer->full_name }}" data-initial-value="{{ $lecturer->full_name }}"/>
                                             <span role="alert" class="text-danger fs-6 d-flex align-items-center justify-content-center">
                                         <br>
-                                        <strong id="error-message-full-name"></strong>
+                                        <strong id="error-message-full-name-update-{{ $lecturer->id }}"></strong>
                                     </span>
                                         </div>
                                     </div>
                                     <div class="row mb-3 mt-4">
                                         <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Email<span class="required">*</span></label>
                                         <div class="col-md-7">
-                                            <input type="text" name="email" class="form-control fs-6" value="{{ $lecturer->user->email }}"/>
+                                            <input type="text" name="email" class="form-control fs-6" value="{{ $lecturer->user->email }}" data-initial-value="{{ $lecturer->user->email }}"/>
                                             <span role="alert" class="text-danger fs-6 d-flex align-items-center justify-content-center">
                                         <br>
-                                        <strong id="error-message-email"></strong>
+                                        <strong id="error-message-email-update-{{ $lecturer->id }}"></strong>
                                     </span>
                                         </div>
                                     </div>
                                     <div class="row mb-3 mt-4">
                                         <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Học vị</label>
                                         <div class="col-md-7">
-                                            <input type="text" name="academic-rank" class="form-control fs-6" value="{{ $lecturer->academic_rank }}"/>
+                                            <input type="text" name="academic-rank" class="form-control fs-6" value="{{ $lecturer->academic_rank }}" data-initial-value="{{ $lecturer->academic_rank }}"/>
                                         </div>
                                     </div>
                                     <div class="row mb-3 mt-4">
                                         <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Bộ môn</label>
                                         <div class="col-md-7">
-                                            <input type="text" name="department" class="form-control fs-6" value="{{ $lecturer->department }}"/>
+                                            <input type="text" name="department" class="form-control fs-6" value="{{ $lecturer->department }}" data-initial-value="{{ $lecturer->department }}"/>
                                         </div>
                                     </div>
                                     <div class="row mb-3 mt-4">
                                         <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Khoa</label>
                                         <div class="col-md-7">
-                                            <input type="text" name="faculty" class="form-control fs-6" value="{{ $lecturer->faculty }}"/>
+                                            <input type="text" name="faculty" class="form-control fs-6" value="{{ $lecturer->faculty }}" data-initial-value="{{ $lecturer->faculty }}"/>
                                         </div>
                                     </div>
                                     <div class="row mb-3 mt-4">
                                         <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Chức vị</label>
                                         <div class="col-md-7">
-                                            <input type="text" name="position" class="form-control fs-6" value="{{ $lecturer->position }}"/>
+                                            <input type="text" name="position" class="form-control fs-6" value="{{ $lecturer->position }}" data-initial-value="{{ $lecturer->position }}"/>
                                         </div>
                                     </div>
                                 </form>
@@ -85,7 +85,7 @@
                                     <h1 class="modal-title fs-5" id="exampleModalLabel">Xóa giảng viên</h1>
                                 </div>
                                 <div class="modal-body">
-                                    Bạn có chắc chắn muốn xóa giảng viên?<br> Điều này sẽ dẫn đến tài khoản của giảng viên cũng sẽ không còn tồn tại trong hệ thống.
+                                    <p class="text-wrap m-0">Bạn có chắc chắn muốn xóa giảng viên?<br> Điều này sẽ dẫn đến tài khoản của giảng viên cũng sẽ không còn tồn tại trong hệ thống.</p>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Trở về</button>

@@ -6,38 +6,58 @@ use App\Models\Lecturer;
 use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use Maatwebsite\Excel\Concerns\WithValidation;
 
 class LecturersImport implements ToCollection, WithHeadingRow
 {
     /**
     * @param Collection $collection
     */
-    public function collection(Collection $collection)
+    public function collection(Collection $rows)
     {
-        foreach ($collection as $row) {
-            Lecturer::create([
-                'full_name' => $row['Họ và tên'],
-                'academic_rank' => $row['Học vị'],
-                'department' => $row['Bộ môn'],
-                'faculty' => $row['Khoa'],
-                'position' => $row['Chức vị'],
-            ]);
+        $rules = [
+            'ho_va_ten' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+        ];
 
-            User::create([
-                'email' => $row['Email'],
-                'password' => Hash::make('123456'),
-                'role_id' => 4,
-            ]);
+        foreach ($rows as $row)
+        {
+            $trimmedRow = array_map('trim', $row->toArray());
+
+
+            $validator = Validator::make($trimmedRow, $rules);
+
+            if ($validator->fails()) {
+                continue;
+            }
+
+            $user = User::where('email', $trimmedRow['email'])->first();
+
+            if ($user) {
+                $user->lecturer->update([
+                    'full_name' => $trimmedRow['ho_va_ten'],
+                    'academic_rank' => $trimmedRow['hoc_vi'],
+                    'department' => $trimmedRow['bo_mon'],
+                    'faculty' => $trimmedRow['khoa'],
+                    'position' => $trimmedRow['chuc_vi'],
+                ]);
+            } else {
+                $user = User::create([
+                    'email' => $trimmedRow['email'],
+                    'password' => Hash::make('123456'),
+                    'role_id' => 4,
+                ]);
+                Lecturer::create([
+                    'full_name' => $trimmedRow['ho_va_ten'],
+                    'academic_rank' => $trimmedRow['hoc_vi'],
+                    'department' => $trimmedRow['bo_mon'],
+                    'faculty' => $trimmedRow['khoa'],
+                    'position' => $trimmedRow['chuc_vi'],
+                    'user_id' => $user->id,
+                ]);
+            }
         }
     }
-//    public function rules(): array
-//    {
-//        return [
-//            '*.Họ và tên' => 'required|string|max:255',
-//            '*.Email' => 'required|email|unique:users,email',
-//        ];
-//    }
 }

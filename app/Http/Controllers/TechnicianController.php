@@ -29,14 +29,14 @@ class TechnicianController extends Controller
         $title = 'Giảng viên';
         $user = Auth::user();
 
-        $lecturers = Lecturer::orderBy('updated_at', 'desc')->paginate(10);
+        $lecturers = Lecturer::orderBy('updated_at', 'desc')->paginate(7);
 
         return view('technician.list-lecturer', compact('title','user', 'lecturers'));
     }
 
     public function getListLecturerAPI()
     {
-        $lecturers = Lecturer::orderBy('updated_at', 'desc')->paginate(10);
+        $lecturers = Lecturer::orderBy('updated_at', 'desc')->paginate(7);
 
 //        return view('technician.test', compact('lecturers'));
         response()->json(['lecturers' => $lecturers]);
@@ -138,7 +138,7 @@ class TechnicianController extends Controller
 
         $lecturer->save();
 
-        $lecturers = Lecturer::orderBy('updated_at', 'desc')->paginate(10);
+        $lecturers = Lecturer::orderBy('updated_at', 'desc')->paginate(7);
         $table_lecturer = view('technician.table-lecturer', compact('lecturers'))->render();
 
         return response()->json(['success' => 'Thêm giảng viên thành công!', 'table_lecturer' => $table_lecturer, 'links' => $lecturers->render('pagination::bootstrap-5')->toHtml()]);
@@ -249,7 +249,7 @@ class TechnicianController extends Controller
 
         $lecturer->save();
 
-        $lecturers = Lecturer::orderBy('updated_at', 'desc')->paginate(10);
+        $lecturers = Lecturer::orderBy('updated_at', 'desc')->paginate(7);
         $table_lecturer = view('technician.table-lecturer', compact('lecturers'))->render();
 
         return response()->json(['success' => 'Chỉnh sửa thông tin giảng viên thành công!', 'table_lecturer' => $table_lecturer, 'links' => $lecturers->render('pagination::bootstrap-5')->toHtml()]);
@@ -286,7 +286,7 @@ class TechnicianController extends Controller
         $user = User::findOrFail($userId);
         $user->delete();
 
-        $lecturers = Lecturer::orderBy('updated_at', 'desc')->paginate(10);
+        $lecturers = Lecturer::orderBy('updated_at', 'desc')->paginate(7);
         $table_lecturer = view('technician.table-lecturer', compact('lecturers'))->render();
 
         return response()->json(['success' => 'Xóa giảng viên thành công!', 'table_lecturer' => $table_lecturer, 'links' => $lecturers->render('pagination::bootstrap-5')->toHtml()]);
@@ -304,6 +304,9 @@ class TechnicianController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'lecturer-file' => 'required|mimes:xlsx,xls',
+        ], [
+            'lecturer-file.required' => 'Vui lòng nhập file',
+            'lecturer-file.mimes' => 'Vui lòng nhập đúng định dạng file excel (.xlsx, .xls)',
         ]);
 
         if ($validator->fails()) {
@@ -314,10 +317,9 @@ class TechnicianController extends Controller
         $import = new LecturersImport();
         Excel::import($import, $file);
 
-        if ($import->failures()->isNotEmpty()) {
-            return response()->json(['errors' => $import->failures()]);
-        }
+        $lecturers = Lecturer::orderBy('updated_at', 'desc')->paginate(7);
+        $table_lecturer = view('technician.table-lecturer', compact('lecturers'))->render();
 
-        return response()->json(['success' => 'Nhập file thành công!']);
+        return response()->json(['success' => 'Nhập file giảng viên thành công!', 'table_lecturer' => $table_lecturer, 'links' => $lecturers->render('pagination::bootstrap-5')->toHtml()]);
     }
 }

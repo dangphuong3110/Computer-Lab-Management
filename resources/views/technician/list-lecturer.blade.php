@@ -16,12 +16,12 @@
 
     </div>
 
-    <div class="row p-4 ms-5 me-5 mb-0 main-content">
+    <div class="row p-4 ms-5 me-5 mt-5 mb-0 main-content">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <div class="text fs-4">Danh sách giảng viên</div>
                 <div class="d-flex justify-content-end">
-                    <a href="{{ route('technician.create-lecturer') }}" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add-lecturer-modal">Thêm</a>
+                    <a href="{{ route('technician.create-lecturer') }}" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#add-lecturer-modal">Thêm</a>
                     <!----- Modal thêm giảng viên ----->
                     <div class="modal fade" id="add-lecturer-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addLecturerModalLabel" aria-hidden="true">
                         <div class="modal-dialog modal-dialog-centered">
@@ -38,7 +38,7 @@
                                                 <input type="text" name="full-name" class="form-control fs-6"/>
                                                 <span role="alert" class="text-danger fs-6 d-flex align-items-center justify-content-center">
                                                     <br>
-                                                    <strong id="error-message-full-name"></strong>
+                                                    <strong id="error-message-full-name-create"></strong>
                                                 </span>
                                             </div>
                                         </div>
@@ -48,7 +48,7 @@
                                                 <input type="text" name="email" class="form-control fs-6"/>
                                                 <span role="alert" class="text-danger fs-6 d-flex align-items-center justify-content-center">
                                                     <br>
-                                                    <strong id="error-message-email"></strong>
+                                                    <strong id="error-message-email-create"></strong>
                                                 </span>
                                             </div>
                                         </div>
@@ -88,7 +88,7 @@
                             </div>
                         </div>
                     </div>
-                    <button type="button" class="btn btn-secondary ms-2" data-bs-toggle="modal" data-bs-target="#import-lecturer-modal">Nhập file</button>
+                    <button type="button" class="btn btn-outline-success ms-2" data-bs-toggle="modal" data-bs-target="#import-lecturer-modal">Nhập file</button>
                     <!----- Modal nhập file giảng viên ----->
                     <div class="modal fade" id="import-lecturer-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addLecturerModalLabel" aria-hidden="true">
                         <div class="modal-dialog modal-dialog-centered">
@@ -125,12 +125,12 @@
                     <thead>
                     <tr>
                         <th scope="col" class="text-center" width="5%">STT</th>
-                        <th scope="col" class="text-center" width="20%">Họ và tên</th>
+                        <th scope="col" class="text-center" width="18%">Họ và tên</th>
                         <th scope="col" class="text-center" width="15%">Học vị</th>
                         <th scope="col" class="text-center" width="20%">Bộ môn</th>
                         <th scope="col" class="text-center" width="20%">Khoa</th>
                         <th scope="col" class="text-center" width="10%">Chức vụ</th>
-                        <th scope="col" class="text-center" width="10%">Hành động</th>
+                        <th scope="col" class="text-center action-column">Hành động</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -144,7 +144,7 @@
                                     <td class="text-center">{{ $lecturer->faculty }}</td>
                                     <td class="text-center">{{ $lecturer->position }}</td>
                                     <td class="text-center">
-                                        <a href="{{ route('technician.edit-lecturer', $lecturer->id) }}" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#update-lecturer-modal-{{ $lecturer->id }}"><i class='bx bx-pencil'></i></a>
+                                        <a href="{{ route('technician.edit-lecturer', $lecturer->id) }}" class="btn btn-sm btn-primary my-auto" data-bs-toggle="modal" data-bs-target="#update-lecturer-modal-{{ $lecturer->id }}"><i class='bx bx-pencil'></i></a>
                                         <!----- Modal sửa giảng viên ----->
                                         <div class="modal fade modal-update" id="update-lecturer-modal-{{ $lecturer->id }}" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addLecturerModalLabel" aria-hidden="true">
                                             <div class="modal-dialog modal-dialog-centered">
@@ -159,45 +159,45 @@
                                                             <div class="row mb-3 mt-4">
                                                                 <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Họ và tên<span class="required">*</span></label>
                                                                 <div class="col-md-7">
-                                                                    <input type="text" name="full-name" class="form-control fs-6" value="{{ $lecturer->full_name }}"/>
+                                                                    <input type="text" name="full-name" class="form-control fs-6" value="{{ $lecturer->full_name }}" data-initial-value="{{ $lecturer->full_name }}"/>
                                                                     <span role="alert" class="text-danger fs-6 d-flex align-items-center justify-content-center">
-                                                                <br>
-                                                                <strong id="error-message-full-name"></strong>
-                                                            </span>
+                                                                        <br>
+                                                                        <strong id="error-message-full-name-update-{{ $lecturer->id }}"></strong>
+                                                                    </span>
                                                                 </div>
                                                             </div>
                                                             <div class="row mb-3 mt-4">
                                                                 <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Email<span class="required">*</span></label>
                                                                 <div class="col-md-7">
-                                                                    <input type="text" name="email" class="form-control fs-6" value="{{ $lecturer->user->email }}"/>
+                                                                    <input type="text" name="email" class="form-control fs-6" value="{{ $lecturer->user->email }}" data-initial-value="{{ $lecturer->user->email }}"/>
                                                                     <span role="alert" class="text-danger fs-6 d-flex align-items-center justify-content-center">
-                                                                <br>
-                                                                <strong id="error-message-email"></strong>
-                                                            </span>
+                                                                        <br>
+                                                                        <strong id="error-message-email-update-{{ $lecturer->id }}"></strong>
+                                                                    </span>
                                                                 </div>
                                                             </div>
                                                             <div class="row mb-3 mt-4">
                                                                 <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Học vị</label>
                                                                 <div class="col-md-7">
-                                                                    <input type="text" name="academic-rank" class="form-control fs-6" value="{{ $lecturer->academic_rank }}"/>
+                                                                    <input type="text" name="academic-rank" class="form-control fs-6" value="{{ $lecturer->academic_rank }}" data-initial-value="{{ $lecturer->academic_rank }}"/>
                                                                 </div>
                                                             </div>
                                                             <div class="row mb-3 mt-4">
                                                                 <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Bộ môn</label>
                                                                 <div class="col-md-7">
-                                                                    <input type="text" name="department" class="form-control fs-6" value="{{ $lecturer->department }}"/>
+                                                                    <input type="text" name="department" class="form-control fs-6" value="{{ $lecturer->department }}" data-initial-value="{{ $lecturer->department }}"/>
                                                                 </div>
                                                             </div>
                                                             <div class="row mb-3 mt-4">
                                                                 <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Khoa</label>
                                                                 <div class="col-md-7">
-                                                                    <input type="text" name="faculty" class="form-control fs-6" value="{{ $lecturer->faculty }}"/>
+                                                                    <input type="text" name="faculty" class="form-control fs-6" value="{{ $lecturer->faculty }}" data-initial-value="{{ $lecturer->faculty }}"/>
                                                                 </div>
                                                             </div>
                                                             <div class="row mb-3 mt-4">
                                                                 <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Chức vị</label>
                                                                 <div class="col-md-7">
-                                                                    <input type="text" name="position" class="form-control fs-6" value="{{ $lecturer->position }}"/>
+                                                                    <input type="text" name="position" class="form-control fs-6" value="{{ $lecturer->position }}" data-initial-value="{{ $lecturer->position }}"/>
                                                                 </div>
                                                             </div>
                                                         </form>
@@ -221,7 +221,7 @@
                                                             <h1 class="modal-title fs-5" id="exampleModalLabel">Xóa giảng viên</h1>
                                                         </div>
                                                         <div class="modal-body">
-                                                            Bạn có chắc chắn muốn xóa giảng viên?<br> Điều này sẽ dẫn đến tài khoản của giảng viên cũng sẽ không còn tồn tại trong hệ thống.
+                                                            <p class="text-wrap m-0">Bạn có chắc chắn muốn xóa giảng viên?<br> Điều này sẽ dẫn đến tài khoản của giảng viên cũng sẽ không còn tồn tại trong hệ thống.</p>
                                                         </div>
                                                         <div class="modal-footer">
                                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Trở về</button>
@@ -270,10 +270,7 @@
                     url: '{{ route("technician.store-lecturer-api") }}',
                     success: function (response) {
                         if (response.success) {
-                            $('#success-message').text(response.success).fadeIn();
-                            setTimeout(function() {
-                                $('#success-message').fadeOut();
-                            }, 4000);
+                            showToastSuccess(response.success);
                             form[0].reset();
                             $('#table-lecturer tbody').html(response.table_lecturer);
                             $('#paginate-lecturer').html(response.links);
@@ -281,17 +278,19 @@
                             addEventForModalUpdate();
                             addEventForButtons();
                             $('#add-lecturer-modal').modal('hide');
+                            $('body').css('overflow', 'auto');
                         } else {
                             if (response.errors['full-name']) {
-                                $('#error-message-full-name').text(response.errors['full-name']);
+                                $('#error-message-full-name-create').text(response.errors['full-name']);
                             } else {
-                                $('#error-message-full-name').text('');
+                                $('#error-message-full-name-create').text('');
                             }
                             if (response.errors['email']) {
-                                $('#error-message-email').text(response.errors['email']);
+                                $('#error-message-email-create').text(response.errors['email']);
                             } else {
-                                $('#error-message-email').text('');
+                                $('#error-message-email-create').text('');
                             }
+                            $('body').append('<div class="modal-backdrop fade show"></div>');
                         }
                         overlay.classList.remove('show');
                     },
@@ -313,28 +312,26 @@
                     url: url,
                     success: function (response) {
                         if (response.success) {
-                            $('#success-message').text(response.success).fadeIn();
-                            setTimeout(function() {
-                                $('#success-message').fadeOut();
-                            }, 4000);
-                            // updateInitialValue($('#update-lecturer-modal-' + lecturerId));
+                            showToastSuccess(response.success);
                             $('#table-lecturer tbody').html(response.table_lecturer);
                             $('#paginate-lecturer').html(response.links);
                             updatePagination();
                             addEventForModalUpdate();
                             addEventForButtons();
                             $('#update-lecturer-modal-' + lecturerId).modal('hide');
+                            $('body').css('overflow', 'auto');
                         } else {
                             if (response.errors['full-name']) {
-                                $('#error-message-full-name').text(response.errors['full-name']);
+                                $('#error-message-full-name-update-' + lecturerId).text(response.errors['full-name']);
                             } else {
-                                $('#error-message-full-name').text('');
+                                $('#error-message-full-name-update-' + lecturerId).text('');
                             }
                             if (response.errors['email']) {
-                                $('#error-message-email').text(response.errors['email']);
+                                $('#error-message-email-update-' + lecturerId).text(response.errors['email']);
                             } else {
-                                $('#error-message-email').text('');
+                                $('#error-message-email-update-' + lecturerId).text('');
                             }
+                            $('body').append('<div class="modal-backdrop fade show"></div>');
                         }
                         overlay.classList.remove('show');
                     },
@@ -353,17 +350,14 @@
                     url: url,
                     success: function (response) {
                         if (response.success) {
-                            $('#success-message').text(response.success).fadeIn();
-                            setTimeout(function() {
-                                $('#success-message').fadeOut();
-                            }, 4000);
-                            // resetInitialValue();
+                            showToastSuccess(response.success);
                             $('#table-lecturer tbody').html(response.table_lecturer);
                             $('#paginate-lecturer').html(response.links);
                             updatePagination();
                             addEventForModalUpdate();
                             addEventForButtons();
                             $('#destroy-lecturer-modal-' + lecturerId).modal('hide');
+                            $('body').css('overflow', 'auto');
                         }
 
                         overlay.classList.remove('show');
@@ -384,12 +378,18 @@
                     url: '{{ route("technician.import-lecturer-api") }}',
                     success: function (response) {
                         if (response.success) {
-                            $('#success-message').text(response.success).fadeIn();
-                            setTimeout(function() {
-                                $('#success-message').fadeOut();
-                            }, 4000);
-
-                            $('#import-lecturer-modal-').modal('hide');
+                            showToastSuccess(response.success);
+                            form[0].reset();
+                            $('#table-lecturer tbody').html(response.table_lecturer);
+                            $('#paginate-lecturer').html(response.links);
+                            updatePagination();
+                            addEventForModalUpdate();
+                            addEventForButtons();
+                            $('#import-lecturer-modal').modal('hide');
+                            $('body').css('overflow', 'auto');
+                        } else {
+                            showToastError(response.errors['lecturer-file']);
+                            $('body').append('<div class="modal-backdrop fade show"></div>');
                         }
 
                         overlay.classList.remove('show');
@@ -451,7 +451,6 @@
 
                     const lecturerId = $(this).data('lecturer-id');
                     const form = $('#update-lecturer-form-' + lecturerId);
-                    console.log(form[0]);
 
                     submitFormUpdateLecturer(form[0], lecturerId, overlay);
                 });
@@ -468,30 +467,30 @@
                 });
 
                 $('.close-btn').click(function() {
-                    $('#error-message-full-name').text('');
-                    $('#error-message-email').text('');
+                    $('#error-message-full-name-create').text('');
+                    $('#error-message-email-create').text('');
+                    $('.modal-backdrop.fade.show').remove();
                 });
 
                 $('.close-update-btn').click(function() {
-                    $('#error-message-full-name').text('');
-                    $('#error-message-email').text('');
+                    const lecturerId = $(this).data('lecturer-id');
+                    $('#error-message-full-name-update-' + lecturerId).text('');
+                    $('#error-message-email-update-' + lecturerId).text('');
+                    $('.modal-backdrop.fade.show').remove();
                 });
             }
 
             function addEventForModalUpdate() {
                 $('.modal-update').on('shown.bs.modal', function() {
                     const modal = $(this);
-                    // Lưu trữ giá trị ban đầu của mỗi trường input
                     modal.find('input, select, textarea').each(function() {
                         const input = $(this);
                         input.data('initial-value', input.val());
                     });
                 });
 
-                // Khi modal bị ẩn
                 $('.modal-update').on('hidden.bs.modal', function() {
                     const modal = $(this);
-                    // Khôi phục lại giá trị ban đầu của mỗi trường input
                     modal.find('input, select, textarea').each(function() {
                         const input = $(this);
                         input.val(input.data('initial-value'));
@@ -499,6 +498,52 @@
                 });
             }
 
+            function resetInitialValue() {
+                $('.modal-update').find('input, select, textarea').each(function() {
+                    const input = $(this);
+                    input.val(input.data('initial-value'));
+                });
+            }
+
+            function showToastSuccess(text) {
+                Toastify({
+                    text: text,
+                    duration: 4000,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    stopOnFocus: true,
+                    style: {
+                        background: "linear-gradient(to right, #1930B0, #0D6EFD)",
+                    },
+                    offset: {
+                        x: 50,
+                        y: 60,
+                    },
+                    onClick: function(){}
+                }).showToast();
+            }
+
+            function showToastError(text) {
+                Toastify({
+                    text: text,
+                    duration: 4000,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    stopOnFocus: true,
+                    style: {
+                        background: "linear-gradient(to right, #9D2626, #F95968)",
+                    },
+                    offset: {
+                        x: 50,
+                        y: 60,
+                    },
+                    onClick: function(){}
+                }).showToast();
+            }
+
+            resetInitialValue();
             addEventForModalUpdate();
             addEventForButtons();
         });
