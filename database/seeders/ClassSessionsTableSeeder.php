@@ -14,8 +14,8 @@ class ClassSessionsTableSeeder extends Seeder
     public function run(): void
     {
         $class_sessions = [
-            ['start_lesson' => '07:00:00', 'end_lesson' => '09:45:00', 'day_of_week' => 'Thứ hai', 'room_id' => 4, 'class_id' => 1],
-            ['start_lesson' => '07:00:00', 'end_lesson' => '09:45:00', 'day_of_week' => 'Thứ năm', 'room_id' => 6, 'class_id' => 1],
+            ['start_lesson' => '07:00:00', 'end_lesson' => '09:45:00', 'day_of_week' => '2', 'room_id' => 4, 'class_id' => 1],
+            ['start_lesson' => '07:00:00', 'end_lesson' => '09:45:00', 'day_of_week' => '5', 'room_id' => 6, 'class_id' => 1],
         ];
 
         DB::table('class_sessions')->insert($class_sessions);

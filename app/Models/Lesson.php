@@ -12,6 +12,6 @@ class Lesson extends Model
 
     public function classSessions()
     {
-        return $this->belongsToMany(ClassSession::class, 'class_session_lesson');
+        return $this->belongsToMany(ClassSession::class, 'class_session_lesson', 'lesson_id', 'session_id');
     }
 }
