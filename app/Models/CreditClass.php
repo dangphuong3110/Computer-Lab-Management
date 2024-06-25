@@ -16,7 +16,7 @@ class CreditClass extends Model
 
     public function students()
     {
-        return $this->belongsToMany(Student::class, 'student_class');
+        return $this->belongsToMany(Student::class, 'student_class', 'class_id', 'student_id');
     }
 
     public function lecturer()
@@ -26,6 +26,6 @@ class CreditClass extends Model
 
     public function classSessions()
     {
-        return $this->hasMany(ClassSession::class);
+        return $this->hasMany(ClassSession::class, 'class_id');
     }
 }

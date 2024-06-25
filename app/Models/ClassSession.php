@@ -15,7 +15,7 @@ class ClassSession extends Model
 
     public function creditClass()
     {
-        return $this->belongsTo(CreditClass::class);
+        return $this->belongsTo(CreditClass::class, 'class_id');
     }
 
     public function room()

@@ -29,7 +29,7 @@ class Student extends Model
 
     public function creditClasses()
     {
-        return $this->belongsToMany(CreditClass::class, 'class_student');
+        return $this->belongsToMany(CreditClass::class, 'class_student', 'student_id', 'class_id');
     }
 
     public function reports()
