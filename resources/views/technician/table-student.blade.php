@@ -23,20 +23,12 @@
                                         <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Họ và tên<span class="required">*</span></label>
                                         <div class="col-md-7">
                                             <input type="text" name="full-name" class="form-control fs-6" value="{{ $student->full_name }}" data-initial-value="{{ $student->full_name }}"/>
-                                            <span role="alert" class="text-danger fs-6 d-flex align-items-center justify-content-center">
-                                                <br>
-                                                <strong id="error-message-full-name-update-{{ $student->id }}"></strong>
-                                            </span>
                                         </div>
                                     </div>
                                     <div class="row mb-3 mt-4">
                                         <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Mã sinh viên<span class="required">*</span></label>
                                         <div class="col-md-7">
                                             <input type="text" name="student-code" class="form-control fs-6" value="{{ $student->student_code }}" data-initial-value="{{ $student->student_code }}"/>
-                                            <span role="alert" class="text-danger fs-6 d-flex align-items-center justify-content-center">
-                                                <br>
-                                                <strong id="error-message-student-code-update-{{ $student->id }}"></strong>
-                                            </span>
                                         </div>
                                     </div>
                                     <div class="row mb-3 mt-4">

@@ -36,20 +36,12 @@
                                             <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Họ và tên<span class="required">*</span></label>
                                             <div class="col-md-7">
                                                 <input type="text" name="full-name" class="form-control fs-6"/>
-                                                <span role="alert" class="text-danger fs-6 d-flex align-items-center justify-content-center">
-                                                    <br>
-                                                    <strong id="error-message-full-name-create"></strong>
-                                                </span>
                                             </div>
                                         </div>
                                         <div class="row mb-3 mt-4">
                                             <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Mã sinh viên<span class="required">*</span></label>
                                             <div class="col-md-7">
                                                 <input type="text" name="student-code" class="form-control fs-6"/>
-                                                <span role="alert" class="text-danger fs-6 d-flex align-items-center justify-content-center">
-                                                    <br>
-                                                    <strong id="error-message-student-code-create"></strong>
-                                                </span>
                                             </div>
                                         </div>
                                         <div class="row mb-3 mt-4">
@@ -161,20 +153,12 @@
                                                             <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Họ và tên<span class="required">*</span></label>
                                                             <div class="col-md-7">
                                                                 <input type="text" name="full-name" class="form-control fs-6" value="{{ $student->full_name }}" data-initial-value="{{ $student->full_name }}"/>
-                                                                <span role="alert" class="text-danger fs-6 d-flex align-items-center justify-content-center">
-                                                                    <br>
-                                                                    <strong id="error-message-full-name-update-{{ $student->id }}"></strong>
-                                                                </span>
                                                             </div>
                                                         </div>
                                                         <div class="row mb-3 mt-4">
                                                             <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Mã sinh viên<span class="required">*</span></label>
                                                             <div class="col-md-7">
                                                                 <input type="text" name="student-code" class="form-control fs-6" value="{{ $student->student_code }}" data-initial-value="{{ $student->student_code }}"/>
-                                                                <span role="alert" class="text-danger fs-6 d-flex align-items-center justify-content-center">
-                                                                    <br>
-                                                                    <strong id="error-message-student-code-update-{{ $student->id }}"></strong>
-                                                                </span>
                                                             </div>
                                                         </div>
                                                         <div class="row mb-3 mt-4">
@@ -285,14 +269,10 @@
                             $('body').css('overflow', 'auto');
                         } else {
                             if (response.errors['full-name']) {
-                                $('#error-message-full-name-create').text(response.errors['full-name']);
-                            } else {
-                                $('#error-message-full-name-create').text('');
+                                showToastError(response.errors['full-name']);
                             }
                             if (response.errors['student-code']) {
-                                $('#error-message-student-code-create').text(response.errors['student-code']);
-                            } else {
-                                $('#error-message-student-code-create').text('');
+                                showToastError(response.errors['student-code'])
                             }
                             $('body').append('<div class="modal-backdrop fade show"></div>');
                         }
@@ -326,14 +306,10 @@
                             $('body').css('overflow', 'auto');
                         } else {
                             if (response.errors['full-name']) {
-                                $('#error-message-full-name-update-' + studentId).text(response.errors['full-name']);
-                            } else {
-                                $('#error-message-full-name-update-' + studentId).text('');
+                                showToastError(response.errors['full-name']);
                             }
                             if (response.errors['student-code']) {
-                                $('#error-message-student-code-update-' + studentId).text(response.errors['student-code']);
-                            } else {
-                                $('#error-message-student-code-update-' + studentId).text('');
+                                showToastError(response.errors['student-code'])
                             }
                             $('body').append('<div class="modal-backdrop fade show"></div>');
                         }
@@ -471,15 +447,10 @@
                 });
 
                 $('.close-btn').click(function() {
-                    $('#error-message-full-name-create').text('');
-                    $('#error-message-student-code-create').text('');
                     $('.modal-backdrop.fade.show').remove();
                 });
 
                 $('.close-update-btn').click(function() {
-                    const studentId = $(this).data('student-id');
-                    $('#error-message-full-name-update-' + studentId).text('');
-                    $('#error-message-student-code-update-' + studentId).text('');
                     $('.modal-backdrop.fade.show').remove();
                 });
             }

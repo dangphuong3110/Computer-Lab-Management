@@ -36,20 +36,12 @@
                                             <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Họ và tên<span class="required">*</span></label>
                                             <div class="col-md-7">
                                                 <input type="text" name="full-name" class="form-control fs-6"/>
-                                                <span role="alert" class="text-danger fs-6 d-flex align-items-center justify-content-center">
-                                                    <br>
-                                                    <strong id="error-message-full-name-create"></strong>
-                                                </span>
                                             </div>
                                         </div>
                                         <div class="row mb-3 mt-4">
                                             <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Email<span class="required">*</span></label>
                                             <div class="col-md-7">
                                                 <input type="text" name="email" class="form-control fs-6"/>
-                                                <span role="alert" class="text-danger fs-6 d-flex align-items-center justify-content-center">
-                                                    <br>
-                                                    <strong id="error-message-email-create"></strong>
-                                                </span>
                                             </div>
                                         </div>
                                         <div class="row mb-3 mt-4">
@@ -164,20 +156,12 @@
                                                                 <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Họ và tên<span class="required">*</span></label>
                                                                 <div class="col-md-7">
                                                                     <input type="text" name="full-name" class="form-control fs-6" value="{{ $lecturer->full_name }}" data-initial-value="{{ $lecturer->full_name }}"/>
-                                                                    <span role="alert" class="text-danger fs-6 d-flex align-items-center justify-content-center">
-                                                                        <br>
-                                                                        <strong id="error-message-full-name-update-{{ $lecturer->id }}"></strong>
-                                                                    </span>
                                                                 </div>
                                                             </div>
                                                             <div class="row mb-3 mt-4">
                                                                 <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Email<span class="required">*</span></label>
                                                                 <div class="col-md-7">
                                                                     <input type="text" name="email" class="form-control fs-6" value="{{ $lecturer->user->email }}" data-initial-value="{{ $lecturer->user->email }}"/>
-                                                                    <span role="alert" class="text-danger fs-6 d-flex align-items-center justify-content-center">
-                                                                        <br>
-                                                                        <strong id="error-message-email-update-{{ $lecturer->id }}"></strong>
-                                                                    </span>
                                                                 </div>
                                                             </div>
                                                             <div class="row mb-3 mt-4">
@@ -291,14 +275,10 @@
                             $('body').css('overflow', 'auto');
                         } else {
                             if (response.errors['full-name']) {
-                                $('#error-message-full-name-create').text(response.errors['full-name']);
-                            } else {
-                                $('#error-message-full-name-create').text('');
+                                showToastError(response.errors['full-name']);
                             }
                             if (response.errors['email']) {
-                                $('#error-message-email-create').text(response.errors['email']);
-                            } else {
-                                $('#error-message-email-create').text('');
+                                showToastError(response.errors['email']);
                             }
                             $('body').append('<div class="modal-backdrop fade show"></div>');
                         }
@@ -332,14 +312,10 @@
                             $('body').css('overflow', 'auto');
                         } else {
                             if (response.errors['full-name']) {
-                                $('#error-message-full-name-update-' + lecturerId).text(response.errors['full-name']);
-                            } else {
-                                $('#error-message-full-name-update-' + lecturerId).text('');
+                                showToastError(response.errors['full-name']);
                             }
                             if (response.errors['email']) {
-                                $('#error-message-email-update-' + lecturerId).text(response.errors['email']);
-                            } else {
-                                $('#error-message-email-update-' + lecturerId).text('');
+                                showToastError(response.errors['email']);
                             }
                             $('body').append('<div class="modal-backdrop fade show"></div>');
                         }
@@ -477,15 +453,10 @@
                 });
 
                 $('.close-btn').click(function() {
-                    $('#error-message-full-name-create').text('');
-                    $('#error-message-email-create').text('');
                     $('.modal-backdrop.fade.show').remove();
                 });
 
                 $('.close-update-btn').click(function() {
-                    const lecturerId = $(this).data('lecturer-id');
-                    $('#error-message-full-name-update-' + lecturerId).text('');
-                    $('#error-message-email-update-' + lecturerId).text('');
                     $('.modal-backdrop.fade.show').remove();
                 });
             }
