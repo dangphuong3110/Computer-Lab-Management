@@ -4,7 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Imports\LecturersImport;
 use App\Imports\StudentsImport;
+use App\Models\Building;
+use App\Models\ClassSession;
+use App\Models\CreditClass;
 use App\Models\Lecturer;
+use App\Models\Lesson;
+use App\Models\Room;
 use App\Models\Student;
 use App\Models\User;
 use Carbon\Carbon;
@@ -16,9 +21,6 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class TechnicianController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $title = 'Trang chủ';
@@ -45,6 +47,53 @@ class TechnicianController extends Controller
         $students = Student::orderBy('updated_at', 'desc')->paginate(7);
 
         return view('technician.list-student', compact('title','user', 'students'));
+    }
+
+    public function getListClass() {
+        $title = 'Lớp học phần';
+        $user = Auth::user();
+
+        $classes = CreditClass::withCount('classSessions')->orderBy('updated_at', 'desc')->paginate(7);
+
+        $classes->transform(function ($class) {
+            $class->start_date = Carbon::parse($class->start_date)->format('d-m-Y');
+            $class->end_date = Carbon::parse($class->end_date)->format('d-m-Y');
+
+            return $class;
+        });
+
+        $lecturers = Lecturer::all();
+        $buildings = Building::all();
+        $rooms = Room::all();
+        $classSessions = $classes->map(function ($class) {
+            return $class->classSessions;
+        });
+        $lessons = $classSessions->map(function ($sessions) {
+            return $sessions->map(function ($session) {
+                return $session->lessons;
+            });
+        });
+
+        return view('technician.list-class', compact('title','user', 'classes', 'lecturers', 'buildings', 'rooms', 'classSessions', 'lessons'));
+    }
+
+    public function getLessonOfClassSessionAPI(string $classId)
+    {
+        $class = CreditClass::with(['classSessions.lessons' => function ($query) {
+            $query->select('id', 'session_id');
+        }])->findOrFail($classId);
+
+        $classSessionsLessons = $class->classSessions->map(function ($session) {
+            $minLessonId = $session->lessons->min('id');
+            $maxLessonId = $session->lessons->max('id');
+
+            return [
+                'min_lesson_id' => $minLessonId,
+                'max_lesson_id' => $maxLessonId,
+            ];
+        });
+
+        return response()->json($classSessionsLessons);
     }
 
     public function storeLecturerAPI(Request $request)
@@ -139,6 +188,153 @@ class TechnicianController extends Controller
         return response()->json(['success' => 'Thêm sinh viên thành công!', 'table_student' => $table_student, 'links' => $students->render('pagination::bootstrap-5')->toHtml()]);
     }
 
+    public function storeClassAPI(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'class-name' => 'required|string|max:255',
+            'start-date' => 'required|date|before:end-date',
+            'end-date'   => 'required|date|after:start-date',
+        ], [
+            'class-name.required' => 'Vui lòng nhập tên lớp học phần',
+            'class-name.string' => 'Tên lớp học phần phải là chuỗi',
+            'class-name.max' => 'Tên lớp học phần không được vượt quá 255 ký tự',
+            'start-data.date' => 'Ngày bắt đầu không hợp lệ',
+            'start-date.required' => 'Vui lòng chọn ngày bắt đầu',
+            'start-date.before' => 'Ngày bắt đầu phải trước ngày kết thúc',
+            'end-date.date' => 'Ngày kết thúc không hợp lệ',
+            'end-date.required' => 'Vui lòng chọn ngày kết thúc',
+            'end-date.after' => 'Ngày kết thúc phải sau ngày bắt đầu',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()]);
+        }
+
+        $lessonRanges = [];
+
+        $daysOfWeeks = $request->input('day-of-week[]');
+        $startLessons = $request->input('start-lesson[]');
+        $endLessons = $request->input('end-lesson[]');
+        $roomIds = $request->input('room[]');
+        $startDate = $request->input('start-date');
+        $endDate = $request->input('end-date');
+
+        foreach ($daysOfWeeks as $key => $daysOfWeek) {
+            if ($endLessons[$key] - $startLessons[$key] >= 3) {
+                return response()->json(['errors' => ['class-session' => "Số tiết học trong một buổi học không được vượt quá 3 tiết!"]]);
+            }
+
+            if (!isset($lessonRanges[$daysOfWeek])) {
+                $lessonRanges[$daysOfWeek] = [];
+            }
+
+            foreach ($lessonRanges[$daysOfWeek] as $existingRange) {
+                if (($startLessons[$key] >= $existingRange[0] && $startLessons[$key] <= $existingRange[1]) || ($endLessons[$key] >= $existingRange[0] && $endLessons[$key] <= $existingRange[1])) {
+                    return response()->json(['errors' => ['class-session' => "Buổi học vào thứ {$daysOfWeek} bị trùng tiết học với nhau!"]]);
+                }
+            }
+
+            $lessonRanges[$daysOfWeek][] = [$startLessons[$key], $endLessons[$key], $roomIds[$key]];
+
+            foreach ($lessonRanges[$daysOfWeek] as $range) {
+                $room_id = $range[2];
+                $conflictingClass = ClassSession::whereHas('lessons', function ($query) use ($range, $daysOfWeek, $room_id) {
+                    $query->where('lessons.id', '>=', $range[0])
+                        ->where('lessons.id', '<=', $range[1])
+                        ->where('day_of_week', $daysOfWeek)
+                        ->where('room_id', $room_id);
+                })->whereHas('creditClass', function ($query) use ($startDate, $endDate) {
+                        $query->whereBetween('start_date', [$startDate, $endDate])
+                            ->orWhereBetween('end_date', [$startDate, $endDate]);
+                })->first();
+
+                if ($conflictingClass) {
+                    return response()->json(['errors' => ['class-session' => "Buổi học vào thứ {$daysOfWeek} bị trùng tiết học với lớp học khác! (bấm để xem)", 'class-id' => $conflictingClass->class_id]]);
+                }
+            }
+        }
+
+        $lecturerId = $request->input('lecturer');
+        $lecturerClasses = CreditClass::where('lecturer_id', $lecturerId)->get();
+
+        foreach ($lecturerClasses as $lecturerClass) {
+            if (Carbon::parse($lecturerClass->start_date)->between($startDate, $endDate) ||
+                Carbon::parse($lecturerClass->end_date)->between($startDate, $endDate)) {
+                foreach ($lecturerClass->classSessions as $classSession) {
+                    $startLessonId = $classSession->lessons()->orderBy('start_time', 'asc')->first()->id;
+                    $endLessonId = $classSession->lessons()->orderBy('end_time', 'desc')->first()->id;
+                    foreach ($lessonRanges as $dayOfWeek => $ranges) {
+                        foreach ($ranges as $range) {
+                            if ($classSession->day_of_week == $dayOfWeek &&
+                                (($startLessonId >= $range[0] && $startLessonId <= $range[1]) ||
+                                    ($endLessonId >= $range[0] && $endLessonId <= $range[1]) ||
+                                    ($endLessonId <= $range[0] && $startLessonId >= $range[1]))) {
+                                return response()->json(['errors' => ['class-session' => "Giảng viên đã có buổi học trùng với buổi học bạn đang cố gắng thêm! (bấm để xem)", 'class-id' => $classSession->class_id]]);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        $creditClass = new CreditClass();
+
+        $creditClass->name = $request->input('class-name');
+        $creditClass->start_date = $startDate;
+        $creditClass->end_date = $endDate;
+        $creditClass->class_code = $request->input('class-code');
+        $creditClass->lecturer_id = $request->input('lecturer');
+
+        $creditClass->save();
+
+        for ($i = 0; $i < $request->input('number-of-session'); $i++) {
+            $classSession = new ClassSession();
+            $lessonStart = Lesson::where('id', $request->input('start-lesson[]')[$i])->first();
+            $lessonEnd = Lesson::where('id', $request->input('end-lesson[]')[$i])->first();
+
+            $classSession->start_lesson = $lessonStart->start_time;
+            $classSession->end_lesson = $lessonEnd->end_time;
+            $classSession->day_of_week = $request->input('day-of-week[]')[$i];
+            $classSession->room_id = $request->input('room[]')[$i];
+            $classSession->class_id = $creditClass->id;
+
+            $classSession->save();
+
+            $classSession->lessons()->attach(range($lessonStart->id, $lessonEnd->id));
+        }
+
+        $classes = CreditClass::withCount('classSessions')->orderBy('updated_at', 'desc')->paginate(7);
+
+        $classes->transform(function ($class) {
+            $class->start_date = Carbon::parse($class->start_date)->format('d-m-Y');
+            $class->end_date = Carbon::parse($class->end_date)->format('d-m-Y');
+
+            return $class;
+        });
+
+        $lecturers = Lecturer::all();
+        $buildings = Building::all();
+        $rooms = Room::all();
+        $classSessions = $classes->map(function ($class) {
+            return $class->classSessions;
+        });
+        $lessons = $classSessions->map(function ($sessions) {
+            return $sessions->map(function ($session) {
+                return $session->lessons;
+            });
+        });
+
+        $table_class = view('technician.table-class', compact('classes', 'lecturers', 'buildings', 'rooms'))->render();
+
+        return response()->json([
+            'success' => 'Thêm lớp học phần thành công!',
+            'table_class' => $table_class,
+            'links' => $classes->render('pagination::bootstrap-5')->toHtml(),
+            'class_sessions' => $classSessions,
+            'lessons' => $lessons
+        ]);
+    }
+
     public function updateLecturerAPI(Request $request, string $id)
     {
         $lecturer = Lecturer::findOrFail($id);
@@ -221,6 +417,177 @@ class TechnicianController extends Controller
         return response()->json(['success' => 'Chỉnh sửa thông tin sinh viên thành công!', 'table_student' => $table_student, 'links' => $students->render('pagination::bootstrap-5')->toHtml()]);
     }
 
+    public function updateClassAPI(Request $request, string $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'class-name' => 'required|string|max:255',
+            'start-date' => 'required|date|before:end-date',
+            'end-date'   => 'required|date|after:start-date',
+        ], [
+            'class-name.required' => 'Vui lòng nhập tên lớp học phần',
+            'class-name.string' => 'Tên lớp học phần phải là chuỗi',
+            'class-name.max' => 'Tên lớp học phần không được vượt quá 255 ký tự',
+            'start-data.date' => 'Ngày bắt đầu không hợp lệ',
+            'start-date.required' => 'Vui lòng chọn ngày bắt đầu',
+            'start-date.before' => 'Ngày bắt đầu phải trước ngày kết thúc',
+            'end-date.date' => 'Ngày kết thúc không hợp lệ',
+            'end-date.required' => 'Vui lòng chọn ngày kết thúc',
+            'end-date.after' => 'Ngày kết thúc phải sau ngày bắt đầu',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()]);
+        }
+
+        $lessonRanges = [];
+
+        $daysOfWeeks = $request->input('day-of-week[]');
+        $startLessons = $request->input('start-lesson[]');
+        $endLessons = $request->input('end-lesson[]');
+        $roomIds = $request->input('room[]');
+        $startDate = $request->input('start-date');
+        $endDate = $request->input('end-date');
+
+        foreach ($daysOfWeeks as $key => $daysOfWeek) {
+            if ($endLessons[$key] - $startLessons[$key] >= 3) {
+                return response()->json(['errors' => ['class-session' => "Số tiết học trong một buổi học không được vượt quá 3 tiết!"]]);
+            }
+
+            if (!isset($lessonRanges[$daysOfWeek])) {
+                $lessonRanges[$daysOfWeek] = [];
+            }
+
+            foreach ($lessonRanges[$daysOfWeek] as $existingRange) {
+                if (($startLessons[$key] >= $existingRange[0] && $startLessons[$key] <= $existingRange[1]) || ($endLessons[$key] >= $existingRange[0] && $endLessons[$key] <= $existingRange[1])) {
+                    return response()->json(['errors' => ['class-session' => "Buổi học vào thứ {$daysOfWeek} bị trùng tiết học với nhau!"]]);
+                }
+            }
+
+            $lessonRanges[$daysOfWeek][] = [$startLessons[$key], $endLessons[$key], $roomIds[$key]];
+
+            foreach ($lessonRanges[$daysOfWeek] as $range) {
+                $room_id = $range[2];
+                $conflictingClass = ClassSession::whereHas('lessons', function ($query) use ($range, $daysOfWeek, $room_id, $id) {
+                    $query->where('lessons.id', '>=', $range[0])
+                        ->where('lessons.id', '<=', $range[1])
+                        ->where('day_of_week', $daysOfWeek)
+                        ->where('room_id', $room_id)
+                        ->where('class_sessions.class_id', '!=', $id);
+                })->whereHas('creditClass', function ($query) use ($startDate, $endDate) {
+                    $query->whereBetween('start_date', [$startDate, $endDate])
+                        ->orWhereBetween('end_date', [$startDate, $endDate]);
+                })->first();
+
+                if ($conflictingClass) {
+                    return response()->json(['errors' => ['class-session' => "Buổi học vào thứ {$daysOfWeek} bị trùng tiết học với lớp học khác! (bấm để xem)", 'class-id' => $conflictingClass->class_id]]);
+                }
+            }
+        }
+
+        $lecturerId = $request->input('lecturer');
+        $lecturerClasses = CreditClass::where('lecturer_id', $lecturerId)->where('id', '!=', $id)->get();
+
+        foreach ($lecturerClasses as $lecturerClass) {
+            if (Carbon::parse($lecturerClass->start_date)->between($startDate, $endDate) ||
+                Carbon::parse($lecturerClass->end_date)->between($startDate, $endDate)) {
+                foreach ($lecturerClass->classSessions as $classSession) {
+                    $startLessonId = $classSession->lessons()->orderBy('start_time', 'asc')->first()->id;
+                    $endLessonId = $classSession->lessons()->orderBy('end_time', 'desc')->first()->id;
+                    foreach ($lessonRanges as $dayOfWeek => $ranges) {
+                        foreach ($ranges as $range) {
+                            if ($classSession->day_of_week == $dayOfWeek &&
+                                (($startLessonId >= $range[0] && $startLessonId <= $range[1]) ||
+                                    ($endLessonId >= $range[0] && $endLessonId <= $range[1]))) {
+                                return response()->json(['errors' => ['class-session' => "Giảng viên đã có buổi học trùng với buổi học bạn đang cố gắng thêm! (bấm để xem)", 'class-id' => $classSession->class_id]]);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        $creditClass = CreditClass::findOrFail($id);
+
+        $creditClass->name = $request->input('class-name');
+        $creditClass->start_date = $startDate;
+        $creditClass->end_date = $endDate;
+        $creditClass->class_code = $request->input('class-code');
+        $creditClass->lecturer_id = $request->input('lecturer');
+
+        $creditClass->save();
+        $creditClass->touch();
+
+        $classSessions = ClassSession::where('class_id', $id)->get();
+
+        foreach ($classSessions as $classSession) {
+            $classSession->lessons()->detach();
+            $classSession->delete();
+        }
+
+        for ($i = 0; $i < $request->input('number-of-session'); $i++) {
+            $classSession = new ClassSession();
+            $lessonStart = Lesson::where('id', $request->input('start-lesson[]')[$i])->first();
+            $lessonEnd = Lesson::where('id', $request->input('end-lesson[]')[$i])->first();
+
+            $classSession->start_lesson = $lessonStart->start_time;
+            $classSession->end_lesson = $lessonEnd->end_time;
+            $classSession->day_of_week = $request->input('day-of-week[]')[$i];
+            $classSession->room_id = $request->input('room[]')[$i];
+            $classSession->class_id = $creditClass->id;
+
+            $classSession->save();
+
+            $classSession->lessons()->attach(range($lessonStart->id, $lessonEnd->id));
+        }
+
+        $classes = CreditClass::withCount('classSessions')->orderBy('updated_at', 'desc')->paginate(7);
+
+        $classes->transform(function ($class) {
+            $class->start_date = Carbon::parse($class->start_date)->format('d-m-Y');
+            $class->end_date = Carbon::parse($class->end_date)->format('d-m-Y');
+
+            return $class;
+        });
+
+        $lecturers = Lecturer::all();
+        $buildings = Building::all();
+        $rooms = Room::all();
+        $classSessions = $classes->map(function ($class) {
+            return $class->classSessions;
+        });
+        $lessons = $classSessions->map(function ($sessions) {
+            return $sessions->map(function ($session) {
+                return $session->lessons;
+            });
+        });
+
+        $table_class = view('technician.table-class', compact('classes', 'lecturers', 'buildings', 'rooms'))->render();
+
+        return response()->json([
+            'success' => 'Chỉnh sửa thông tin lớp học phần thành công!',
+            'table_class' => $table_class,
+            'links' => $classes->render('pagination::bootstrap-5')->toHtml(),
+            'class_sessions' => $classSessions,
+            'lessons' => $lessons
+        ]);
+    }
+
+    public function updateStatusClassAPI(string $id) {
+        $class = CreditClass::findOrFail($id);
+
+        if ($class->status == 'active') {
+            $class->status = 'inactive';
+            $message = 'Đóng lớp thành công!';
+        } else {
+            $class->status = 'active';
+            $message = 'Mở lớp thành công!';
+        }
+
+        $class->save();
+
+        return response()->json(['success' => $message]);
+    }
+
     public function destroyLecturerAPI(string $id)
     {
         $lecturer = Lecturer::findOrFail($id);
@@ -251,6 +618,50 @@ class TechnicianController extends Controller
         $table_student = view('technician.table-student', compact('students'))->render();
 
         return response()->json(['success' => 'Xóa sinh viên thành công!', 'table_student' => $table_student, 'links' => $students->render('pagination::bootstrap-5')->toHtml()]);
+    }
+
+    public function destroyClassAPI(string $id)
+    {
+        $classSessions = ClassSession::where('class_id', $id)->get();
+        foreach ($classSessions as $classSession) {
+            $classSession->lessons()->detach();
+            $classSession->delete();
+        }
+
+        $creditClass = CreditClass::findOrFail($id);
+
+        $creditClass->delete();
+
+        $classes = CreditClass::withCount('classSessions')->orderBy('updated_at', 'desc')->paginate(7);
+
+        $classes->transform(function ($class) {
+            $class->start_date = Carbon::parse($class->start_date)->format('d-m-Y');
+            $class->end_date = Carbon::parse($class->end_date)->format('d-m-Y');
+
+            return $class;
+        });
+
+        $lecturers = Lecturer::all();
+        $buildings = Building::all();
+        $rooms = Room::all();
+        $classSessions = $classes->map(function ($class) {
+            return $class->classSessions;
+        });
+        $lessons = $classSessions->map(function ($sessions) {
+            return $sessions->map(function ($session) {
+                return $session->lessons;
+            });
+        });
+
+        $table_class = view('technician.table-class', compact('classes', 'lecturers', 'buildings', 'rooms'))->render();
+
+        return response()->json([
+            'success' => 'Xóa lớp học phần thành công!',
+            'table_class' => $table_class,
+            'links' => $classes->render('pagination::bootstrap-5')->toHtml(),
+            'class_sessions' => $classSessions,
+            'lessons' => $lessons
+        ]);
     }
 
     public function importLecturerAPI(Request $request)
