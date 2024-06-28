@@ -359,7 +359,7 @@
                         @endforeach
                     @else
                         <tr>
-                            <td colspan="6" class="text-center">No Data Found</td>
+                            <td colspan="6" class="text-center">Không có dữ liệu lớp học phần</td>
                         </tr>
                     @endif
                     </tbody>

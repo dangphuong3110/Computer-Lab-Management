@@ -233,7 +233,7 @@
                         @endforeach
                     @else
                         <tr>
-                            <td colspan="7" class="text-center">No Data Found</td>
+                            <td colspan="7" class="text-center">Không có dữ liệu sinh viên</td>
                         </tr>
                     @endif
                     </tbody>
