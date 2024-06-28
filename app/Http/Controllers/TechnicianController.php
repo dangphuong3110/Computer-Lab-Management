@@ -102,13 +102,13 @@ class TechnicianController extends Controller
             'full-name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email',
         ], [
-            'full-name.required' => 'Vui lòng nhập họ và tên',
-            'full-name.string' => 'Họ và tên phải là chuỗi',
-            'full-name.max' => 'Họ và tên không được vượt quá 255 ký tự',
-            'email.required' => 'Vui lòng nhập địa chỉ email',
-            'email.email' => 'Địa chỉ email không hợp lệ',
-            'email.unique' => 'Địa chỉ email đã được sử dụng',
-            'email.max' => 'Địa chỉ email không được vượt quá 255 ký tự',
+            'full-name.required' => 'Vui lòng nhập họ và tên!',
+            'full-name.string' => 'Họ và tên phải là chuỗi!',
+            'full-name.max' => 'Họ và tên không được vượt quá 255 ký tự!',
+            'email.required' => 'Vui lòng nhập địa chỉ email!',
+            'email.email' => 'Địa chỉ email không hợp lệ!',
+            'email.unique' => 'Địa chỉ email đã được sử dụng!',
+            'email.max' => 'Địa chỉ email không được vượt quá 255 ký tự!',
         ]);
 
         if ($validator->fails()) {
@@ -148,13 +148,13 @@ class TechnicianController extends Controller
             'full-name' => 'required|string|max:255',
             'student-code' => 'required|string|max:255|unique:students,student_code',
         ], [
-            'full-name.required' => 'Vui lòng nhập họ và tên',
-            'full-name.string' => 'Họ và tên phải là chuỗi',
-            'full-name.max' => 'Họ và tên không được vượt quá 255 ký tự',
-            'student-code.required' => 'Vui lòng nhập mã sinh viên',
-            'student-code.string' => 'Mã sinh viên không phải là chuỗi',
-            'student-code.unique' => 'Mã sinh viên đã tồn tại',
-            'student-code.max' => 'Mã sinh viên không được vượt quá 255 ký tự',
+            'full-name.required' => 'Vui lòng nhập họ và tên!',
+            'full-name.string' => 'Họ và tên phải là chuỗi!',
+            'full-name.max' => 'Họ và tên không được vượt quá 255 ký tự!',
+            'student-code.required' => 'Vui lòng nhập mã sinh viên!',
+            'student-code.string' => 'Mã sinh viên không phải là chuỗi!',
+            'student-code.unique' => 'Mã sinh viên đã tồn tại!',
+            'student-code.max' => 'Mã sinh viên không được vượt quá 255 ký tự!',
         ]);
 
         if ($validator->fails()) {
@@ -195,15 +195,15 @@ class TechnicianController extends Controller
             'start-date' => 'required|date|before:end-date',
             'end-date'   => 'required|date|after:start-date',
         ], [
-            'class-name.required' => 'Vui lòng nhập tên lớp học phần',
-            'class-name.string' => 'Tên lớp học phần phải là chuỗi',
-            'class-name.max' => 'Tên lớp học phần không được vượt quá 255 ký tự',
-            'start-data.date' => 'Ngày bắt đầu không hợp lệ',
-            'start-date.required' => 'Vui lòng chọn ngày bắt đầu',
-            'start-date.before' => 'Ngày bắt đầu phải trước ngày kết thúc',
-            'end-date.date' => 'Ngày kết thúc không hợp lệ',
-            'end-date.required' => 'Vui lòng chọn ngày kết thúc',
-            'end-date.after' => 'Ngày kết thúc phải sau ngày bắt đầu',
+            'class-name.required' => 'Vui lòng nhập tên lớp học phần!',
+            'class-name.string' => 'Tên lớp học phần phải là chuỗi!',
+            'class-name.max' => 'Tên lớp học phần không được vượt quá 255 ký tự!',
+            'start-data.date' => 'Ngày bắt đầu không hợp lệ!',
+            'start-date.required' => 'Vui lòng chọn ngày bắt đầu!',
+            'start-date.before' => 'Ngày bắt đầu phải trước ngày kết thúc!',
+            'end-date.date' => 'Ngày kết thúc không hợp lệ!',
+            'end-date.required' => 'Vui lòng chọn ngày kết thúc!',
+            'end-date.after' => 'Ngày kết thúc phải sau ngày bắt đầu!',
         ]);
 
         if ($validator->fails()) {
@@ -343,13 +343,13 @@ class TechnicianController extends Controller
             'full-name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,' . $lecturer->user_id,
         ], [
-            'full-name.required' => 'Vui lòng nhập họ và tên',
-            'full-name.string' => 'Họ và tên phải là chuỗi',
-            'full-name.max' => 'Họ và tên không được vượt quá 255 ký tự',
-            'email.required' => 'Vui lòng nhập địa chỉ email',
-            'email.email' => 'Địa chỉ email không hợp lệ',
-            'email.unique' => 'Địa chỉ email đã được sử dụng',
-            'email.max' => 'Địa chỉ email không được vượt quá 255 ký tự',
+            'full-name.required' => 'Vui lòng nhập họ và tên!',
+            'full-name.string' => 'Họ và tên phải là chuỗi!',
+            'full-name.max' => 'Họ và tên không được vượt quá 255 ký tự!',
+            'email.required' => 'Vui lòng nhập địa chỉ email!',
+            'email.email' => 'Địa chỉ email không hợp lệ!',
+            'email.unique' => 'Địa chỉ email đã được sử dụng!',
+            'email.max' => 'Địa chỉ email không được vượt quá 255 ký tự!',
         ]);
 
         if ($validator->fails()) {
@@ -384,13 +384,13 @@ class TechnicianController extends Controller
             'full-name' => 'required|string|max:255',
             'student-code' => 'required|string|max:255|unique:students,student_code,' . $student->id,
         ], [
-            'full-name.required' => 'Vui lòng nhập họ và tên',
-            'full-name.string' => 'Họ và tên phải là chuỗi',
-            'full-name.max' => 'Họ và tên không được vượt quá 255 ký tự',
-            'student-code.required' => 'Vui lòng nhập mã sinh viên',
-            'student-code.string' => 'Mã sinh viên không phải là chuỗi',
-            'student-code.unique' => 'Mã sinh viên đã tồn tại',
-            'student-code.max' => 'Mã sinh viên không được vượt quá 255 ký tự',
+            'full-name.required' => 'Vui lòng nhập họ và tên!',
+            'full-name.string' => 'Họ và tên phải là chuỗi!',
+            'full-name.max' => 'Họ và tên không được vượt quá 255 ký tự!',
+            'student-code.required' => 'Vui lòng nhập mã sinh viên!',
+            'student-code.string' => 'Mã sinh viên không phải là chuỗi!',
+            'student-code.unique' => 'Mã sinh viên đã tồn tại!',
+            'student-code.max' => 'Mã sinh viên không được vượt quá 255 ký tự!',
         ]);
 
         if ($validator->fails()) {
@@ -424,15 +424,15 @@ class TechnicianController extends Controller
             'start-date' => 'required|date|before:end-date',
             'end-date'   => 'required|date|after:start-date',
         ], [
-            'class-name.required' => 'Vui lòng nhập tên lớp học phần',
-            'class-name.string' => 'Tên lớp học phần phải là chuỗi',
-            'class-name.max' => 'Tên lớp học phần không được vượt quá 255 ký tự',
-            'start-data.date' => 'Ngày bắt đầu không hợp lệ',
-            'start-date.required' => 'Vui lòng chọn ngày bắt đầu',
-            'start-date.before' => 'Ngày bắt đầu phải trước ngày kết thúc',
-            'end-date.date' => 'Ngày kết thúc không hợp lệ',
-            'end-date.required' => 'Vui lòng chọn ngày kết thúc',
-            'end-date.after' => 'Ngày kết thúc phải sau ngày bắt đầu',
+            'class-name.required' => 'Vui lòng nhập tên lớp học phần!',
+            'class-name.string' => 'Tên lớp học phần phải là chuỗi!',
+            'class-name.max' => 'Tên lớp học phần không được vượt quá 255 ký tự!',
+            'start-data.date' => 'Ngày bắt đầu không hợp lệ!',
+            'start-date.required' => 'Vui lòng chọn ngày bắt đầu!',
+            'start-date.before' => 'Ngày bắt đầu phải trước ngày kết thúc!',
+            'end-date.date' => 'Ngày kết thúc không hợp lệ!',
+            'end-date.required' => 'Vui lòng chọn ngày kết thúc!',
+            'end-date.after' => 'Ngày kết thúc phải sau ngày bắt đầu!',
         ]);
 
         if ($validator->fails()) {
@@ -669,8 +669,8 @@ class TechnicianController extends Controller
         $validator = Validator::make($request->all(), [
             'lecturer-file' => 'required|mimes:xlsx,xls',
         ], [
-            'lecturer-file.required' => 'Vui lòng nhập file',
-            'lecturer-file.mimes' => 'Vui lòng nhập đúng định dạng file excel (.xlsx, .xls)',
+            'lecturer-file.required' => 'Vui lòng nhập file!',
+            'lecturer-file.mimes' => 'Vui lòng nhập đúng định dạng file excel (.xlsx, .xls)!',
         ]);
 
         if ($validator->fails()) {
@@ -692,8 +692,8 @@ class TechnicianController extends Controller
         $validator = Validator::make($request->all(), [
             'student-file' => 'required|mimes:xlsx,xls',
         ], [
-            'student-file.required' => 'Vui lòng nhập file',
-            'student-file.mimes' => 'Vui lòng nhập đúng định dạng file excel (.xlsx, .xls)',
+            'student-file.required' => 'Vui lòng nhập file!',
+            'student-file.mimes' => 'Vui lòng nhập đúng định dạng file excel (.xlsx, .xls)!',
         ]);
 
         if ($validator->fails()) {

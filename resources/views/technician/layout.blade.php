@@ -27,7 +27,7 @@
             </span>
             <div class="text header-text">
                 <span class="name-university">Đại học Thủy lợi</span>
-                <span class="name">{{ $user->technician->full_name }}</span>
+                <span class="name">{{ $user->technician->full_name ?? '' }}</span>
             </div>
         </div>
         <i class='bx bx-chevron-right toggle'></i>

@@ -6,6 +6,7 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\LecturerController;
 use App\Http\Controllers\TechnicianController;
 use App\Http\Controllers\ManagerController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,7 +24,14 @@ Route::get('/', function () {
 });
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [LoginController::class, 'login'])->middleware('guest')->name('login');
+Route::post('/login-api', [LoginController::class, 'loginAPI'])->middleware('guest')->name('login-api');
+
+Route::post('/register', [UserController::class, 'registerAPI'])->name('register-api');
+Route::post('/verification-email', [UserController::class, 'verificationEmailAPI'])->name('verification-email-api');
+
+Route::post('/forgot-password-api', [UserController::class, 'forgotPasswordAPI'])->name('forgot-password-api');
+Route::get('/reset-password/{token}', [UserController::class, 'resetPassword'])->name('reset-password');
+Route::post('/reset-password-api', [UserController::class, 'resetPasswordAPI'])->name('reset-password-api');
 
 Route::middleware(['auth', 'check.role:student'])->group(function () {
     Route::resource('/student', StudentController::class);
