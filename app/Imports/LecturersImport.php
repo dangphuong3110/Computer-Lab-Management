@@ -33,6 +33,10 @@ class LecturersImport implements ToCollection, WithHeadingRow
                 continue;
             }
 
+            if (!str_contains($trimmedRow['email'], '@tlu.edu.vn')) {
+                continue;
+            }
+
             $user = User::where('email', $trimmedRow['email'])->first();
 
             if (!$user) {

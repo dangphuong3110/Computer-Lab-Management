@@ -99,11 +99,10 @@ class TechnicianController extends Controller
     public function storeLecturerAPI(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'full-name' => 'required|string|max:255',
+            'full-name' => 'required|max:255',
             'email' => 'required|email|max:255|unique:users,email',
         ], [
             'full-name.required' => 'Vui lòng nhập họ và tên!',
-            'full-name.string' => 'Họ và tên phải là chuỗi!',
             'full-name.max' => 'Họ và tên không được vượt quá 255 ký tự!',
             'email.required' => 'Vui lòng nhập địa chỉ email!',
             'email.email' => 'Địa chỉ email không hợp lệ!',
@@ -113,6 +112,10 @@ class TechnicianController extends Controller
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()]);
+        }
+
+        if (!str_contains($request->input('email'), '@tlu.edu.vn')) {
+            return response()->json(['errors' => ['email' => 'Email phải là email giảng viên của nhà trường!']]);
         }
 
         $user = new User();
@@ -145,25 +148,30 @@ class TechnicianController extends Controller
     public function storeStudentAPI(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'full-name' => 'required|string|max:255',
-            'student-code' => 'required|string|max:255|unique:students,student_code',
+            'full-name' => 'required|max:255',
+            'student-code' => 'unique:students,student_code',
+            'email' => 'required|email|max:255|unique:users,email',
         ], [
             'full-name.required' => 'Vui lòng nhập họ và tên!',
-            'full-name.string' => 'Họ và tên phải là chuỗi!',
             'full-name.max' => 'Họ và tên không được vượt quá 255 ký tự!',
-            'student-code.required' => 'Vui lòng nhập mã sinh viên!',
-            'student-code.string' => 'Mã sinh viên không phải là chuỗi!',
             'student-code.unique' => 'Mã sinh viên đã tồn tại!',
-            'student-code.max' => 'Mã sinh viên không được vượt quá 255 ký tự!',
+            'email.required' => 'Vui lòng nhập địa chỉ email!',
+            'email.email' => 'Địa chỉ email không hợp lệ!',
+            'email.unique' => 'Địa chỉ email đã được sử dụng!',
+            'email.max' => 'Địa chỉ email không được vượt quá 255 ký tự!',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()]);
         }
 
+        if (!str_contains($request->input('email'), '@e.tlu.edu.vn')) {
+            return response()->json(['errors' => ['email' => 'Email phải là email sinh viên của nhà trường!']]);
+        }
+
         $user = new User();
 
-        $user->email = $request->input('student-code');
+        $user->email = $request->input('email');
         $user->password = Hash::make('123456');
         $user->phone = $request->input('phone');
         $user->role_id = '3';
@@ -340,11 +348,10 @@ class TechnicianController extends Controller
         $lecturer = Lecturer::findOrFail($id);
 
         $validator = Validator::make($request->all(), [
-            'full-name' => 'required|string|max:255',
+            'full-name' => 'required|max:255',
             'email' => 'required|email|max:255|unique:users,email,' . $lecturer->user_id,
         ], [
             'full-name.required' => 'Vui lòng nhập họ và tên!',
-            'full-name.string' => 'Họ và tên phải là chuỗi!',
             'full-name.max' => 'Họ và tên không được vượt quá 255 ký tự!',
             'email.required' => 'Vui lòng nhập địa chỉ email!',
             'email.email' => 'Địa chỉ email không hợp lệ!',
@@ -354,6 +361,10 @@ class TechnicianController extends Controller
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()]);
+        }
+
+        if (!str_contains($request->input('email'), '@tlu.edu.vn')) {
+            return response()->json(['errors' => ['email' => 'Email phải là email giảng viên của nhà trường!']]);
         }
 
         $user = User::findOrFail($lecturer->user_id);
@@ -381,24 +392,29 @@ class TechnicianController extends Controller
         $student = Student::findOrFail($id);
 
         $validator = Validator::make($request->all(), [
-            'full-name' => 'required|string|max:255',
-            'student-code' => 'required|string|max:255|unique:students,student_code,' . $student->id,
+            'full-name' => 'required|max:255',
+            'student-code' => 'unique:students,student_code,' . $student->id,
+            'email' => 'required|email|max:255|unique:users,email' . $student->user_id,
         ], [
             'full-name.required' => 'Vui lòng nhập họ và tên!',
-            'full-name.string' => 'Họ và tên phải là chuỗi!',
             'full-name.max' => 'Họ và tên không được vượt quá 255 ký tự!',
-            'student-code.required' => 'Vui lòng nhập mã sinh viên!',
-            'student-code.string' => 'Mã sinh viên không phải là chuỗi!',
             'student-code.unique' => 'Mã sinh viên đã tồn tại!',
-            'student-code.max' => 'Mã sinh viên không được vượt quá 255 ký tự!',
+            'email.required' => 'Vui lòng nhập địa chỉ email!',
+            'email.email' => 'Địa chỉ email không hợp lệ!',
+            'email.unique' => 'Địa chỉ email đã được sử dụng!',
+            'email.max' => 'Địa chỉ email không được vượt quá 255 ký tự!',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()]);
         }
 
+        if (!str_contains($request->input('email'), '@e.tlu.edu.vn')) {
+            return response()->json(['errors' => ['email' => 'Email phải là email sinh viên của nhà trường!']]);
+        }
+
         $user = User::findOrFail($student->user_id);
-        $user->email = $request->input('student-code');
+        $user->email = $request->input('email');
         $user->phone = $request->input('phone');
 
         $user->save();

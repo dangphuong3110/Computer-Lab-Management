@@ -39,7 +39,13 @@
                                             </div>
                                         </div>
                                         <div class="row mb-3 mt-4">
-                                            <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Mã sinh viên<span class="required">*</span></label>
+                                            <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Email<span class="required">*</span></label>
+                                            <div class="col-md-7">
+                                                <input type="text" name="email" class="form-control fs-6"/>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3 mt-4">
+                                            <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Mã sinh viên</label>
                                             <div class="col-md-7">
                                                 <input type="text" name="student-code" class="form-control fs-6"/>
                                             </div>
@@ -74,7 +80,7 @@
                                     </form>
                                 </div>
                                 <div class="text-center">
-                                    <p class="ps-3 pe-3 note">*Chú ý: Tài khoản sẽ được tạo tự động với tên đăng nhập là <span>Mã sinh viên</span> và mật khẩu là <span>123456</span></p>
+                                    <p class="ps-3 pe-3 note">*Chú ý: Tài khoản sẽ được tạo tự động với tên đăng nhập là <span>Email</span> và mật khẩu là <span>123456</span></p>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary close-btn" data-bs-dismiss="modal">Đóng</button>
@@ -104,7 +110,7 @@
                                 </div>
                                 <div class="text-center">
                                     <p class="ps-3 pe-3">File mẫu: <a href="{{ asset('file/import-student.xlsx') }}" download>mau-nhap.xlsx</a></p>
-                                    <p class="ps-3 pe-3 note">*Chú ý: Tài khoản sẽ được tạo tự động với tên đăng nhập là <span>Mã sinh viên</span> và mật khẩu là <span>123456</span>.<br> Thông tin tối thiểu cần có: <span>Họ và tên</span> + <span>Mã sinh viên</span></p>
+                                    <p class="ps-3 pe-3 note">*Chú ý: Tài khoản sẽ được tạo tự động với tên đăng nhập là <span>Email</span> và mật khẩu là <span>123456</span>.<br> Thông tin tối thiểu cần có: <span>Họ và tên</span> + <span>Email</span></p>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary close-btn" data-bs-dismiss="modal">Đóng</button>
@@ -120,9 +126,10 @@
                     <thead>
                     <tr>
                         <th scope="col" class="text-center" width="5%">STT</th>
-                        <th scope="col" class="text-center" width="25%">Họ và tên</th>
-                        <th scope="col" class="text-center" width="25%">Mã sinh viên</th>
+                        <th scope="col" class="text-center" width="15%">Họ và tên</th>
+                        <th scope="col" class="text-center" width="15%">Mã sinh viên</th>
                         <th scope="col" class="text-center" width="15%">Lớp</th>
+                        <th scope="col" class="text-center" width="20%">Email</th>
                         <th scope="col" class="text-center" width="20%">Số điện thoại</th>
                         <th scope="col" class="text-center action-column">Hành động</th>
                     </tr>
@@ -135,6 +142,7 @@
                                 <td class="text-center">{{ $student->full_name }}</td>
                                 <td class="text-center">{{ $student->student_code }}</td>
                                 <td class="text-center">{{ $student->class }}</td>
+                                <td class="text-center">{{ $student->user->email }}</td>
                                 <td class="text-center">{{ $student->user->phone }}</td>
                                 <td class="text-center">
                                     <a href="#" class="btn btn-sm btn-primary my-auto" data-bs-toggle="modal" data-bs-target="#update-student-modal-{{ $student->id }}"><i class='bx bx-pencil'></i></a>
@@ -156,7 +164,13 @@
                                                             </div>
                                                         </div>
                                                         <div class="row mb-3 mt-4">
-                                                            <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Mã sinh viên<span class="required">*</span></label>
+                                                            <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end"  value="{{ $student->user->email }}" data-initial-value="{{ $student->user->email }}">Email<span class="required">*</span></label>
+                                                            <div class="col-md-7">
+                                                                <input type="text" name="email" class="form-control fs-6"/>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row mb-3 mt-4">
+                                                            <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Mã sinh viên</label>
                                                             <div class="col-md-7">
                                                                 <input type="text" name="student-code" class="form-control fs-6" value="{{ $student->student_code }}" data-initial-value="{{ $student->student_code }}"/>
                                                             </div>
@@ -274,6 +288,9 @@
                             if (response.errors['student-code']) {
                                 showToastError(response.errors['student-code'])
                             }
+                            if (response.errors['email']) {
+                                showToastError(response.errors['email']);
+                            }
                             $('body').append('<div class="modal-backdrop fade show"></div>');
                         }
                         overlay.classList.remove('show');
@@ -310,6 +327,9 @@
                             }
                             if (response.errors['student-code']) {
                                 showToastError(response.errors['student-code'])
+                            }
+                            if (response.errors['email']) {
+                                showToastError(response.errors['email']);
                             }
                             $('body').append('<div class="modal-backdrop fade show"></div>');
                         }
