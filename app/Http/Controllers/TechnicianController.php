@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 
 class TechnicianController extends Controller
@@ -75,6 +76,15 @@ class TechnicianController extends Controller
         });
 
         return view('technician.list-class', compact('title','user', 'classes', 'lecturers', 'buildings', 'rooms', 'classSessions', 'lessons'));
+    }
+
+    public function getListBuilding() {
+        $title = 'Phòng máy';
+        $user = Auth::user();
+
+        $buildings = Building::orderBy('updated_at', 'desc')->paginate(7);
+
+        return view('technician.list-building', compact('title','user', 'buildings'));
     }
 
     public function getLessonOfClassSessionAPI(string $classId)
@@ -149,29 +159,22 @@ class TechnicianController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'full-name' => 'required|max:255',
-            'student-code' => 'unique:students,student_code',
-            'email' => 'required|email|max:255|unique:users,email',
+            'student-code' => 'required|max:255|unique:students,student-code',
         ], [
             'full-name.required' => 'Vui lòng nhập họ và tên!',
             'full-name.max' => 'Họ và tên không được vượt quá 255 ký tự!',
-            'student-code.unique' => 'Mã sinh viên đã tồn tại!',
-            'email.required' => 'Vui lòng nhập địa chỉ email!',
-            'email.email' => 'Địa chỉ email không hợp lệ!',
-            'email.unique' => 'Địa chỉ email đã được sử dụng!',
-            'email.max' => 'Địa chỉ email không được vượt quá 255 ký tự!',
+            'student-code.required' => 'Vui lòng nhập địa mã sinh viên!',
+            'student-code.unique' => 'Mã sinh viên đã được sử dụng!',
+            'student-code.max' => 'Mã sinh viên không được vượt quá 255 ký tự!',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()]);
         }
 
-        if (!str_contains($request->input('email'), '@e.tlu.edu.vn')) {
-            return response()->json(['errors' => ['email' => 'Email phải là email sinh viên của nhà trường!']]);
-        }
-
         $user = new User();
 
-        $user->email = $request->input('email');
+        $user->email = trim($request->input('student-code')) . '@e.tlu.edu.vn';
         $user->password = Hash::make('123456');
         $user->phone = $request->input('phone');
         $user->role_id = '3';
@@ -393,28 +396,21 @@ class TechnicianController extends Controller
 
         $validator = Validator::make($request->all(), [
             'full-name' => 'required|max:255',
-            'student-code' => 'unique:students,student_code,' . $student->id,
-            'email' => 'required|email|max:255|unique:users,email' . $student->user_id,
+            'student-code' => 'required|max:255|unique:students,student-code,' . $student->student_code,
         ], [
             'full-name.required' => 'Vui lòng nhập họ và tên!',
             'full-name.max' => 'Họ và tên không được vượt quá 255 ký tự!',
-            'student-code.unique' => 'Mã sinh viên đã tồn tại!',
-            'email.required' => 'Vui lòng nhập địa chỉ email!',
-            'email.email' => 'Địa chỉ email không hợp lệ!',
-            'email.unique' => 'Địa chỉ email đã được sử dụng!',
-            'email.max' => 'Địa chỉ email không được vượt quá 255 ký tự!',
+            'student-code.required' => 'Vui lòng nhập địa mã sinh viên!',
+            'student-code.unique' => 'Mã sinh viên đã được sử dụng!',
+            'student-code.max' => 'Mã sinh viên không được vượt quá 255 ký tự!',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()]);
         }
 
-        if (!str_contains($request->input('email'), '@e.tlu.edu.vn')) {
-            return response()->json(['errors' => ['email' => 'Email phải là email sinh viên của nhà trường!']]);
-        }
-
         $user = User::findOrFail($student->user_id);
-        $user->email = $request->input('email');
+        $user->email = trim($request->input('student-code')) . '@e.tlu.edu.vn';
         $user->phone = $request->input('phone');
 
         $user->save();

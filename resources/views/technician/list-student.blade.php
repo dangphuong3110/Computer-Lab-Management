@@ -11,11 +11,6 @@
             </nav>
         </div>
     </div>
-
-    <div class="ms-5 me-5 alert alert-success" id="success-message" style="display: none;">
-
-    </div>
-
     <div class="row p-4 ms-5 me-5 mt-5 mb-0 main-content">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -38,14 +33,14 @@
                                                 <input type="text" name="full-name" class="form-control fs-6"/>
                                             </div>
                                         </div>
+{{--                                        <div class="row mb-3 mt-4">--}}
+{{--                                            <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Email<span class="required">*</span></label>--}}
+{{--                                            <div class="col-md-7">--}}
+{{--                                                <input type="text" name="email" class="form-control fs-6"/>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
                                         <div class="row mb-3 mt-4">
-                                            <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Email<span class="required">*</span></label>
-                                            <div class="col-md-7">
-                                                <input type="text" name="email" class="form-control fs-6"/>
-                                            </div>
-                                        </div>
-                                        <div class="row mb-3 mt-4">
-                                            <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Mã sinh viên</label>
+                                            <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Mã sinh viên<span class="required">*</span></label>
                                             <div class="col-md-7">
                                                 <input type="text" name="student-code" class="form-control fs-6"/>
                                             </div>
@@ -80,7 +75,7 @@
                                     </form>
                                 </div>
                                 <div class="text-center">
-                                    <p class="ps-3 pe-3 note">*Chú ý: Tài khoản sẽ được tạo tự động với tên đăng nhập là <span>Email</span> và mật khẩu là <span>123456</span></p>
+                                    <p class="ps-3 pe-3 note">*Chú ý: Tài khoản sẽ được tạo tự động với tên đăng nhập là <span>Ma_sinh_vien@e.tlu.edu.vn</span> và mật khẩu là <span>123456</span></p>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary close-btn" data-bs-dismiss="modal">Đóng</button>
@@ -110,7 +105,7 @@
                                 </div>
                                 <div class="text-center">
                                     <p class="ps-3 pe-3">File mẫu: <a href="{{ asset('file/import-student.xlsx') }}" download>mau-nhap.xlsx</a></p>
-                                    <p class="ps-3 pe-3 note">*Chú ý: Tài khoản sẽ được tạo tự động với tên đăng nhập là <span>Email</span> và mật khẩu là <span>123456</span>.<br> Thông tin tối thiểu cần có: <span>Họ và tên</span> + <span>Email</span></p>
+                                    <p class="ps-3 pe-3 note">*Chú ý: Tài khoản sẽ được tạo tự động với tên đăng nhập là <span>Ma_sinh_vien@e.tlu.edu.vn</span> và mật khẩu là <span>123456</span>.<br> Thông tin tối thiểu cần có: <span>Họ và tên</span> + <span>Mã sinh viên</span></p>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary close-btn" data-bs-dismiss="modal">Đóng</button>
@@ -163,14 +158,14 @@
                                                                 <input type="text" name="full-name" class="form-control fs-6" value="{{ $student->full_name }}" data-initial-value="{{ $student->full_name }}"/>
                                                             </div>
                                                         </div>
+{{--                                                        <div class="row mb-3 mt-4">--}}
+{{--                                                            <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Email<span class="required">*</span></label>--}}
+{{--                                                            <div class="col-md-7">--}}
+{{--                                                                <input type="text" name="email" class="form-control fs-6" value="{{ $student->user->email }}" data-initial-value="{{ $student->user->email }}"/>--}}
+{{--                                                            </div>--}}
+{{--                                                        </div>--}}
                                                         <div class="row mb-3 mt-4">
-                                                            <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end"  value="{{ $student->user->email }}" data-initial-value="{{ $student->user->email }}">Email<span class="required">*</span></label>
-                                                            <div class="col-md-7">
-                                                                <input type="text" name="email" class="form-control fs-6"/>
-                                                            </div>
-                                                        </div>
-                                                        <div class="row mb-3 mt-4">
-                                                            <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Mã sinh viên</label>
+                                                            <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Mã sinh viên<span class="required">*</span></label>
                                                             <div class="col-md-7">
                                                                 <input type="text" name="student-code" class="form-control fs-6" value="{{ $student->student_code }}" data-initial-value="{{ $student->student_code }}"/>
                                                             </div>

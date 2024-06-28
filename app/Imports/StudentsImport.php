@@ -21,7 +21,7 @@ class StudentsImport implements ToCollection, WithHeadingRow
     {
         $rules = [
             'ho_va_ten' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
+            'ma_sinh_vien' => 'required|string|max:255',
         ];
 
         foreach ($rows as $row)
@@ -38,15 +38,12 @@ class StudentsImport implements ToCollection, WithHeadingRow
                 continue;
             }
 
-            if (!str_contains($trimmedRow['email'], '@e.tlu.edu.vn')) {
-                continue;
-            }
-
-            $user = User::where('email', $trimmedRow['email'])->first();
+            $email = $trimmedRow['ma_sinh_vien'] . '@e.tlu.edu.vn';
+            $user = User::where('email', $email)->first();
 
             if (!$user) {
                 $user = User::create([
-                    'email' => $trimmedRow['email'],
+                    'email' => $email,
                     'password' => Hash::make('123456'),
                     'phone' => $trimmedRow['so_dien_thoai'],
                     'role_id' => 3,

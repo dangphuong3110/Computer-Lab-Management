@@ -26,14 +26,14 @@
                                             <input type="text" name="full-name" class="form-control fs-6" value="{{ $student->full_name }}" data-initial-value="{{ $student->full_name }}"/>
                                         </div>
                                     </div>
+{{--                                    <div class="row mb-3 mt-4">--}}
+{{--                                        <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Email<span class="required">*</span></label>--}}
+{{--                                        <div class="col-md-7">--}}
+{{--                                            <input type="text" name="email" class="form-control fs-6" value="{{ $student->user->email }}" data-initial-value="{{ $student->user->email }}"/>--}}
+{{--                                        </div>--}}
+{{--                                    </div>--}}
                                     <div class="row mb-3 mt-4">
-                                        <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end"  value="{{ $student->user->email }}" data-initial-value="{{ $student->user->email }}">Email<span class="required">*</span></label>
-                                        <div class="col-md-7">
-                                            <input type="text" name="email" class="form-control fs-6"/>
-                                        </div>
-                                    </div>
-                                    <div class="row mb-3 mt-4">
-                                        <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Mã sinh viên</label>
+                                        <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Mã sinh viên<span class="required">*</span></label>
                                         <div class="col-md-7">
                                             <input type="text" name="student-code" class="form-control fs-6" value="{{ $student->student_code }}" data-initial-value="{{ $student->student_code }}"/>
                                         </div>

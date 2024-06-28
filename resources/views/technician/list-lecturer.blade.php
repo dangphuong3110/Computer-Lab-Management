@@ -11,11 +11,6 @@
             </nav>
         </div>
     </div>
-
-    <div class="ms-5 me-5 alert alert-success" id="success-message" style="display: none;">
-
-    </div>
-
     <div class="row p-4 ms-5 me-5 mt-5 mb-0 main-content">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center mb-3">
