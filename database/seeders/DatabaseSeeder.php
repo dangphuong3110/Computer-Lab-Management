@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             ManagersTableSeeder::class,
             BuildingsTableSeeder::class,
             RoomsTableSeeder::class,
+            ComputersTableSeeder::class,
             CreditClassesTableSeeder::class,
             LessonsTableSeeder::class,
             ClassSessionsTableSeeder::class,

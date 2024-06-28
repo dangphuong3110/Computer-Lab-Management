@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('computers', function (Blueprint $table) {
             $table->id();
+            $table->integer('position');
             $table->text('configuration')->nullable();
             $table->date('purchase_date')->nullable();
             $table->string('status', 100)->nullable()->default('available');
