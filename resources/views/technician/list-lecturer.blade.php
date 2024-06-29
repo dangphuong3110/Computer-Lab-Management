@@ -337,10 +337,14 @@
                             updatePagination();
                             addEventForModalUpdate();
                             addEventForButtons();
-                            $('#destroy-lecturer-modal-' + lecturerId).modal('hide');
-                            $('body').css('overflow', 'auto');
+                        } else {
+                            if (response.errors['lecturer']) {
+                                showToastError(response.errors['lecturer']);
+                            }
                         }
 
+                        $('#destroy-lecturer-modal-' + lecturerId).modal('hide');
+                        $('body').css('overflow', 'auto');
                         overlay.classList.remove('show');
                     },
                     error: function (error) {

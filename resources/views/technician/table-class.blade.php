@@ -13,7 +13,7 @@
             <td class="text-center">
                 <a href="#" class="btn btn-sm btn-primary my-auto btn-edit-class" id="btn-edit-class-{{ $class->id }}" data-index="{{ $index }}" data-class-id="{{ $class->id }}" data-bs-toggle="modal" data-bs-target="#update-class-modal-{{ $class->id }}"><i class='bx bx-pencil'></i></a>
                 <!----- Modal sửa lớp học ----->
-                <div class="modal fade modal-update" id="update-class-modal-{{ $class->id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addClassModalLabel" aria-hidden="true">
+                <div class="modal fade modal-update" id="update-class-modal-{{ $class->id }}" data-index="{{ $index }}" data-class-id="{{ $class->id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addClassModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-xl modal-dialog-centered">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -147,10 +147,10 @@
                         <div class="modal-dialog modal-dialog-centered">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h1 class="modal-title fs-5" id="exampleModalLabel">Xóa sinh viên</h1>
+                                    <h1 class="modal-title fs-5" id="exampleModalLabel">Xóa lớp học phần</h1>
                                 </div>
                                 <div class="modal-body">
-                                    <p class="text-wrap m-0">Bạn có chắc chắn muốn xóa sinh viên?<br> Điều này sẽ dẫn đến tài khoản của sinh viên cũng sẽ không còn tồn tại trong hệ thống.</p>
+                                    <p class="text-wrap m-0">Bạn có chắc chắn muốn xóa lớp học phần?</p>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Trở về</button>

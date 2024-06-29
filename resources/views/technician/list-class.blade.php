@@ -546,10 +546,14 @@
                             updatePagination();
                             addEventForModalUpdate();
                             addEventForButtons();
-                            $('#destroy-class-modal-' + classId).modal('hide');
-                            $('body').css('overflow', 'auto');
+                        } else {
+                            if (response.errors['class']) {
+                                showToastError(response.errors['class']);
+                            }
                         }
 
+                        $('#destroy-class-modal-' + classId).modal('hide');
+                        $('body').css('overflow', 'auto');
                         overlay.classList.remove('show');
                     },
                     error: function (error) {

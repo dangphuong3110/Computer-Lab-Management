@@ -833,6 +833,21 @@ class TechnicianController extends Controller
         $lecturer = Lecturer::findOrFail($id);
         $userId = $lecturer->user_id;
 
+        $activeClasses = $lecturer->creditClasses()
+            ->where(function ($query) {
+                $query->where('start_date', '<=', Carbon::now())
+                    ->where('end_date', '>=', Carbon::now());
+            })->get();
+
+        if ($activeClasses->count() > 0) {
+            $activeClassNames = $activeClasses->pluck('name')->implode(', ');
+            return response()->json([
+                'errors' => ['lecturer' => "Không thể xóa vì giảng viên này đang tiếp quản các lớp học: $activeClassNames. Vui lòng chuyển lớp học sang giảng viên khác trước khi xóa!"]
+            ]);
+        } else if ($lecturer->creditClasses->count() > 0) {
+            return response()->json(['errors' => ['lecturer' => 'Không thể xóa vì giảng viên này đã tiếp quản các lớp học! Dữ liệu lưu trữ về giảng viên này sẽ được giữ lại để phục vụ báo cáo!']]);
+        }
+
         $lecturer->delete();
 
         $user = User::findOrFail($userId);
@@ -862,13 +877,18 @@ class TechnicianController extends Controller
 
     public function destroyClassAPI(string $id)
     {
+
+        $creditClass = CreditClass::findOrFail($id);
+
+        if (Carbon::now() >= Carbon::parse($creditClass->start_date) && Carbon::now() <= Carbon::parse($creditClass->end_date)) {
+            return response()->json(['errors' => ['class' => 'Không thể xóa lớp học phần đang diễn ra!']]);
+        }
+
         $classSessions = ClassSession::where('class_id', $id)->get();
         foreach ($classSessions as $classSession) {
             $classSession->lessons()->detach();
             $classSession->delete();
         }
-
-        $creditClass = CreditClass::findOrFail($id);
 
         $creditClass->delete();
 
