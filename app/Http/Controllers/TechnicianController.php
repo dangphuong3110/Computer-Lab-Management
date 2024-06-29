@@ -128,6 +128,38 @@ class TechnicianController extends Controller
         return view('technician.list-computer', compact('title','user', 'building', 'room', 'computers'));
     }
 
+    public function getListStudentClass(string $class_id)
+    {
+        $title = 'Sinh viên lớp học phần';
+        $user = Auth::user();
+
+        $class = CreditClass::where('id', $class_id)->first();
+        $students = $class->students()->orderBy('class_student.created_at', 'desc')->paginate(7);
+
+        return view('technician.list-student-class', compact('title','user', 'students', 'class'));
+    }
+
+    public function getStudentByStudentCodeAPI(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'student-code' => 'required',
+        ], [
+            'student-code.required' => 'Vui lòng nhập mã sinh viên!',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()]);
+        }
+
+        $student = Student::where('student_code', $request->input('student-code'))->first();
+
+        if (!$student) {
+            return response()->json(['errors' => ['student-code' => 'Không tìm thấy sinh viên!']]);
+        } else {
+            return response()->json(['success' => 'Đã tìm thấy sinh viên!','student' => $student]);
+        }
+    }
+
     public function storeLecturerAPI(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -366,6 +398,39 @@ class TechnicianController extends Controller
             'class_sessions' => $classSessions,
             'lessons' => $lessons
         ]);
+    }
+
+    public function storeStudentClassAPI(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'student-code' => 'required',
+        ], [
+            'student-code.required' => 'Vui lòng nhập mã sinh viên!',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()]);
+        }
+
+        $student = Student::where('student_code', $request->input('student-code'))->first();
+
+        if (!$student) {
+            return response()->json(['errors' => ['student-code' => 'Không tìm thấy sinh viên!']]);
+        } else {
+            $class_id = $request->input('class_id');
+            $student = Student::where('student_code', $request->input('student-code'))->first();
+
+            if ($student->creditClasses()->where('id', $class_id)->exists()) {
+                return response()->json(['errors' => ['student-class' => 'Sinh viên đã có trong lớp học!']]);
+            }
+
+            $student->creditClasses()->attach($class_id, ['created_at' => now(), 'updated_at' => now()]);
+
+            $class = CreditClass::where('id', $class_id)->first();
+            $students = $class->students()->orderBy('class_student.created_at', 'desc')->paginate(7);
+            $table_student_class = view('technician.table-student-class', compact('students', 'class'))->render();
+
+            return response()->json(['success' => 'Đã thêm sinh viên vào lớp học!', 'table_student_class' => $table_student_class, 'links' => $students->render('pagination::bootstrap-5')->toHtml()]);
+        }
     }
 
     public function storeBuildingAPI(Request $request)
@@ -922,6 +987,19 @@ class TechnicianController extends Controller
             'class_sessions' => $classSessions,
             'lessons' => $lessons
         ]);
+    }
+
+    public function destroyStudentClassAPI(Request $request, string $student_id)
+    {
+        $student = Student::findOrFail($student_id);
+
+        $student->creditClasses()->detach();
+
+        $class = CreditClass::where('id', $request->input('class_id'))->first();
+        $students = $class->students()->orderBy('class_student.created_at', 'desc')->paginate(7);
+        $table_student_class = view('technician.table-student-class', compact('students', 'class'))->render();
+
+        return response()->json(['success' => 'Xóa sinh viên khỏi lớp học phần thành công!', 'table_student_class' => $table_student_class, 'links' => $students->render('pagination::bootstrap-5')->toHtml()]);
     }
 
     public function destroyBuildingAPI(string $id)

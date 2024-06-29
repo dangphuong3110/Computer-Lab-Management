@@ -58,7 +58,7 @@
                         <span class="text nav-text">Sinh viên</span>
                     </a>
                 </li>
-                <li class="nav-link {{ request()->routeIs('technician.get-list-class') ? 'active' : '' }}">
+                <li class="nav-link {{ request()->routeIs('technician.get-list-class', 'technician.get-list-student-class') ? 'active' : '' }}">
                     <a href="{{ route('technician.get-list-class') }}">
                         <i class='bx bxs-grid icon'></i>
                         <span class="text nav-text">Lớp học phần</span>

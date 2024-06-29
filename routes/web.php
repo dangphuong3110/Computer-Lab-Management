@@ -56,6 +56,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/get-list-student', [TechnicianController::class, 'getListStudent'])->name('technician.get-list-student')->middleware('check.role:technician');
 
     Route::get('/get-list-student-api', [TechnicianController::class, 'getListStudentAPI'])->name('technician.get-list-student-api');
+    Route::post('/search-student-api', [TechnicianController::class, 'getStudentByStudentCodeAPI'])->name('technician.search-student-api');
     Route::post('/store-student-api', [TechnicianController::class, 'storeStudentAPI'])->name('technician.store-student-api');
     Route::put('/update-student-api/{student}', [TechnicianController::class, 'updateStudentAPI'])->name('technician.update-student-api');
     Route::delete('/delete-student-api/{student}', [TechnicianController::class, 'destroyStudentAPI'])->name('technician.destroy-student-api');
@@ -63,13 +64,16 @@ Route::middleware(['auth'])->group(function () {
 
     // Class
     Route::get('/get-list-class', [TechnicianController::class, 'getListClass'])->name('technician.get-list-class')->middleware('check.role:technician');
+    Route::get('/get-list-student-class/{class}', [TechnicianController::class, 'getListStudentClass'])->name('technician.get-list-student-class')->middleware('check.role:technician');
 
     Route::get('/get-list-class-api', [TechnicianController::class, 'getListClassAPI'])->name('technician.get-list-class-api');
     Route::get('/get-lesson-of-class-session-api/{class}', [TechnicianController::class, 'getLessonOfClassSessionAPI'])->name('technician.get-lesson-of-class-session-api');
     Route::post('/store-class-api', [TechnicianController::class, 'storeClassAPI'])->name('technician.store-class-api');
+    Route::post('/store-student-class-api', [TechnicianController::class, 'storeStudentClassAPI'])->name('technician.store-student-class-api');
     Route::put('/update-class-api/{class}', [TechnicianController::class, 'updateClassAPI'])->name('technician.update-class-api');
     Route::put('/update-class-status-api/{class}', [TechnicianController::class, 'updateStatusClassAPI'])->name('technician.update-status-class-api');
     Route::delete('/delete-class-api/{class}', [TechnicianController::class, 'destroyClassAPI'])->name('technician.destroy-class-api');
+    Route::delete('/delete-student-class-api/{student}', [TechnicianController::class, 'destroyStudentClassAPI'])->name('technician.destroy-student-class-api');
     Route::post('/import-class-api', [TechnicianController::class, 'importClassAPI'])->name('technician.import-class-api');
 
     // Building
