@@ -21,7 +21,7 @@ class CreditClass extends Model
 
     public function lecturer()
     {
-        return $this->belongsTo(Lecturer::class);
+        return $this->belongsTo(Lecturer::class, 'lecturer_id');
     }
 
     public function classSessions()

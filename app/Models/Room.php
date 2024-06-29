@@ -14,16 +14,16 @@ class Room extends Model
 
     public function building()
     {
-        return $this->belongsTo(Building::class);
+        return $this->belongsTo(Building::class, 'building_id', 'id');
     }
 
     public function classSessions()
     {
-        return $this->hasMany(ClassSession::class);
+        return $this->hasMany(ClassSession::class, 'room_id', 'id');
     }
 
     public function computers()
     {
-        return $this->hasMany(Computer::class);
+        return $this->hasMany(Computer::class, 'room_id', 'id');
     }
 }

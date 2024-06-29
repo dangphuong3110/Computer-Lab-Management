@@ -50,26 +50,26 @@ class User extends Authenticatable
 
     public function role()
     {
-        return $this->belongsTo(Role::class);
+        return $this->belongsTo(Role::class, 'role_id');
     }
 
     public function student()
     {
-        return $this->hasOne(Student::class);
+        return $this->hasOne(Student::class, 'user_id');
     }
 
     public function lecturer()
     {
-        return $this->hasOne(Lecturer::class);
+        return $this->hasOne(Lecturer::class, 'user_id');
     }
 
     public function technician()
     {
-        return $this->hasOne(Technician::class);
+        return $this->hasOne(Technician::class, 'user_id');
     }
 
     public function manager()
     {
-        return $this->hasOne(Manager::class);
+        return $this->hasOne(Manager::class, 'user_id');
     }
 }

@@ -15,12 +15,12 @@ class ClassSession extends Model
 
     public function creditClass()
     {
-        return $this->belongsTo(CreditClass::class, 'class_id');
+        return $this->belongsTo(CreditClass::class, 'class_id', 'id');
     }
 
     public function room()
     {
-        return $this->belongsTo(Room::class);
+        return $this->belongsTo(Room::class, 'room_id', 'id');
     }
 
     public function lessons()
@@ -30,6 +30,6 @@ class ClassSession extends Model
 
     public function attendances()
     {
-        return $this->hasMany(Attendance::class);
+        return $this->hasMany(Attendance::class, 'session_id', 'id');
     }
 }

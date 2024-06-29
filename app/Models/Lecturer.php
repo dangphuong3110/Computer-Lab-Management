@@ -23,16 +23,16 @@ class Lecturer extends Model
     ];
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function creditClasses()
     {
-        return $this->hasMany(CreditClass::class);
+        return $this->hasMany(CreditClass::class, 'lecturer_id');
     }
 
     public function reports()
     {
-        return $this->hasMany(Report::class);
+        return $this->hasMany(Report::class, 'lecturer_id');
     }
 }

@@ -14,16 +14,16 @@ class Report extends Model
 
     public function student()
     {
-        return $this->belongsTo(Student::class);
+        return $this->belongsTo(Student::class, 'student_id', 'id');
     }
 
     public function lecturer()
     {
-        return $this->belongsTo(Lecturer::class);
+        return $this->belongsTo(Lecturer::class, 'lecturer_id', 'id');
     }
 
     public function technician()
     {
-        return $this->belongsTo(Technician::class);
+        return $this->belongsTo(Technician::class, 'technician_id', 'id');
     }
 }
