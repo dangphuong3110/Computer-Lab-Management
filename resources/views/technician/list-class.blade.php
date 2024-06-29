@@ -147,36 +147,6 @@
                             </div>
                         </div>
                     </div>
-{{--                    <button type="button" class="btn btn-outline-success ms-2" data-bs-toggle="modal" data-bs-target="#import-class-modal">Nhập file</button>--}}
-{{--                    <!----- Modal nhập file sinh viên ----->--}}
-{{--                    <div class="modal fade" id="import-class-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addClassModalLabel" aria-hidden="true">--}}
-{{--                        <div class="modal-dialog modal-dialog-centered">--}}
-{{--                            <div class="modal-content">--}}
-{{--                                <div class="modal-header">--}}
-{{--                                    <h1 class="modal-title fs-5" id="exampleModalLabel">Nhập file sinh viên</h1>--}}
-{{--                                </div>--}}
-{{--                                <div class="modal-body">--}}
-{{--                                    <form method="post" action="{{ route('technician.import-class-api') }}" enctype="multipart/form-data" id="import-class-form">--}}
-{{--                                        @csrf--}}
-{{--                                        <div class="row mb-3 mt-4 d-flex justify-content-center align-items-center">--}}
-{{--                                            <label class="col-md-3 col-label-form fs-6 fw-bold text-md-end">Chọn file</label>--}}
-{{--                                            <div class="col-md-8">--}}
-{{--                                                <input type="file" name="class-file" class="form-control fs-6" accept=".xlsx,.xls"/>--}}
-{{--                                            </div>--}}
-{{--                                        </div>--}}
-{{--                                    </form>--}}
-{{--                                </div>--}}
-{{--                                <div class="text-center">--}}
-{{--                                    <p class="ps-3 pe-3">File mẫu: <a href="{{ asset('file/import-class.xlsx') }}" download>mau-nhap.xlsx</a></p>--}}
-{{--                                    <p class="ps-3 pe-3 note">*Chú ý: Tài khoản sẽ được tạo tự động với tên đăng nhập là <span>Mã sinh viên</span> và mật khẩu là <span>123456</span>.<br> Thông tin tối thiểu cần có: <span>Họ và tên</span> + <span>Mã sinh viên</span></p>--}}
-{{--                                </div>--}}
-{{--                                <div class="modal-footer">--}}
-{{--                                    <button type="button" class="btn btn-secondary close-btn" data-bs-dismiss="modal">Đóng</button>--}}
-{{--                                    <button type="button" id="btn-import-class" class="btn btn-primary">Nhập</button>--}}
-{{--                                </div>--}}
-{{--                            </div>--}}
-{{--                        </div>--}}
-{{--                    </div>--}}
                 </div>
             </div>
             <div class="table-responsive" id="table-class">
@@ -563,38 +533,6 @@
                 });
             }
 
-            function submitFormImportClass (form, overlay) {
-                const formData = new FormData(form[0]);
-                $.ajax({
-                    type: 'POST',
-                    data: formData,
-                    contentType: false,
-                    processData: false,
-                    url: '{{ route("technician.import-class-api") }}',
-                    success: function (response) {
-                        if (response.success) {
-                            showToastSuccess(response.success);
-                            form[0].reset();
-                            $('#table-class tbody').html(response.table_class);
-                            $('#paginate-class').html(response.links);
-                            updatePagination();
-                            addEventForModalUpdate();
-                            addEventForButtons();
-                            $('#import-class-modal').modal('hide');
-                            $('body').css('overflow', 'auto');
-                        } else {
-                            showToastError(response.errors['class-file']);
-                            $('body').append('<div class="modal-backdrop fade show"></div>');
-                        }
-
-                        overlay.classList.remove('show');
-                    },
-                    error: function (error) {
-                        console.error(error);
-                    }
-                });
-            }
-
             function updatePagination () {
                 const currentUrl = new URL(window.location.href);
                 const currentPath = currentUrl.pathname;
@@ -620,16 +558,6 @@
 
                 const form = $('#add-class-form');
                 submitFormCreateClass(form, overlay);
-            });
-
-            $('#btn-import-class').click(function(e) {
-                e.preventDefault();
-                const overlay = document.getElementById('overlay');
-                overlay.classList.add('show');
-                $('.modal-backdrop').remove();
-
-                const form = $('#import-class-form');
-                submitFormImportClass(form, overlay);
             });
 
             function addEventForButtons () {

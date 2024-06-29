@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Imports\LecturersImport;
+use App\Imports\StudentClassImport;
 use App\Imports\StudentsImport;
 use App\Models\Building;
 use App\Models\ClassSession;
@@ -1093,5 +1094,31 @@ class TechnicianController extends Controller
         $table_student = view('technician.table-student', compact('students'))->render();
 
         return response()->json(['success' => 'Nhập file sinh viên thành công!', 'table_student' => $table_student, 'links' => $students->render('pagination::bootstrap-5')->toHtml()]);
+    }
+
+    public function importStudentClassAPI(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'student-class-file' => 'required|mimes:xlsx,xls',
+        ], [
+            'student-class-file.required' => 'Vui lòng nhập file!',
+            'student-class-file.mimes' => 'Vui lòng nhập đúng định dạng file excel (.xlsx, .xls)!',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()]);
+        }
+
+        $file = $request->file('student-class-file');
+
+        $class_id = $request->input('class_id');
+        $import = new StudentClassImport($class_id);
+        Excel::import($import, $file);
+
+        $class = CreditClass::where('id', $class_id)->first();
+        $students = $class->students()->orderBy('class_student.created_at', 'desc')->paginate(7);
+        $table_student_class = view('technician.table-student-class', compact('students', 'class'))->render();
+
+        return response()->json(['success' => 'Nhập file sinh viên vào lớp học phần thành công!', 'table_student_class' => $table_student_class, 'links' => $students->render('pagination::bootstrap-5')->toHtml()]);
     }
 }

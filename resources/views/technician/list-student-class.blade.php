@@ -26,7 +26,7 @@
                                     <h1 class="modal-title fs-5" id="exampleModalLabel">Thêm sinh viên vào lớp học phần</h1>
                                 </div>
                                 <div class="modal-body">
-                                    <form method="post" action="{{ route('technician.store-student-api') }}" id="add-student-form">
+                                    <form method="post" action="{{ route('technician.store-student-class-api') }}" id="add-student-form">
                                         @csrf
                                         <div class="row mb-3 mt-4">
                                             <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Mã sinh viên<span class="required">*</span></label>
@@ -49,32 +49,32 @@
                             </div>
                         </div>
                     </div>
-                    <button type="button" class="btn btn-outline-success ms-2" data-bs-toggle="modal" data-bs-target="#import-student-modal">Nhập file</button>
+                    <button type="button" class="btn btn-outline-success ms-2" data-bs-toggle="modal" data-bs-target="#import-student-class-modal">Nhập file</button>
                     <!----- Modal nhập file sinh viên ----->
-                    <div class="modal fade" id="import-student-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addStudentModalLabel" aria-hidden="true">
+                    <div class="modal fade" id="import-student-class-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addStudentClassModalLabel" aria-hidden="true">
                         <div class="modal-dialog modal-dialog-centered">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h1 class="modal-title fs-5" id="exampleModalLabel">Nhập file sinh viên</h1>
+                                    <h1 class="modal-title fs-5" id="exampleModalLabel">Nhập file sinh viên vào lớp học phần</h1>
                                 </div>
                                 <div class="modal-body">
-                                    <form method="post" action="{{ route('technician.import-student-api') }}" enctype="multipart/form-data" id="import-student-form">
+                                    <form method="post" action="{{ route('technician.import-student-class-api', $class->id) }}" enctype="multipart/form-data" id="import-student-class-form">
                                         @csrf
                                         <div class="row mb-3 mt-4 d-flex justify-content-center align-items-center">
                                             <label class="col-md-3 col-label-form fs-6 fw-bold text-md-end">Chọn file</label>
                                             <div class="col-md-8">
-                                                <input type="file" name="student-file" class="form-control fs-6" accept=".xlsx,.xls"/>
+                                                <input type="file" name="student-class-file" class="form-control fs-6" accept=".xlsx,.xls"/>
                                             </div>
                                         </div>
                                     </form>
                                 </div>
                                 <div class="text-center">
-                                    <p class="ps-3 pe-3">File mẫu: <a href="{{ asset('file/import-student.xlsx') }}" download>mau-nhap.xlsx</a></p>
-                                    <p class="ps-3 pe-3 note">*Chú ý: Tài khoản sẽ được tạo tự động với tên đăng nhập là <span>Ma_sinh_vien@e.tlu.edu.vn</span> và mật khẩu là <span>123456</span>.<br> Thông tin tối thiểu cần có: <span>Họ và tên</span> + <span>Mã sinh viên</span></p>
+                                    <p class="ps-3 pe-3">File mẫu: <a href="{{ asset('file/import-student-into-class.xlsx') }}" download>mau-nhap.xlsx</a></p>
+                                    <p class="ps-3 pe-3 note">*Chú ý: Thông tin tối thiểu cần có: <span>Mã sinh viên</span></p>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary close-btn" data-bs-dismiss="modal">Đóng</button>
-                                    <button type="button" id="btn-import-student" class="btn btn-primary">Nhập</button>
+                                    <button type="button" id="btn-import-student-class" class="btn btn-primary">Nhập</button>
                                 </div>
                             </div>
                         </div>
@@ -137,7 +137,7 @@
                     @endif
                     </tbody>
                 </table>
-                <div class="fw-bold skill-pagination" id="paginate-student">
+                <div class="fw-bold skill-pagination" id="paginate-student-class">
                     {!! $students->render('pagination::bootstrap-5') !!}
                 </div>
             </div>
@@ -171,7 +171,7 @@
                             showToastSuccess(response.success);
                             form[0].reset();
                             $('#table-student-class tbody').html(response.table_student_class);
-                            $('#paginate-student').html(response.links);
+                            $('#paginate-student-class').html(response.links);
                             updatePagination();
                             addEventForModalUpdate();
                             addEventForButtons();
@@ -247,7 +247,7 @@
                         if (response.success) {
                             showToastSuccess(response.success);
                             $('#table-student-class tbody').html(response.table_student_class);
-                            $('#paginate-student').html(response.links);
+                            $('#paginate-student-class').html(response.links);
                             updatePagination();
                             addEventForModalUpdate();
                             addEventForButtons();
@@ -263,27 +263,28 @@
                 });
             }
 
-            function submitFormImportStudent (form, overlay) {
+            function submitFormImportStudentClass (form, overlay) {
                 const formData = new FormData(form[0]);
+                formData.append('class_id', '{{ $class->id }}');
                 $.ajax({
                     type: 'POST',
                     data: formData,
                     contentType: false,
                     processData: false,
-                    url: '{{ route("technician.import-student-api") }}',
+                    url: '{{ route("technician.import-student-class-api") }}',
                     success: function (response) {
                         if (response.success) {
                             showToastSuccess(response.success);
                             form[0].reset();
-                            $('#table-student tbody').html(response.table_student);
-                            $('#paginate-student').html(response.links);
+                            $('#table-student-class tbody').html(response.table_student_class);
+                            $('#paginate-student-class').html(response.links);
                             updatePagination();
                             addEventForModalUpdate();
                             addEventForButtons();
-                            $('#import-student-modal').modal('hide');
+                            $('#import-student-class-modal').modal('hide');
                             $('body').css('overflow', 'auto');
                         } else {
-                            showToastError(response.errors['student-file']);
+                            showToastError(response.errors['student-class-file']);
                             $('body').append('<div class="modal-backdrop fade show"></div>');
                         }
 
@@ -332,14 +333,14 @@
                 submitFormSearchStudent(form, overlay);
             });
 
-            $('#btn-import-student').click(function(e) {
+            $('#btn-import-student-class').click(function(e) {
                 e.preventDefault();
                 const overlay = document.getElementById('overlay');
                 overlay.classList.add('show');
                 $('.modal-backdrop').remove();
 
-                const form = $('#import-student-form');
-                submitFormImportStudent(form, overlay);
+                const form = $('#import-student-class-form');
+                submitFormImportStudentClass(form, overlay);
             });
 
             function addEventForButtons () {

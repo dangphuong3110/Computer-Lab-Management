@@ -74,7 +74,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/update-class-status-api/{class}', [TechnicianController::class, 'updateStatusClassAPI'])->name('technician.update-status-class-api');
     Route::delete('/delete-class-api/{class}', [TechnicianController::class, 'destroyClassAPI'])->name('technician.destroy-class-api');
     Route::delete('/delete-student-class-api/{student}', [TechnicianController::class, 'destroyStudentClassAPI'])->name('technician.destroy-student-class-api');
-    Route::post('/import-class-api', [TechnicianController::class, 'importClassAPI'])->name('technician.import-class-api');
+    Route::post('/import-student-class-api', [TechnicianController::class, 'importStudentClassAPI'])->name('technician.import-student-class-api');
 
     // Building
     Route::get('/get-list-building', [TechnicianController::class, 'getListBuilding'])->name('technician.get-list-building')->middleware('check.role:technician');
