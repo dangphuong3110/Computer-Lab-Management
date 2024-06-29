@@ -68,9 +68,35 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/get-lesson-of-class-session-api/{class}', [TechnicianController::class, 'getLessonOfClassSessionAPI'])->name('technician.get-lesson-of-class-session-api');
     Route::post('/store-class-api', [TechnicianController::class, 'storeClassAPI'])->name('technician.store-class-api');
     Route::put('/update-class-api/{class}', [TechnicianController::class, 'updateClassAPI'])->name('technician.update-class-api');
-    Route::put('/update-class-status/{class}', [TechnicianController::class, 'updateStatusClassAPI'])->name('technician.update-status-class-api');
+    Route::put('/update-class-status-api/{class}', [TechnicianController::class, 'updateStatusClassAPI'])->name('technician.update-status-class-api');
     Route::delete('/delete-class-api/{class}', [TechnicianController::class, 'destroyClassAPI'])->name('technician.destroy-class-api');
     Route::post('/import-class-api', [TechnicianController::class, 'importClassAPI'])->name('technician.import-class-api');
+
+    // Building
+    Route::get('/get-list-building', [TechnicianController::class, 'getListBuilding'])->name('technician.get-list-building')->middleware('check.role:technician');
+
+    Route::get('/get-list-building-api', [TechnicianController::class, 'getListBuildingAPI'])->name('technician.get-list-building-api');
+    Route::post('/store-building-api', [TechnicianController::class, 'storeBuildingAPI'])->name('technician.store-building-api');
+    Route::put('/update-building-api/{building}', [TechnicianController::class, 'updateBuildingAPI'])->name('technician.update-building-api');
+    Route::delete('/delete-building-api/{building}', [TechnicianController::class, 'destroyBuildingAPI'])->name('technician.destroy-building-api');
+
+    // Room
+    Route::get('/get-list-room/{building}', [TechnicianController::class, 'getListRoom'])->name('technician.get-list-room')->middleware('check.role:technician');
+
+    Route::get('/get-list-room-api', [TechnicianController::class, 'getListRoomAPI'])->name('technician.get-list-room-api');
+    Route::post('/store-room-api', [TechnicianController::class, 'storeRoomAPI'])->name('technician.store-room-api');
+    Route::put('/update-room-api/{room}', [TechnicianController::class, 'updateRoomAPI'])->name('technician.update-room-api');
+    Route::delete('/delete-room-api/{room}', [TechnicianController::class, 'destroyRoomAPI'])->name('technician.destroy-room-api');
+
+    // Room
+    Route::get('/get-list-computer/{room}', [TechnicianController::class, 'getListComputer'])->name('technician.get-list-computer')->middleware('check.role:technician');
+
+    Route::get('/get-list-computer-api', [TechnicianController::class, 'getListComputerAPI'])->name('technician.get-list-computer-api');
+    Route::post('/store-computer-api', [TechnicianController::class, 'storeComputerAPI'])->name('technician.store-computer-api');
+    Route::put('/update-computer-api/{computer}', [TechnicianController::class, 'updateComputerAPI'])->name('technician.update-computer-api');
+    Route::put('/start-maintenance-computer-api/{computer}', [TechnicianController::class, 'startMaintenanceClassAPI'])->name('technician.start-maintenance-computer-api');
+    Route::put('/end-maintenance-computer-api/{computer}', [TechnicianController::class, 'endMaintenanceClassAPI'])->name('technician.end-maintenance-computer-api');
+    Route::delete('/delete-computer-api/{computer}', [TechnicianController::class, 'destroyComputerAPI'])->name('technician.destroy-computer-api');
 });
 
 Route::middleware(['auth', 'check.role:manager'])->group(function () {

@@ -64,10 +64,10 @@
                         <span class="text nav-text">Lớp học phần</span>
                     </a>
                 </li>
-                <li class="nav-link">
-                    <a href="#">
+                <li class="nav-link {{ request()->routeIs('technician.get-list-building', 'technician.get-list-room', 'technician.get-list-computer') ? 'active' : '' }}">
+                    <a href="{{ route('technician.get-list-building') }}">
                         <i class='bx bx-buildings icon'></i>
-                        <span class="text nav-text">Phòng máy</span>
+                        <span class="text nav-text">Nhà thực hành</span>
                     </a>
                 </li>
                 <li class="nav-link">

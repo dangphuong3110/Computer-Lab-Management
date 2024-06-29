@@ -6,6 +6,7 @@ use App\Imports\LecturersImport;
 use App\Imports\StudentsImport;
 use App\Models\Building;
 use App\Models\ClassSession;
+use App\Models\Computer;
 use App\Models\CreditClass;
 use App\Models\Lecturer;
 use App\Models\Lesson;
@@ -78,15 +79,6 @@ class TechnicianController extends Controller
         return view('technician.list-class', compact('title','user', 'classes', 'lecturers', 'buildings', 'rooms', 'classSessions', 'lessons'));
     }
 
-    public function getListBuilding() {
-        $title = 'Phòng máy';
-        $user = Auth::user();
-
-        $buildings = Building::orderBy('updated_at', 'desc')->paginate(7);
-
-        return view('technician.list-building', compact('title','user', 'buildings'));
-    }
-
     public function getLessonOfClassSessionAPI(string $classId)
     {
         $class = CreditClass::with(['classSessions.lessons' => function ($query) {
@@ -104,6 +96,36 @@ class TechnicianController extends Controller
         });
 
         return response()->json($classSessionsLessons);
+    }
+
+    public function getListBuilding() {
+        $title = 'Nhà thực hành';
+        $user = Auth::user();
+
+        $buildings = Building::orderBy('updated_at', 'desc')->get();
+
+        return view('technician.list-building', compact('title','user', 'buildings'));
+    }
+
+    public function getListRoom(string $building_id) {
+        $title = 'Phòng máy';
+        $user = Auth::user();
+
+        $rooms = Room::where('building_id', $building_id)->orderBy('updated_at', 'desc')->get();
+
+        return view('technician.list-room', compact('title','user', 'rooms', 'building_id'));
+    }
+
+    public function getListComputer(string $room_id)
+    {
+        $title = 'Sơ đồ phòng máy';
+        $user = Auth::user();
+
+        $room = Room::where('id', $room_id)->first();
+        $building = Building::where('id', $room->building_id)->first();
+        $computers = Computer::where('room_id', $room_id)->get();
+
+        return view('technician.list-computer', compact('title','user', 'building', 'room', 'computers'));
     }
 
     public function storeLecturerAPI(Request $request)
@@ -344,6 +366,92 @@ class TechnicianController extends Controller
             'class_sessions' => $classSessions,
             'lessons' => $lessons
         ]);
+    }
+
+    public function storeBuildingAPI(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'building-name' => 'required|max:255',
+        ], [
+            'building-name.required' => 'Vui lòng nhập tên nhà thực hành!',
+            'building-name.max' => 'Tên nhà thực hành không được vượt quá 255 ký tự!',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()]);
+        }
+
+        $building = new Building();
+        $building->name = $request->input('building-name');
+
+        $building->save();
+
+        $buildings = Building::orderBy('updated_at', 'desc')->get();
+        $table_building = view('technician.table-building', compact('buildings'))->render();
+
+        return response()->json(['success' => 'Thêm nhà thực hành thành công!', 'table_building' => $table_building]);
+    }
+
+    public function storeRoomAPI(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'room-name' => 'required|max:255',
+            'capacity' => 'required|numeric|min:1',
+        ], [
+            'room-name.required' => 'Vui lòng nhập tên phòng máy!',
+            'room-name.max' => 'Tên phòng máy không được vượt quá 255 ký tự!',
+            'capacity.required' => 'Vui lòng nhập sức chứa của phòng máy!',
+            'capacity.numeric' => 'Sức chứa của phòng máy phải là một số!',
+            'capacity.min' => 'Sức chứa của phòng máy phải lớn hơn 0!',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()]);
+        }
+
+        $room = new Room();
+        $room->name = $request->input('room-name');
+        $room->capacity = $request->input('capacity');
+        $room->building_id = $request->input('building_id');
+
+        $room->save();
+
+        $building_id = $request->input('building_id');
+
+        $rooms = Room::where('building_id', $building_id)->orderBy('updated_at', 'desc')->get();
+        $table_room = view('technician.table-room', compact('rooms', 'building_id'))->render();
+
+        return response()->json(['success' => 'Thêm phòng máy thành công!', 'table_room' => $table_room]);
+    }
+
+    public function storeComputerAPI(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'position' => 'required|int|min:1',
+        ], [
+            'position.required' => 'Vui lòng nhập vị trí máy tính!',
+            'position.int' => 'Vị trí máy tính phải là một số nguyên!',
+            'position.min' => 'Vị trí máy tính phải lớn hơn 0!',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()]);
+        }
+
+        $room = Room::findOrFail($request->input('room_id'));
+
+        $computer = new Computer();
+        $computer->position = $request->input('position');
+        $computer->configuration = $request->input('configuration');
+        $computer->purchase_date = $request->input('purchase-date');
+        $computer->room_id = $room->id;
+
+        $computer->save();
+
+        $computers = Computer::where('room_id', $room->id)->get();
+        $table_computer = view('technician.table-computer', compact('computers', 'room'))->render();
+
+        return response()->json(['success' => 'Thêm máy tính thành công!', 'table_computer' => $table_computer]);
     }
 
     public function updateLecturerAPI(Request $request, string $id)
@@ -600,6 +708,126 @@ class TechnicianController extends Controller
         return response()->json(['success' => $message]);
     }
 
+    public function updateBuildingAPI(Request $request, string $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'building-name' => 'required|max:255',
+        ], [
+            'building-name.required' => 'Vui lòng nhập tên nhà thực hành!',
+            'building-name.max' => 'Tên nhà thực hành không được vượt quá 255 ký tự!',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()]);
+        }
+
+        $building = Building::findOrFail($id);
+        $building->name = $request->input('building-name');
+
+        $building->save();
+
+        $buildings = Building::orderBy('updated_at', 'desc')->get();
+        $table_building = view('technician.table-building', compact('buildings'))->render();
+
+        return response()->json(['success' => 'Chỉnh sửa thông tin nhà thực hành thành công!', 'table_building' => $table_building]);
+    }
+
+    public function updateRoomAPI(Request $request, string $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'room-name' => 'required|max:255',
+            'capacity' => 'required|numeric|min:1',
+        ], [
+            'room-name.required' => 'Vui lòng nhập tên phòng máy!',
+            'room-name.max' => 'Tên phòng máy không được vượt quá 255 ký tự!',
+            'capacity.required' => 'Vui lòng nhập sức chứa của phòng máy!',
+            'capacity.numeric' => 'Sức chứa của phòng máy phải là một số!',
+            'capacity.min' => 'Sức chứa của phòng máy phải lớn hơn 0!',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()]);
+        }
+
+        $maxPositionComputer = Room::findOrFail($id)->computers()->max('position');
+
+        if ($request->input('capacity') < $maxPositionComputer) {
+            return response()->json(['errors' => ['capacity' => 'Sức chứa của phòng máy không thể nhỏ hơn vị trí máy tính lớn nhất đã đặt!']]);
+        }
+
+        $room = Room::findOrFail($id);
+        $room->name = $request->input('room-name');
+        $room->capacity = $request->input('capacity');
+
+        $room->save();
+
+        $building_id = $request->input('building_id');
+
+        $rooms = Room::where('building_id', $building_id)->orderBy('updated_at', 'desc')->get();
+        $table_room = view('technician.table-room', compact('rooms', 'building_id'))->render();
+
+        return response()->json(['success' => 'Chỉnh sửa thông tin phòng máy thành công!', 'table_room' => $table_room]);
+    }
+
+    public function updateComputerAPI(Request $request, string $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'position' => 'required|int|min:1',
+        ], [
+            'position.required' => 'Vui lòng nhập vị trí máy tính!',
+            'position.int' => 'Vị trí máy tính phải là một số nguyên!',
+            'position.min' => 'Vị trí máy tính phải lớn hơn 0!',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()]);
+        }
+
+        $room = Room::findOrFail($request->input('room_id'));
+
+        $computer = Computer::findOrFail($id);
+        $computer->position = $request->input('position');
+        $computer->configuration = $request->input('configuration');
+        $computer->purchase_date = $request->input('purchase-date');
+
+        $computer->save();
+
+        $computers = Computer::where('room_id', $room->id)->get();
+        $table_computer = view('technician.table-computer', compact('computers', 'room'))->render();
+
+        return response()->json(['success' => 'Chỉnh sửa thông tin máy tính thành công!', 'table_computer' => $table_computer]);
+    }
+
+    public function startMaintenanceClassAPI(Request $request, string $id) {
+        $computer = Computer::findOrFail($id);
+
+        $computer->status = 'unavailable';
+
+        $computer->save();
+
+        $room = Room::findOrFail($request->input('room_id'));
+
+        $computers = Computer::where('room_id', $room->id)->get();
+        $table_computer = view('technician.table-computer', compact('computers', 'room'))->render();
+
+        return response()->json(['success' => 'Bắt đầu quá trình bảo trì máy tính thành công!', 'table_computer' => $table_computer]);
+    }
+
+    public function endMaintenanceClassAPI(Request $request, string $id) {
+        $computer = Computer::findOrFail($id);
+
+        $computer->status = 'available';
+
+        $computer->save();
+
+        $room = Room::findOrFail($request->input('room_id'));
+
+        $computers = Computer::where('room_id', $room->id)->get();
+        $table_computer = view('technician.table-computer', compact('computers', 'room'))->render();
+
+        return response()->json(['success' => 'Kết thúc quá trình bảo trì máy tính thành công!', 'table_computer' => $table_computer]);
+    }
+
     public function destroyLecturerAPI(string $id)
     {
         $lecturer = Lecturer::findOrFail($id);
@@ -674,6 +902,53 @@ class TechnicianController extends Controller
             'class_sessions' => $classSessions,
             'lessons' => $lessons
         ]);
+    }
+
+    public function destroyBuildingAPI(string $id)
+    {
+        $building = Building::findOrFail($id);
+
+        if ($building->rooms->count() > 0) {
+            return response()->json(['errors' => ['building' => 'Không thể xóa vì tòa nhà này đang chứa phòng máy! Vui lòng xóa tất cả phòng máy trong tòa nhà trước khi xóa!']]);
+        }
+
+        $building->delete();
+
+        $buildings = Building::orderBy('updated_at', 'desc')->get();
+        $table_building = view('technician.table-building', compact('buildings'))->render();
+
+        return response()->json(['success' => 'Xóa nhà thực hành thành công!', 'table_building' => $table_building]);
+    }
+
+    public function destroyRoomAPI(Request $request, string $id)
+    {
+        $room = Room::findOrFail($id);
+
+        if ($room->computers->count() > 0) {
+            return response()->json(['errors' => ['room' => 'Không thể xóa vì phòng máy này đang chứa máy tính! Vui lòng xóa tất cả máy tính trong phòng máy trước khi xóa!']]);
+        }
+
+        $room->delete();
+
+        $building_id = $request->input('building_id');
+
+        $rooms = Room::where('building_id', $building_id)->orderBy('updated_at', 'desc')->get();
+        $table_room = view('technician.table-room', compact('rooms', 'building_id'))->render();
+
+        return response()->json(['success' => 'Xóa phòng máy thành công!', 'table_room' => $table_room]);
+    }
+
+    public function destroyComputerAPI(Request $request, string $id)
+    {
+        $computer = Computer::findOrFail($id);
+
+        $computer->delete();
+
+        $room = Room::findOrFail($request->input('room_id'));
+        $computers = Computer::where('room_id', $room->id)->get();
+        $table_computer = view('technician.table-computer', compact('computers', 'room'))->render();
+
+        return response()->json(['success' => 'Xóa máy tính thành công!', 'table_computer' => $table_computer]);
     }
 
     public function importLecturerAPI(Request $request)
