@@ -45,6 +45,10 @@ class StudentClassImport implements ToCollection, WithHeadingRow
             if (!$student) {
                 continue;
             } else {
+                if ($student->creditClasses()->where('id', $this->class_id)->exists()) {
+                    continue;
+                }
+
                 $student->creditClasses()->attach($this->class_id,  ['created_at' => now(), 'updated_at' => now()]);
             }
         }
