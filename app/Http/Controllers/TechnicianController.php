@@ -333,8 +333,7 @@ class TechnicianController extends Controller
                         foreach ($ranges as $range) {
                             if ($classSession->day_of_week == $dayOfWeek &&
                                 (($startLessonId >= $range[0] && $startLessonId <= $range[1]) ||
-                                    ($endLessonId >= $range[0] && $endLessonId <= $range[1]) ||
-                                    ($endLessonId <= $range[0] && $startLessonId >= $range[1]))) {
+                                    ($endLessonId >= $range[0] && $endLessonId <= $range[1]))) {
                                 return response()->json(['errors' => ['class-session' => "Giảng viên đã có buổi học trùng với buổi học bạn đang cố gắng thêm! (bấm để xem)", 'class-id' => $classSession->class_id]]);
                             }
                         }
@@ -422,6 +421,28 @@ class TechnicianController extends Controller
 
             if ($student->creditClasses()->where('id', $class_id)->exists()) {
                 return response()->json(['errors' => ['student-class' => 'Sinh viên đã có trong lớp học!']]);
+            }
+
+            $newClass = CreditClass::findOrFail($class_id);
+            $newClassSessions = $newClass->classSessions;
+
+            $currentClasses = $student->creditClasses;
+
+            foreach ($currentClasses as $currentClass) {
+                if (Carbon::parse($newClass->start_date)->between($currentClass->start_date, $currentClass->end_date) ||
+                    Carbon::parse($newClass->end_date)->between($currentClass->start_date, $currentClass->end_date)) {
+                    $currentClassSessions = $currentClass->classSessions;
+
+                    foreach ($newClassSessions as $newClassSession) {
+                        foreach ($currentClassSessions as $currentClassSession) {
+                            if ($newClassSession->day_of_week == $currentClassSession->day_of_week &&
+                                $newClassSession->start_lesson <= $currentClassSession->end_lesson &&
+                                $newClassSession->end_lesson >= $currentClassSession->start_lesson) {
+                                return response()->json(['errors' => ['student-class' => 'Sinh viên đã có lớp trùng tiết học với lớp mới! (' . $currentClass->name . ')']]);
+                            }
+                        }
+                    }
+                }
             }
 
             $student->creditClasses()->attach($class_id, ['created_at' => now(), 'updated_at' => now()]);
@@ -588,7 +609,7 @@ class TechnicianController extends Controller
 
         return response()->json(['success' => 'Đổi mật khẩu tài khoản của giảng viên thành công!']);
     }
-    
+
     public function updateStudentAPI(Request $request, string $id)
     {
         $student = Student::findOrFail($id);
