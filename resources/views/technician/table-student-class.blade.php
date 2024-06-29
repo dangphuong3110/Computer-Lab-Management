@@ -8,7 +8,9 @@
             <td class="text-center">{{ $student->user->email }}</td>
             <td class="text-center">{{ $student->user->phone }}</td>
             <td class="text-center">
-                <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#destroy-student-class-modal-{{ $student->id }}"><i class='bx bx-trash'></i></button>
+                <div class="wrap-button m-1" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Xóa sinh viên khỏi lớp học phần">
+                    <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#destroy-student-class-modal-{{ $student->id }}"><i class='bx bx-trash'></i></button>
+                </div>
                 <form method="post" action="{{ route('technician.destroy-student-class-api', $student->id) }}" id="destroy-student-class-form-{{ $student->id }}">
                     @csrf
                     @method('DELETE')

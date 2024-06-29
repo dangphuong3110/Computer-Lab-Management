@@ -6,8 +6,44 @@
             <td class="text-center">{{ $lecturer->faculty }}</td>
             <td class="text-center">{{ $lecturer->user->email }}</td>
             <td class="text-center">{{ $lecturer->user->phone }}</td>
-            <td class="text-center">
-                <a href="#" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#update-lecturer-modal-{{ $lecturer->id }}"><i class='bx bx-pencil'></i></a>
+            <td class="text-center d-flex justify-content-center">
+                <div class="wrap-button m-1" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Đổi mật khẩu tài khoản">
+                    <a href="#" class="btn btn-sm btn-success my-auto" data-bs-toggle="modal" data-bs-target="#update-password-lecturer-modal-{{ $lecturer->id }}"><i class='bx bxs-key'></i></a>
+                </div>
+                <!----- Modal đổi mật khẩu giảng viên ----->
+                <div class="modal fade" id="update-password-lecturer-modal-{{ $lecturer->id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="updatePasswordLecturerModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="exampleModalLabel">Đổi mật khẩu tài khoản giảng viên</h1>
+                            </div>
+                            <div class="modal-body">
+                                <form method="post" action="{{ route('technician.update-password-lecturer-api', $lecturer->id) }}" id="update-password-lecturer-form-{{ $lecturer->id }}">
+                                    @csrf
+                                    <div class="row mb-3 mt-4">
+                                        <label class="col-md-5 col-label-form fs-6 fw-bold text-md-end">Mật khẩu mới<span class="required">*</span></label>
+                                        <div class="col-md-7">
+                                            <input type="password" name="new-password" class="form-control fs-6"/>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3 mt-4">
+                                        <label class="col-md-5 col-label-form fs-6 fw-bold text-md-end">Nhập lại mật khẩu mới<span class="required">*</span></label>
+                                        <div class="col-md-7">
+                                            <input type="password" name="re-enter-new-password" class="form-control fs-6"/>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary close-update-btn" data-bs-dismiss="modal">Đóng</button>
+                                <button type="submit" class="btn btn-primary btn-update-password-lecturer" data-lecturer-id="{{ $lecturer->id }}">Xác nhận</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="wrap-button m-1" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Sửa thông tin giảng viên">
+                    <a href="#" class="btn btn-sm btn-primary my-auto" data-bs-toggle="modal" data-bs-target="#update-lecturer-modal-{{ $lecturer->id }}"><i class='bx bx-pencil'></i></a>
+                </div>
                 <!----- Modal sửa giảng viên ----->
                 <div class="modal fade modal-update" id="update-lecturer-modal-{{ $lecturer->id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addLecturerModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
@@ -70,7 +106,9 @@
                         </div>
                     </div>
                 </div>
-                <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#destroy-lecturer-modal-{{ $lecturer->id }}"><i class='bx bx-trash'></i></button>
+                <div class="wrap-button m-1" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Xóa giảng viên">
+                    <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#destroy-lecturer-modal-{{ $lecturer->id }}"><i class='bx bx-trash'></i></button>
+                </div>
                 <form method="post" action="{{ route('technician.destroy-lecturer-api', $lecturer->id) }}" id="destroy-lecturer-form-{{ $lecturer->id }}">
                     @csrf
                     @method('DELETE')
@@ -100,4 +138,3 @@
         <td colspan="6" class="text-center">Không có dữ liệu giảng viên</td>
     </tr>
 @endif
-

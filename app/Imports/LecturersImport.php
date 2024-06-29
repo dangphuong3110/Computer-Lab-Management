@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
@@ -33,7 +34,7 @@ class LecturersImport implements ToCollection, WithHeadingRow
                 continue;
             }
 
-            if (!str_contains($trimmedRow['email'], '@tlu.edu.vn')) {
+            if (!Str::endsWith($trimmedRow['email'], '@tlu.edu.vn')) {
                 continue;
             }
 

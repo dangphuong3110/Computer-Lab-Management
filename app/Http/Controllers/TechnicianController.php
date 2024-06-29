@@ -179,7 +179,7 @@ class TechnicianController extends Controller
             return response()->json(['errors' => $validator->errors()]);
         }
 
-        if (!str_contains($request->input('email'), '@tlu.edu.vn')) {
+        if (!Str::endsWith($request->input('email'), '@tlu.edu.vn')) {
             return response()->json(['errors' => ['email' => 'Email phải là email giảng viên của nhà trường!']]);
         }
 
@@ -214,7 +214,7 @@ class TechnicianController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'full-name' => 'required|max:255',
-            'student-code' => 'required|max:255|unique:students,student-code',
+            'student-code' => 'required|max:255|unique:students,student_code',
         ], [
             'full-name.required' => 'Vui lòng nhập họ và tên!',
             'full-name.max' => 'Họ và tên không được vượt quá 255 ký tự!',
@@ -540,7 +540,7 @@ class TechnicianController extends Controller
             return response()->json(['errors' => $validator->errors()]);
         }
 
-        if (!str_contains($request->input('email'), '@tlu.edu.vn')) {
+        if (!Str::endsWith($request->input('email'), '@tlu.edu.vn')) {
             return response()->json(['errors' => ['email' => 'Email phải là email giảng viên của nhà trường!']]);
         }
 
@@ -564,13 +564,38 @@ class TechnicianController extends Controller
         return response()->json(['success' => 'Chỉnh sửa thông tin giảng viên thành công!', 'table_lecturer' => $table_lecturer, 'links' => $lecturers->render('pagination::bootstrap-5')->toHtml()]);
     }
 
+    public function updatePasswordLecturerAPI(Request $request, string $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'new-password' => 'required|min:6',
+            're-enter-new-password' => 'same:new-password',
+        ], [
+            'new-password.required' => 'Vui lòng nhập mật khẩu mới!',
+            'new-password.min' => 'Mật khẩu phải chứa ít nhất 6 ký tự!',
+            're-enter-new-password.same' => 'Mật khẩu nhập lại không khớp!',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()]);
+        }
+
+        $lecturer = Lecturer::findOrFail($id);
+
+        $user = User::findOrFail($lecturer->user_id);
+        $user->password = $request->input('new-password');
+
+        $user->save();
+
+        return response()->json(['success' => 'Đổi mật khẩu tài khoản của giảng viên thành công!']);
+    }
+    
     public function updateStudentAPI(Request $request, string $id)
     {
         $student = Student::findOrFail($id);
 
         $validator = Validator::make($request->all(), [
             'full-name' => 'required|max:255',
-            'student-code' => 'required|max:255|unique:students,student-code,' . $student->student_code,
+            'student-code' => 'required|max:255|unique:students,student_code,' . $student->id,
         ], [
             'full-name.required' => 'Vui lòng nhập họ và tên!',
             'full-name.max' => 'Họ và tên không được vượt quá 255 ký tự!',
@@ -601,6 +626,31 @@ class TechnicianController extends Controller
         $table_student = view('technician.table-student', compact('students'))->render();
 
         return response()->json(['success' => 'Chỉnh sửa thông tin sinh viên thành công!', 'table_student' => $table_student, 'links' => $students->render('pagination::bootstrap-5')->toHtml()]);
+    }
+
+    public function updatePasswordStudentAPI(Request $request, string $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'new-password' => 'required|min:6',
+            're-enter-new-password' => 'same:new-password',
+        ], [
+            'new-password.required' => 'Vui lòng nhập mật khẩu mới!',
+            'new-password.min' => 'Mật khẩu phải chứa ít nhất 6 ký tự!',
+            're-enter-new-password.same' => 'Mật khẩu nhập lại không khớp!',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()]);
+        }
+
+        $student = Student::findOrFail($id);
+
+        $user = User::findOrFail($student->user_id);
+        $user->password = $request->input('new-password');
+
+        $user->save();
+
+        return response()->json(['success' => 'Đổi mật khẩu tài khoản của sinh viên thành công!']);
     }
 
     public function updateClassAPI(Request $request, string $id)
@@ -928,6 +978,21 @@ class TechnicianController extends Controller
     public function destroyStudentAPI(string $id)
     {
         $student = Student::findOrFail($id);
+        $activeClasses = $student->creditClasses()
+            ->where(function ($query) {
+                $query->where('start_date', '<=', Carbon::now())
+                    ->where('end_date', '>=', Carbon::now());
+            })->get();
+
+        if ($activeClasses->count() > 0) {
+            $activeClassNames = $activeClasses->pluck('name')->implode(', ');
+            return response()->json([
+                'errors' => ['student' => "Không thể xóa vì sinh viên này đang tham gia các lớp học: $activeClassNames. Vui lòng xóa sinh viên khỏi lớp học phần trước khi xóa!"]
+            ]);
+        } else if ($student->creditClasses->count() > 0) {
+            return response()->json(['errors' => ['student' => 'Không thể xóa vì sinh viên này đã tham gia các lớp học!']]);
+        }
+
         $userId = $student->user_id;
 
         $student->delete();

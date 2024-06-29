@@ -134,8 +134,44 @@
                                     <td class="text-center">{{ $lecturer->faculty }}</td>
                                     <td class="text-center">{{ $lecturer->user->email }}</td>
                                     <td class="text-center">{{ $lecturer->user->phone }}</td>
-                                    <td class="text-center">
-                                        <a href="#" class="btn btn-sm btn-primary my-auto" data-bs-toggle="modal" data-bs-target="#update-lecturer-modal-{{ $lecturer->id }}"><i class='bx bx-pencil'></i></a>
+                                    <td class="text-center d-flex justify-content-center">
+                                        <div class="wrap-button m-1" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Đổi mật khẩu tài khoản">
+                                            <a href="#" class="btn btn-sm btn-success my-auto" data-bs-toggle="modal" data-bs-target="#update-password-lecturer-modal-{{ $lecturer->id }}"><i class='bx bxs-key'></i></a>
+                                        </div>
+                                        <!----- Modal đổi mật khẩu giảng viên ----->
+                                        <div class="modal fade" id="update-password-lecturer-modal-{{ $lecturer->id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="updatePasswordLecturerModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h1 class="modal-title fs-5" id="exampleModalLabel">Đổi mật khẩu tài khoản giảng viên</h1>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <form method="post" action="{{ route('technician.update-password-lecturer-api', $lecturer->id) }}" id="update-password-lecturer-form-{{ $lecturer->id }}">
+                                                            @csrf
+                                                            <div class="row mb-3 mt-4">
+                                                                <label class="col-md-5 col-label-form fs-6 fw-bold text-md-end">Mật khẩu mới<span class="required">*</span></label>
+                                                                <div class="col-md-7">
+                                                                    <input type="password" name="new-password" class="form-control fs-6"/>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row mb-3 mt-4">
+                                                                <label class="col-md-5 col-label-form fs-6 fw-bold text-md-end">Nhập lại mật khẩu mới<span class="required">*</span></label>
+                                                                <div class="col-md-7">
+                                                                    <input type="password" name="re-enter-new-password" class="form-control fs-6"/>
+                                                                </div>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary close-update-btn" data-bs-dismiss="modal">Đóng</button>
+                                                        <button type="submit" class="btn btn-primary btn-update-password-lecturer" data-lecturer-id="{{ $lecturer->id }}">Xác nhận</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="wrap-button m-1" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Sửa thông tin giảng viên">
+                                            <a href="#" class="btn btn-sm btn-primary my-auto" data-bs-toggle="modal" data-bs-target="#update-lecturer-modal-{{ $lecturer->id }}"><i class='bx bx-pencil'></i></a>
+                                        </div>
                                         <!----- Modal sửa giảng viên ----->
                                         <div class="modal fade modal-update" id="update-lecturer-modal-{{ $lecturer->id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addLecturerModalLabel" aria-hidden="true">
                                             <div class="modal-dialog modal-dialog-centered">
@@ -198,7 +234,9 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#destroy-lecturer-modal-{{ $lecturer->id }}"><i class='bx bx-trash'></i></button>
+                                        <div class="wrap-button m-1" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Xóa giảng viên">
+                                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#destroy-lecturer-modal-{{ $lecturer->id }}"><i class='bx bx-trash'></i></button>
+                                        </div>
                                         <form method="post" action="{{ route('technician.destroy-lecturer-api', $lecturer->id) }}" id="destroy-lecturer-form-{{ $lecturer->id }}">
                                             @csrf
                                             @method('DELETE')
@@ -322,6 +360,42 @@
                 });
             }
 
+            function submitFormUpdatePasswordLecturer(form, lecturerId, overlay) {
+                const formDataObj = {};
+                form.find('input, select, textarea').each(function() {
+                    formDataObj[$(this).attr('name')] = $(this).val();
+                });
+
+                let url = `{{ route("technician.update-password-lecturer-api", ":lecturerId") }}`;
+                url = url.replace(':lecturerId', lecturerId);
+                $.ajax({
+                    type: 'PUT',
+                    data: JSON.stringify(formDataObj),
+                    contentType: 'application/json',
+                    url: url,
+                    success: function (response) {
+                        if (response.success) {
+                            showToastSuccess(response.success);
+                            form[0].reset();
+                            $('#update-password-lecturer-modal-' + lecturerId).modal('hide');
+                            $('body').css('overflow', 'auto');
+                        } else {
+                            if (response.errors['new-password']) {
+                                showToastError(response.errors['new-password']);
+                            }
+                            if (response.errors['re-enter-new-password']) {
+                                showToastError(response.errors['re-enter-new-password'])
+                            }
+                            $('body').append('<div class="modal-backdrop fade show"></div>');
+                        }
+                        overlay.classList.remove('show');
+                    },
+                    error: function (error) {
+                        console.error(error);
+                    }
+                });
+            }
+
             function submitFormDestroyLecturer (lecturerId, overlay) {
                 let url = `{{ route("technician.destroy-lecturer-api", ":lecturerId") }}`;
                 url = url.replace(':lecturerId', lecturerId);
@@ -423,7 +497,11 @@
             });
 
             function addEventForButtons () {
+                const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+                const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+
                 $('.btn-update-lecturer').off('click');
+                $('.btn-update-password-lecturer').off('click');
                 $('.btn-destroy-lecturer').off('click');
                 $('.close-btn').off('click');
                 $('.close-update-btn').off('click');
@@ -438,6 +516,20 @@
                     const form = $('#update-lecturer-form-' + lecturerId);
 
                     submitFormUpdateLecturer(form[0], lecturerId, overlay);
+                });
+
+                $('.btn-update-password-lecturer').click(function(e) {
+                    e.preventDefault();
+                    const overlay = document.getElementById('overlay');
+                    overlay.classList.add('show');
+                    $('.modal-backdrop').remove();
+
+                    const lecturerId = $(this).data('lecturer-id');
+                    const form = $('#update-password-lecturer-form-' + lecturerId);
+
+                    console.log(form);
+
+                    submitFormUpdatePasswordLecturer(form, lecturerId, overlay);
                 });
 
                 $('.btn-destroy-lecturer').click('click', function(e) {

@@ -174,9 +174,13 @@
                                         <input class="form-check-input status-class" type="checkbox" role="switch" data-class-id="{{ $class->id }}" {{ $class->status == 'active' ? 'checked' : '' }}>
                                     </div>
                                 </td>
-                                <td class="text-center">
-                                    <a href="{{ route('technician.get-list-student-class', $class->id) }}" class="btn btn-sm btn-success my-auto btn-student-class"><i class='bx bx-group'></i></a>
-                                    <a href="#" class="btn btn-sm btn-primary my-auto btn-edit-class" id="btn-edit-class-{{ $class->id }}" data-index="{{ $index }}" data-class-id="{{ $class->id }}" data-bs-toggle="modal" data-bs-target="#update-class-modal-{{ $class->id }}"><i class='bx bx-pencil'></i></a>
+                                <td class="text-center d-flex justify-content-center">
+                                    <div class="wrap-button m-1" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Danh sách sinh viên">
+                                        <a href="{{ route('technician.get-list-student-class', $class->id) }}" class="btn btn-sm btn-success my-auto btn-student-class"><i class='bx bx-group'></i></a>
+                                    </div>
+                                    <div class="wrap-button m-1" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Sửa thông tin lớp học phần">
+                                        <a href="#" class="btn btn-sm btn-primary my-auto btn-edit-class" id="btn-edit-class-{{ $class->id }}" data-index="{{ $index }}" data-class-id="{{ $class->id }}" data-bs-toggle="modal" data-bs-target="#update-class-modal-{{ $class->id }}"><i class='bx bx-pencil'></i></a>
+                                    </div>
                                     <!----- Modal sửa lớp học ----->
                                     <div class="modal fade modal-update" id="update-class-modal-{{ $class->id }}" data-index="{{ $index }}" data-class-id="{{ $class->id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addClassModalLabel" aria-hidden="true">
                                         <div class="modal-dialog modal-xl modal-dialog-centered">
@@ -303,7 +307,9 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#destroy-class-modal-{{ $class->id }}"><i class='bx bx-trash'></i></button>
+                                    <div class="wrap-button m-1" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Xóa lớp học phần">
+                                        <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#destroy-class-modal-{{ $class->id }}"><i class='bx bx-trash'></i></button>
+                                    </div>
                                     <form method="post" action="{{ route('technician.destroy-class-api', $class->id) }}" id="destroy-class-form-{{ $class->id }}">
                                         @csrf
                                         @method('DELETE')
@@ -561,6 +567,12 @@
             });
 
             function addEventForButtons () {
+                const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+                const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+
+                $('.btn-update-student').off('click');
+                $('.btn-update-password-student').off('click');
+
                 $('.btn-update-class').off('click').click(function(e) {
                     e.preventDefault();
                     const overlay = document.getElementById('overlay');

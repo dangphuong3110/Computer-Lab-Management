@@ -76,10 +76,12 @@
                 </div>
             @else
                 <div class="border border-black" style="width: 6.67%; height: 100px;">
-                    <a href="#" class="d-flex align-items-center justify-content-center position-relative" data-bs-toggle="modal" data-bs-target="#add-computer-modal-{{ $i }}">
-                        <span class="position-absolute top-0 start-0">{{ $i }}</span>
-                        <i class="bx bx-plus"></i>
-                    </a>
+                    <div class="wrap-button" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Thêm máy tính" style="width: 100%; height: 100%;">
+                        <a href="#" class="d-flex align-items-center justify-content-center position-relative" data-bs-toggle="modal" data-bs-target="#add-computer-modal-{{ $i }}">
+                            <span class="position-absolute top-0 start-0">{{ $i }}</span>
+                            <i class="bx bx-plus"></i>
+                        </a>
+                    </div>
                     <!----- Modal thêm máy tính ----->
                     <div class="modal fade" id="add-computer-modal-{{ $i }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addComputerModalLabel" aria-hidden="true">
                         <div class="modal-dialog modal-dialog-centered">

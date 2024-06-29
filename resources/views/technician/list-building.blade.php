@@ -52,9 +52,13 @@
                                 <div class="card-header">
                                     <h5 class="card-title m-0">{{ $building->name }}</h5>
                                 </div>
-                                <div class="card-body">
-                                    <a href="{{ route('technician.get-list-room', $building->id) }}" class="btn btn-success m-1 btn-sm"><i class='bx bx-show'></i></a>
-                                    <a href="#" class="btn btn-primary m-1 btn-sm" data-bs-toggle="modal" data-bs-target="#update-building-modal-{{ $building->id }}"><i class='bx bx-pencil'></i></a>
+                                <div class="card-body d-flex justify-content-center">
+                                    <div class="wrap-button" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Danh sách phòng máy">
+                                        <a href="{{ route('technician.get-list-room', $building->id) }}" class="btn btn-success m-1 btn-sm"><i class='bx bx-show'></i></a>
+                                    </div>
+                                    <div class="wrap-button" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Sửa thông tin nhà thực hành">
+                                        <a href="#" class="btn btn-primary m-1 btn-sm" data-bs-toggle="modal" data-bs-target="#update-building-modal-{{ $building->id }}"><i class='bx bx-pencil'></i></a>
+                                    </div>
                                     <!----- Modal sửa nhà thực hành ----->
                                     <div class="modal fade modal-update" id="update-building-modal-{{ $building->id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addBuildingModalLabel" aria-hidden="true">
                                         <div class="modal-dialog modal-dialog-centered">
@@ -81,7 +85,9 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <a href="#" class="btn btn-danger m-1 btn-sm" data-bs-toggle="modal" data-bs-target="#destroy-building-modal-{{ $building->id }}"><i class='bx bx-trash'></i></a>
+                                    <div class="wrap-button" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Xóa nhà thực hành">
+                                        <a href="#" class="btn btn-danger m-1 btn-sm" data-bs-toggle="modal" data-bs-target="#destroy-building-modal-{{ $building->id }}"><i class='bx bx-trash'></i></a>
+                                    </div>
                                     <form method="post" action="{{ route('technician.destroy-building-api', $building->id) }}" id="destroy-building-form-{{ $building->id }}">
                                         @csrf
                                         @method('DELETE')
@@ -231,6 +237,9 @@
             });
 
             function addEventForButtons () {
+                const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+                const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+
                 $('.btn-update-building').off('click');
                 $('.btn-destroy-building').off('click');
                 $('.close-btn').off('click');

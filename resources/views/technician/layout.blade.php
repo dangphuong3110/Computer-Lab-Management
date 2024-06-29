@@ -124,12 +124,12 @@
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 <script src="https://code.jquery.com/ui/1.13.3/jquery-ui.js"></script>
 <script src="{{ asset('js/homepage/script.js') }}"></script>
-@yield('scripts')
 <script>
     AOS.init();
     function confirmLogout() {
         document.getElementById('logout-form').submit();
     }
 </script>
+@yield('scripts')
 </body>
 </html>

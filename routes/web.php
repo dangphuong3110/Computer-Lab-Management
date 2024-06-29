@@ -49,6 +49,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/get-list-lecturer-api', [TechnicianController::class, 'getListLecturerAPI'])->name('technician.get-list-lecturer-api');
     Route::post('/store-lecturer-api', [TechnicianController::class, 'storeLecturerAPI'])->name('technician.store-lecturer-api');
     Route::put('/update-lecturer-api/{lecturer}', [TechnicianController::class, 'updateLecturerAPI'])->name('technician.update-lecturer-api');
+    Route::put('/update-password-lecturer-api/{lecturer}', [TechnicianController::class, 'updatePasswordLecturerAPI'])->name('technician.update-password-lecturer-api');
     Route::delete('/delete-lecturer-api/{lecturer}', [TechnicianController::class, 'destroyLecturerAPI'])->name('technician.destroy-lecturer-api');
     Route::post('/import-lecturer-api', [TechnicianController::class, 'importLecturerAPI'])->name('technician.import-lecturer-api');
 
@@ -59,6 +60,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/search-student-api', [TechnicianController::class, 'getStudentByStudentCodeAPI'])->name('technician.search-student-api');
     Route::post('/store-student-api', [TechnicianController::class, 'storeStudentAPI'])->name('technician.store-student-api');
     Route::put('/update-student-api/{student}', [TechnicianController::class, 'updateStudentAPI'])->name('technician.update-student-api');
+    Route::put('/update-password-student-api/{student}', [TechnicianController::class, 'updatePasswordStudentAPI'])->name('technician.update-password-student-api');
     Route::delete('/delete-student-api/{student}', [TechnicianController::class, 'destroyStudentAPI'])->name('technician.destroy-student-api');
     Route::post('/import-student-api', [TechnicianController::class, 'importStudentAPI'])->name('technician.import-student-api');
 
