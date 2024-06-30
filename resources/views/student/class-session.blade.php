@@ -14,9 +14,59 @@
     </div>
     <div class="row p-4 ms-5 me-5 mt-5 mb-0 main-content">
         <div class="col-12">
-            <div class="mb-3">
-                <div class="text fs-4">Sơ đồ phòng máy: {{ $room->name . ' - ' . $building->name }}</div>
-                <span class="text fs-5">Lớp học phần: {{ $classSession->creditClass->name }}</span>
+            <div class="mb-3 d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="text fs-4">Sơ đồ phòng máy: {{ $room->name . ' - ' . $building->name }}</div>
+                    <span class="text fs-5">Lớp học phần: {{ $classSession->creditClass->name }}</span>
+                </div>
+                <div>
+                    <a href="#" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#view-report-history-modal">Báo cáo đã gửi</a>
+                    <!----- Modal xem lịch sử báo cáo sự cố ----->
+                    <div class="modal fade" id="view-report-history-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="viewReportHistoryModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-xl">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h1 class="modal-title fs-5" id="exampleModalLabel">Lịch sử gửi báo cáo sự cố</h1>
+                                </div>
+                                <div class="modal-body table-responsive">
+                                    <table class="table table-bordered border-black">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col" class="text-center" width="5%">STT</th>
+                                                <th scope="col" class="text-center" width="30%">Nội dung</th>
+                                                <th scope="col" class="text-center" width="30%">Trạng thái</th>
+                                                <th scope="col" class="text-center" width="20%">Thời gian gửi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @if(count($reports) > 0)
+                                                @foreach($reports as $index => $report)
+                                                    <tr>
+                                                        <th scope="row" class="text-center">{{ $index + 1 }}</th>
+                                                        <td class="text-center">{{ $report->content }}</td>
+                                                        <td class="text-center">
+                                                            <span class="p-1 rounded bg-opacity-75 {{ $report->is_approved ? 'bg-success' : 'bg-danger' }}">
+                                                                {{ $report->is_approved ? 'Đã duyệt' : 'Chưa duyệt' }}
+                                                            </span>
+                                                        </td>
+                                                        <td class="text-center">{{ $report->created_at->format('H:m:i d-m-Y') }}</td>
+                                                    </tr>
+                                                @endforeach
+                                            @else
+                                                <tr>
+                                                    <td colspan="4" class="text-center">Không có dữ liệu báo cáo sự cố</td>
+                                                </tr>
+                                            @endif
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary close-btn" data-bs-dismiss="modal">Đóng</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="row border border-black ms-0 me-0" id="table-computer">
                 @php

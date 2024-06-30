@@ -9,6 +9,8 @@ use App\Models\Computer;
 use App\Models\CreditClass;
 use App\Models\Report;
 use App\Models\Room;
+use App\Models\Student;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -76,6 +78,21 @@ class StudentController extends Controller
         return view('student.list-class-session', compact('title', 'user', 'daysOfWeek', 'schedule', 'maxCount', 'dayOfWeekCounts', 'startOfWeek', 'endOfWeek'));
     }
 
+    public function getListClass()
+    {
+        $title = 'Danh sách lớp học';
+        $user = Auth::user();
+
+        $student = $user->student;
+
+        $classes = $student->creditClasses()
+            ->where('status', 'active')
+            ->orderBy('class_student.created_at', 'desc')
+            ->paginate(7);
+
+        return view('student.list-class', compact('title', 'user', 'classes'));
+    }
+
     public function getClassSessionAPI(Request $request, string $id) {
         $creditClass = CreditClass::findOrFail($id);
 
@@ -118,8 +135,9 @@ class StudentController extends Controller
         $attendances = Attendance::where('session_id', $class_session_id)
             ->whereBetween('attendance_time', [$startLesson, $endLesson])
             ->get();
+        $reports = $student->reports;
 
-        return view('student.class-session', compact('title', 'user', 'student', 'classSession', 'room', 'building', 'computers', 'attendances'));
+        return view('student.class-session', compact('title', 'user', 'student', 'classSession', 'room', 'building', 'computers', 'attendances', 'reports'));
     }
 
     public function sendReportAPI(Request $request, string $computer_id)
@@ -212,5 +230,125 @@ class StudentController extends Controller
             'success' => 'Điểm danh thành công!',
             'table_computer' => $table_computer,
         ]);
+    }
+
+    public function joinClassAPI(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'class-code' => 'required|max:255',
+        ], [
+            'class-code.required' => 'Vui lòng nhập mã mời vào lớp!',
+            'class-code.max' => 'Mã mời vào lớp không được vượt quá 255 ký tự!',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()]);
+        }
+
+        $newClass = CreditClass::where('class_code', $request->input('class-code'))->first();
+
+        if (!$newClass) {
+            return response()->json(['errors' => ['class-code' => 'Không tìm thấy lớp học!']]);
+        } else {
+            $student = Auth::user()->student;
+
+            if ($student->creditClasses()->where('class_id', $newClass->id)->exists()) {
+                return response()->json(['errors' => ['class-code' => 'Bạn đã tham gia lớp học này rồi!']]);
+            } else {
+                $newClassSessions = $newClass->classSessions;
+
+                $currentClasses = $student->creditClasses;
+
+                foreach ($currentClasses as $currentClass) {
+                    if (Carbon::parse($newClass->start_date)->between($currentClass->start_date, $currentClass->end_date) ||
+                        Carbon::parse($newClass->end_date)->between($currentClass->start_date, $currentClass->end_date)) {
+                        $currentClassSessions = $currentClass->classSessions;
+
+                        foreach ($newClassSessions as $newClassSession) {
+                            foreach ($currentClassSessions as $currentClassSession) {
+                                if ($newClassSession->day_of_week == $currentClassSession->day_of_week &&
+                                    $newClassSession->start_lesson <= $currentClassSession->end_lesson &&
+                                    $newClassSession->end_lesson >= $currentClassSession->start_lesson) {
+                                    return response()->json(['errors' => ['student-class' => 'Không thể tham gia lớp do trùng lịch học! (' . $currentClass->name . ')']]);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                $student->creditClasses()->attach($newClass->id, ['created_at' => now(), 'updated_at' => now()]);
+                $classes = $student->creditClasses()
+                    ->where('status', 'active')
+                    ->orderBy('class_student.created_at', 'desc')
+                    ->paginate(7);
+                $table_class = view('student.table-class', compact('classes'))->render();
+
+                return response()->json(['success' => 'Tham gia lớp học thành công!', 'table_class' => $table_class, 'links' => $classes->render('pagination::bootstrap-5')->toHtml()]);
+            }
+        }
+    }
+
+    public function getPersonalInfo()
+    {
+        $title = 'Thông tin cá nhân';
+
+        $user = Auth::user();
+
+        return view('student.personal-info', compact('title', 'user'));
+    }
+
+    public function updatePersonalInfoAPI(Request $request, string $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'full-name' => 'required|max:255',
+        ], [
+            'full-name.required' => 'Vui lòng nhập họ và tên!',
+            'full-name.max' => 'Họ và tên không được vượt quá 255 ký tự!',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()]);
+        }
+
+        $student = Student::findOrFail($id);
+
+        $user = $student->user;
+        $user->phone = $request->input('phone');
+
+        $user->save();
+
+        $student->full_name = $request->input('full-name');
+        $student->class = $request->input('class');
+        $student->gender = $request->input('gender');
+        $student->date_of_birth = $request->input('date-of-birth');
+
+        $student->save();
+
+        $table_personal_info = view('student.table-personal-info', compact('user'))->render();
+
+        return response()->json(['success' => 'Cập nhật thông tin cá nhân thành công!', 'table_personal_info' => $table_personal_info]);
+    }
+
+    public function updatePasswordAPI(Request $request, string $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'new-password' => 'required|min:6',
+            're-enter-new-password' => 'same:new-password',
+        ], [
+            'new-password.required' => 'Vui lòng nhập mật khẩu mới!',
+            'new-password.min' => 'Mật khẩu phải chứa ít nhất 6 ký tự!',
+            're-enter-new-password.same' => 'Mật khẩu nhập lại không khớp!',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()]);
+        }
+
+        $user = User::findOrFail($id);
+        $user->password = $request->input('new-password');
+
+        $user->save();
+
+        return response()->json(['success' => 'Đổi mật khẩu tài khoản thành công!']);
     }
 }

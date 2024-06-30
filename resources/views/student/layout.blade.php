@@ -52,15 +52,15 @@
                         <span class="text nav-text">Thời khóa biểu</span>
                     </a>
                 </li>
-                <li class="nav-link {{ request()->routeIs('technician.get-list-student') ? 'active' : '' }}">
-                    <a href="{{ route('technician.get-list-student') }}">
+                <li class="nav-link {{ request()->routeIs('student.get-list-class') ? 'active' : '' }}">
+                    <a href="{{ route('student.get-list-class') }}">
                         <i class='bx bxs-grid icon'></i>
                         <span class="text nav-text">Lớp học của tôi</span>
                     </a>
                 </li>
-                <li class="nav-link {{ request()->routeIs('technician.get-list-student') ? 'active' : '' }}">
-                    <a href="{{ route('technician.get-list-student') }}">
-                        <i class='bx bx-group icon'></i>
+                <li class="nav-link {{ request()->routeIs('student.get-personal-info') ? 'active' : '' }}">
+                    <a href="{{ route('student.get-personal-info') }}">
+                        <i class='bx bxs-user-detail icon'></i>
                         <span class="text nav-text">Thông tin cá nhân</span>
                     </a>
                 </li>
