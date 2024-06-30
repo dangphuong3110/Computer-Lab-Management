@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('reports', function (Blueprint $table) {
             $table->id();
             $table->text('content');
+            $table->boolean('is_approved')->default(false);
             $table->string('status', 100)->nullable()->default('pending');
             $table->dateTime('submitted_at')->nullable();
             $table->dateTime('processed_at')->nullable();
