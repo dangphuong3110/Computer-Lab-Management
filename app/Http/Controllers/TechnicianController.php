@@ -1080,7 +1080,7 @@ class TechnicianController extends Controller
     {
         $student = Student::findOrFail($student_id);
 
-        $student->creditClasses()->detach();
+        $student->creditClasses()->detach($request->input('class_id'));
 
         $class = CreditClass::where('id', $request->input('class_id'))->first();
         $students = $class->students()->orderBy('class_student.created_at', 'desc')->paginate(7);
