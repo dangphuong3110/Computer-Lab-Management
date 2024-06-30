@@ -82,7 +82,7 @@
                 </div>
             </div>
             <div class="table-responsive" id="table-student-class">
-                <table class="table table-bordered">
+                <table class="table table-bordered border-black">
                     <thead>
                     <tr>
                         <th scope="col" class="text-center" width="5%">STT</th>

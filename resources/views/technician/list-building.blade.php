@@ -44,7 +44,7 @@
                     </div>
                 </div>
             </div>
-            <div class="row border rounded ms-0 me-0" id="table-building">
+            <div class="row border border-black rounded ms-0 me-0" id="table-building">
                 @if (count($buildings) > 0)
                     @foreach($buildings as $building)
                         <div class="col-xl-3 col-lg-4 pt-3">
@@ -153,7 +153,7 @@
                             $('body').css('overflow', 'auto');
                         } else {
                             if (response.errors['building-name']) {
-                                showToastError(response.errors['full-name']);
+                                showToastError(response.errors['building-name']);
                             }
                             $('body').append('<div class="modal-backdrop fade show"></div>');
                         }

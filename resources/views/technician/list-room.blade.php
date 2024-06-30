@@ -51,7 +51,7 @@
                     </div>
                 </div>
             </div>
-            <div class="row border rounded ms-0 me-0" id="table-room">
+            <div class="row border border-black rounded ms-0 me-0" id="table-room">
                 @if (count($rooms) > 0)
                     @foreach($rooms as $room)
                         <div class="col-xl-3 col-lg-4 pt-3">
