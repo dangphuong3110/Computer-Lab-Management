@@ -216,7 +216,6 @@
                 });
 
                 formDataObj['room_id'] = '{{ $room->id }}';
-                console.log(formDataObj);
 
                 let url = `{{ route("technician.update-computer-api", ":computerId") }}`;
                 url = url.replace(':computerId', computerId);
@@ -295,7 +294,6 @@
 
                     const position = $(this).data('position');
                     const form = $('#add-computer-form-' + position);
-                    console.log(form);
 
                     submitFormCreateComputer(form, position, overlay);
                 });

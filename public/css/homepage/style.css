@@ -132,6 +132,9 @@ header .image-text .header-text {
 
 .header-text .name {
     margin-top: -2px;
+    white-space: normal;
+    word-wrap: break-word;
+    width: 165px;
 }
 
 .sidebar header .toggle {
@@ -345,6 +348,12 @@ body.dark .switch::before {
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
 }
 
+.card-statistics {
+    background: #FFF;
+    border-radius: 16px;
+    box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1);
+}
+
 span.required {
     font-size: 18px;
     font-weight: 600;
@@ -392,6 +401,12 @@ p.note span {
 
 .dropdown-toggle::after {
     display: none;
+}
+
+.is-class-session:hover {
+    opacity: 0.85;
+    background-color: rgba(0, 0, 0, 0.2);
+    cursor: pointer;
 }
 
 /* ===== Notice when reload ===== */

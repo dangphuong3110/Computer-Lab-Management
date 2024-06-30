@@ -34,7 +34,12 @@ Route::get('/reset-password/{token}', [UserController::class, 'resetPassword'])-
 Route::post('/reset-password-api', [UserController::class, 'resetPasswordAPI'])->name('reset-password-api');
 
 Route::middleware(['auth', 'check.role:student'])->group(function () {
-    Route::resource('/student', StudentController::class);
+    Route::get('/student', [StudentController::class, 'index'])->name('student.index')->middleware('check.role:student');
+    Route::get('/get-list-class-session', [StudentController::class, 'getListClassSession'])->name('student.get-list-class-session')->middleware('check.role:student');
+    Route::post('/get-class-session-api/{class}', [StudentController::class, 'getClassSessionAPI'])->name('student.get-class-session-api');
+    Route::get('/get-class-session/{classSession}', [StudentController::class, 'getClassSession'])->name('student.get-class-session')->middleware('check.role:student');
+    Route::post('/send-report-api/{computer}', [StudentController::class, 'sendReportAPI'])->name('student.send-report-api');
+    Route::post('/attendance-api/{classSession}', [StudentController::class, 'attendanceAPI'])->name('student.attendance-api');
 });
 
 Route::middleware(['auth', 'check.role:lecturer'])->group(function () {
@@ -42,7 +47,7 @@ Route::middleware(['auth', 'check.role:lecturer'])->group(function () {
 });
 
 Route::middleware(['auth'])->group(function () {
-    Route::resource('/technician', TechnicianController::class)->middleware('check.role:technician');
+    Route::get('/technician', [TechnicianController::class, 'index'])->name('technician.index')->middleware('check.role:technician');
     // Lecturer
     Route::get('/get-list-lecturer', [TechnicianController::class, 'getListLecturer'])->name('technician.get-list-lecturer')->middleware('check.role:technician');
 
