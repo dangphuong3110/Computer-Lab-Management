@@ -8,8 +8,8 @@
                 <thead>
                 <tr>
                     <th scope="col" class="text-center" width="5%">STT</th>
-                    <th scope="col" class="text-center" width="30%">Nội dung</th>
-                    <th scope="col" class="text-center" width="30%">Trạng thái</th>
+                    <th scope="col" class="text-center" width="40%">Nội dung</th>
+                    <th scope="col" class="text-center" width="20%">Trạng thái</th>
                     <th scope="col" class="text-center" width="20%">Thời gian gửi</th>
                 </tr>
                 </thead>
@@ -20,7 +20,7 @@
                             <th scope="row" class="text-center">{{ $index + 1 }}</th>
                             <td class="text-center">{{ $report->content }}</td>
                             <td class="text-center">
-                                <span class="p-1 rounded bg-opacity-75 {{ $report->is_approved ? 'bg-success' : 'bg-danger' }}">
+                                <span class="p-1 rounded bg-opacity-75 {{ $report->is_approved ? 'bg-success' : 'bg-warning' }}">
                                     {{ $report->is_approved ? 'Đã duyệt' : 'Chưa duyệt' }}
                                 </span>
                             </td>

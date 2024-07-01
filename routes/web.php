@@ -33,7 +33,7 @@ Route::post('/forgot-password-api', [UserController::class, 'forgotPasswordAPI']
 Route::get('/reset-password/{token}', [UserController::class, 'resetPassword'])->name('reset-password');
 Route::post('/reset-password-api', [UserController::class, 'resetPasswordAPI'])->name('reset-password-api');
 
-Route::middleware(['auth', 'check.role:student'])->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::prefix('/student')->group(function () {
         Route::get('/', [StudentController::class, 'index'])->name('student.index')->middleware('check.role:student');
         Route::get('/get-list-class-session', [StudentController::class, 'getListClassSession'])->name('student.get-list-class-session')->middleware('check.role:student');
@@ -49,8 +49,18 @@ Route::middleware(['auth', 'check.role:student'])->group(function () {
     });
 });
 
-Route::middleware(['auth', 'check.role:lecturer'])->group(function () {
-    Route::resource('/lecturer', LecturerController::class);
+Route::middleware(['auth'])->group(function () {
+    Route::prefix('/lecturer')->group(function () {
+        Route::get('/', [LecturerController::class, 'index'])->name('lecturer.index')->middleware('check.role:lecturer');
+        Route::get('/get-list-class-session', [LecturerController::class, 'getListClassSession'])->name('lecturer.get-list-class-session')->middleware('check.role:lecturer');
+        Route::post('/get-class-session-api/{class}', [LecturerController::class, 'getClassSessionAPI'])->name('lecturer.get-class-session-api');
+        Route::get('/get-class-session/{classSession}', [LecturerController::class, 'getClassSession'])->name('lecturer.get-class-session')->middleware('check.role:lecturer');
+        Route::post('/send-report-api/{room}', [LecturerController::class, 'sendReportAPI'])->name('lecturer.send-report-api');
+        Route::get('/get-list-student-report', [LecturerController::class, 'getListStudentReport'])->name('lecturer.get-list-student-report')->middleware('check.role:lecturer');
+        Route::put('/approve-report-api/{report}', [LecturerController::class, 'approveReportAPI'])->name('lecturer.approve-report-api');
+        Route::put('/disapprove-report-api/{report}', [LecturerController::class, 'disapproveReportAPI'])->name('lecturer.disapprove-report-api');
+        Route::delete('/delete-report-api/{report}', [LecturerController::class, 'destroyReportAPI'])->name('lecturer.destroy-report-api');
+    });
 });
 
 Route::middleware(['auth'])->group(function () {

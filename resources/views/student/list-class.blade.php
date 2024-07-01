@@ -101,6 +101,7 @@
                     contentType: 'application/json',
                     url: '{{ route("student.join-class-api") }}',
                     success: function (response) {
+                        console.log(response);
                         if (response.success) {
                             showToastSuccess(response.success);
                             form[0].reset();
@@ -112,6 +113,9 @@
                         } else {
                             if (response.errors['class-code']) {
                                 showToastError(response.errors['class-code']);
+                            }
+                            if (response.errors['student-class']) {
+                                showToastError(response.errors['student-class']);
                             }
                             $('body').append('<div class="modal-backdrop fade show"></div>');
                         }
