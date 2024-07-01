@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\AttendancesExport;
 use App\Imports\StudentClassImport;
 use App\Models\Attendance;
 use App\Models\Building;
 use App\Models\ClassSession;
 use App\Models\Computer;
 use App\Models\CreditClass;
-use App\Models\Lecturer;
 use App\Models\Report;
 use App\Models\Room;
 use App\Models\Student;
@@ -17,8 +17,6 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -124,7 +122,7 @@ class LecturerController extends Controller
         $startLesson = Carbon::createFromFormat('H:i:s', $classSession->start_lesson)->setDateFrom($today);
         $endLesson = Carbon::createFromFormat('H:i:s', $classSession->end_lesson)->setDateFrom($today);
         $attendances = Attendance::where('session_id', $class_session_id)
-            ->whereBetween('attendance_time', [$startLesson, $endLesson])
+            ->whereBetween('created_at', [$startLesson, $endLesson])
             ->get();
         $reports = $lecturer->reports;
 
@@ -377,5 +375,12 @@ class LecturerController extends Controller
         $table_student_class = view('lecturer.table-student-class', compact('students', 'class'))->render();
 
         return response()->json(['success' => 'Nhập file sinh viên vào lớp học phần thành công!', 'table_student_class' => $table_student_class, 'links' => $students->render('pagination::bootstrap-5')->toHtml()]);
+    }
+
+    public function getExportAttendances(string $class_id)
+    {
+        $class = CreditClass::find($class_id);
+        $export = new AttendancesExport($class);
+        return $export->download('Danh sách điểm danh lớp ' . $class->name . '.xlsx');
     }
 }

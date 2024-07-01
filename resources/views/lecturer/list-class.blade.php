@@ -40,8 +40,11 @@
                                         <div class="wrap-button m-1" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Danh sách sinh viên">
                                             <a href="{{ route('lecturer.get-list-student-class', $class->id) }}" class="btn btn-sm btn-success my-auto btn-student-class"><i class='bx bx-group'></i></a>
                                         </div>
+                                        <div class="wrap-button m-1" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Xuất file điểm danh">
+                                            <a href="{{ route('lecturer.export-attendances', $class->id) }}" class="btn btn-sm btn-primary my-auto btn-export-attendances"><i class='bx bxs-file-export'></i></a>
+                                        </div>
                                         <div class="wrap-button m-1" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Sao chép mã vào lớp">
-                                            <a href="#" class="btn btn-sm btn-primary my-auto btn-student-class btn-copy-class-code" data-class-code="{{ $class->class_code }}"><i class='bx bx-log-in-circle'></i></a>
+                                            <a href="#" class="btn btn-sm btn-secondary my-auto btn-student-class btn-copy-class-code" data-class-code="{{ $class->class_code }}"><i class='bx bx-log-in-circle'></i></a>
                                         </div>
                                     </div>
                                 </td>
@@ -69,6 +72,16 @@
                 const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 
                 $('.btn-copy-class-code').off('click');
+                $('.btn-export-attendances').off('click');
+
+                $('.btn-export-attendances').click(function(e) {
+                    e.preventDefault();
+                    setTimeout(() => {
+                        const overlay = document.getElementById('overlay');
+                        overlay.classList.remove('show');
+                    }, 1000);
+                    window.location.href = $(this).attr('href');
+                });
 
                 $('.btn-copy-class-code').click(function() {
                     const classCode = $(this).data('class-code');

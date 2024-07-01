@@ -133,7 +133,7 @@ class StudentController extends Controller
         $startLesson = Carbon::createFromFormat('H:i:s', $classSession->start_lesson)->setDateFrom($today);
         $endLesson = Carbon::createFromFormat('H:i:s', $classSession->end_lesson)->setDateFrom($today);
         $attendances = Attendance::where('session_id', $class_session_id)
-            ->whereBetween('attendance_time', [$startLesson, $endLesson])
+            ->whereBetween('created_at', [$startLesson, $endLesson])
             ->get();
         $reports = $student->reports()->orderBy('submitted_at', 'desc')->get();
 
@@ -186,7 +186,7 @@ class StudentController extends Controller
 
         $existingAttendance = Attendance::where('session_id', $class_session_id)
             ->where('computer_id', $computer->id)
-            ->whereBetween('attendance_time', [$startLesson, $endLesson])
+            ->whereBetween('created_at', [$startLesson, $endLesson])
             ->first();
 
         if ($existingAttendance) {
@@ -194,7 +194,7 @@ class StudentController extends Controller
             $computers = Computer::where('room_id', $room->id)->get();
 
             $attendances = Attendance::where('session_id', $class_session_id)
-                ->whereBetween('attendance_time', [$startLesson, $endLesson])
+                ->whereBetween('created_at', [$startLesson, $endLesson])
                 ->get();
 
             $table_computer = view('student.table-computer', compact('room', 'computers', 'attendances', 'classSession'))->render();
@@ -203,18 +203,18 @@ class StudentController extends Controller
         }
 
         $studentAttendance = Attendance::where('session_id', $class_session_id)
-            ->whereBetween('attendance_time', [$startLesson, $endLesson])
+            ->whereBetween('created_at', [$startLesson, $endLesson])
             ->where('student_id', $student->id)
             ->first();
 
         if ($studentAttendance) {
             Attendance::where('session_id', $class_session_id)
                 ->where('student_id', $student->id)
-                ->whereBetween('attendance_time', [$startLesson, $endLesson])
+                ->whereBetween('created_at', [$startLesson, $endLesson])
                 ->update(['computer_id' => $computer->id, 'updated_at' => $now]);
         } else {
             $attendance = new Attendance();
-            $attendance->attendance_time = $now;
+            $attendance->attendance_date = Carbon::today()->toDateString();
             $attendance->student_id = $student->id;
             $attendance->session_id = $class_session_id;
             $attendance->computer_id = $computer->id;
@@ -225,7 +225,7 @@ class StudentController extends Controller
         $computers = Computer::where('room_id', $room->id)->get();
 
         $attendances = Attendance::where('session_id', $class_session_id)
-            ->whereBetween('attendance_time', [$startLesson, $endLesson])
+            ->whereBetween('created_at', [$startLesson, $endLesson])
             ->get();
 
         $table_computer = view('student.table-computer', compact('room', 'computers', 'attendances', 'classSession'))->render();

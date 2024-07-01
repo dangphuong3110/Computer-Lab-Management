@@ -343,7 +343,7 @@ body.dark .switch::before {
 }
 
 .main-content {
-    background: #FFF;
+    background: var(--sidebar-color);
     border-radius: 16px;
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
 }

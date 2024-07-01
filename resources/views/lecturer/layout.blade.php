@@ -58,12 +58,6 @@
                         <span class="text nav-text">Lớp học tiếp quản</span>
                     </a>
                 </li>
-                <li class="nav-link {{ request()->routeIs('student.get-list-class') ? 'active' : '' }}">
-                    <a href="{{ route('student.get-list-class') }}">
-                        <i class='bx bxs-file-export icon'></i>
-                        <span class="text nav-text">Xuất file điểm danh</span>
-                    </a>
-                </li>
                 <li class="nav-link {{ request()->routeIs('lecturer.get-list-student-report') ? 'active' : '' }}">
                     <a href="{{ route('lecturer.get-list-student-report') }}">
                         <i class='bx bx-comment-error bx-tada icon' ></i>

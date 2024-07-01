@@ -21,7 +21,7 @@
                 </div>
                 <div class="row" style="min-width: 295px;">
                     <div class="col-12 text-end">
-                        <a href="#" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#send-report-modal">Báo cáo sự cố</a>
+                        <a href="#" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#send-report-modal" style="width: 163px;">Báo cáo sự cố</a>
                         <!----- Modal gửi báo cáo sự cố thiết bị ----->
                         <div class="modal fade" id="send-report-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="sendReportModalLabel" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered">
@@ -47,7 +47,7 @@
                                 </div>
                             </div>
                         </div>
-                        <a href="#" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#view-report-history-modal">Báo cáo đã gửi</a>
+                        <a href="#" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#view-report-history-modal" style="width: 163px;">Báo cáo đã gửi</a>
                         <!----- Modal xem lịch sử báo cáo sự cố ----->
                         <div class="modal fade" id="view-report-history-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="viewReportHistoryModalLabel" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered modal-xl">
@@ -124,6 +124,9 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    <div class="col-12 text-end mt-1">
+                        <a href="{{ route('lecturer.export-attendances', $classSession->class_id) }}" class="btn btn-outline-success btn-export-attendances">Xuất file điểm danh</a>
                     </div>
                 </div>
             </div>
@@ -232,6 +235,15 @@
                 const form = $('#send-report-form');
 
                 submitFormSendReport(form, roomId, overlay);
+            });
+
+            $('.btn-export-attendances').click(function(e) {
+                e.preventDefault();
+                setTimeout(() => {
+                    const overlay = document.getElementById('overlay');
+                    overlay.classList.remove('show');
+                }, 1000);
+                window.location.href = $(this).attr('href');
             });
 
             function addEventForButtons() {

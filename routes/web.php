@@ -70,6 +70,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/store-student-class-api', [LecturerController::class, 'storeStudentClassAPI'])->name('lecturer.store-student-class-api');
         Route::delete('/delete-student-class-api/{student}', [LecturerController::class, 'destroyStudentClassAPI'])->name('lecturer.destroy-student-class-api');
         Route::post('/import-student-class-api', [LecturerController::class, 'importStudentClassAPI'])->name('lecturer.import-student-class-api');
+        Route::get('/export-attendances/{class}', [LecturerController::class, 'getExportAttendances'])->name('lecturer.export-attendances')->middleware('check.role:lecturer');
 
         // Report
         Route::get('/get-list-student-report', [LecturerController::class, 'getListStudentReport'])->name('lecturer.get-list-student-report')->middleware('check.role:lecturer');
