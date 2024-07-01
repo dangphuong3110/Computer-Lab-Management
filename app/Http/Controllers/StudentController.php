@@ -259,6 +259,10 @@ class StudentController extends Controller
             if ($student->creditClasses()->where('class_id', $newClass->id)->exists()) {
                 return response()->json(['errors' => ['class-code' => 'Bạn đã tham gia lớp học này rồi!']]);
             } else {
+                if (!Carbon::now()->between($newClass->start_date, $newClass->end_date)) {
+                    return response()->json(['errors' => ['class-code' => 'Lớp học đã kết thúc!']]);
+                }
+
                 $newClassSessions = $newClass->classSessions;
 
                 $currentClasses = $student->creditClasses;
