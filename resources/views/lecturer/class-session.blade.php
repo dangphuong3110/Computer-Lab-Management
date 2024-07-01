@@ -19,7 +19,7 @@
                     <div class="text fs-4">Sơ đồ phòng máy: {{ $room->name . ' - ' . $building->name }}</div>
                     <span class="text fs-5">Lớp học phần: {{ $classSession->creditClass->name }}</span>
                 </div>
-                <div class="row">
+                <div class="row" style="min-width: 295px;">
                     <div class="col-12 text-end">
                         <a href="#" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#send-report-modal">Báo cáo sự cố</a>
                         <!----- Modal gửi báo cáo sự cố thiết bị ----->
@@ -71,7 +71,7 @@
                                                     <tr>
                                                         <th scope="row" class="text-center">{{ $index + 1 }}</th>
                                                         <td class="text-center">{{ $report->content }}</td>
-                                                        <td class="text-center">
+                                                        <td class="text-center align-middle">
                                                             <span class="p-1 rounded bg-opacity-75
                                                                 @switch($report->status)
                                                                     @case('pending')
@@ -107,7 +107,7 @@
                                                                 @endswitch
                                                             </span>
                                                         </td>
-                                                        <td class="text-center">{{ $report->created_at->format('H:m:i d-m-Y') }}</td>
+                                                        <td class="text-center align-middle">{{ $report->created_at->format('H:m:i d-m-Y') }}</td>
                                                     </tr>
                                                 @endforeach
                                             @else

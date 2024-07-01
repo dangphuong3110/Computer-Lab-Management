@@ -7,13 +7,13 @@
                 Mã sinh viên: {{ $report->student->student_code }}
             </td>
             <td class="text-center">{{ $report->content }}</td>
-            <td class="text-center">
+            <td class="text-center align-middle">
                 <span class="p-1 rounded bg-opacity-75 {{ $report->is_approved ? 'bg-success' : 'bg-warning' }}">
                     {{ $report->is_approved ? 'Đã duyệt' : 'Chưa duyệt' }}
                 </span>
             </td>
-            <td class="text-center">{{ \Carbon\Carbon::parse($report->submitted_at)->format('H:i:s d-m-Y') }}</td>
-            <td class="text-center">
+            <td class="text-center align-middle">{{ \Carbon\Carbon::parse($report->submitted_at)->format('H:i:s d-m-Y') }}</td>
+            <td class="text-center align-middle">
                 <div class="d-flex justify-content-center">
                     <div class="wrap-button m-1" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Duyệt báo cáo">
                         <button class="btn btn-sm btn-success my-auto approve-report" data-report-id="{{ $report->id }}" {{ $report->is_approved ? 'disabled' : '' }}><i class='bx bx-check-square'></i></button>

@@ -1,72 +1,195 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Lecturer</title>
-    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700,200" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-</head>
-<body>
-    <header>
-        <div class="profile-page mb-5">
-            <nav class="navbar navbar-expand-lg bg-nav fixed-top">
-                <div class="container">
-                    <a class="navbar-translate" href="#" data-aos="flip-left">Creative CV</a>
-                    <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navigation" aria-controls="navigation" aria-expanded="false" aria-label="Toggle navigation">
-                        <i class="bi bi-list fs-1 text-white"></i>
-                    </button>
-                    <div id="navigation" class="collapse navbar-collapse">
-                        <ul class="navbar-nav ms-auto me-5">
-                            <li class="nav-item">
-                                <a class="nav-link" href="#" data-aos="flip-left">Your CV</a>
-                            </li>
-                            <li class="nav-item">
-                                <form id="logout-form" action="{{ route('logout') }}" method="POST">
-                                    @csrf
-                                    <a href="" class="nav-link" data-aos="flip-left" data-bs-toggle="modal" data-bs-target="#confirmLogoutModal">Logout</a>
-                                </form>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
+@extends('lecturer.layout')
+@section('css')
+    <style>
+        .wrapper{
+            width: 100%;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        .wrapper header{
+            display: flex;
+            align-items: center;
+            padding: 25px 30px 10px;
+            justify-content: space-between;
+        }
+
+        header .icons{
+            display: flex;
+        }
+
+        header .icons span{
+            height: 38px;
+            width: 38px;
+            margin: 0 1px;
+            cursor: pointer;
+            color: #878787;
+            text-align: center;
+            line-height: 38px;
+            font-size: 1.9rem;
+            user-select: none;
+            border-radius: 50%;
+        }
+
+        .icons span:last-child{
+            margin-right: -10px;
+        }
+
+        header .icons span:hover{
+            background: #f2f2f2;
+        }
+
+        header .current-date{
+            font-size: 1.45rem;
+            font-weight: 500;
+        }
+
+        .calendar{
+            padding: 20px;
+        }
+
+        .calendar ul{
+            display: flex;
+            flex-wrap: wrap;
+            list-style: none;
+            text-align: center;
+        }
+
+        .calendar .days{
+            margin-bottom: 20px;
+        }
+
+        .calendar li{
+            color: #333;
+            width: calc(100% / 7);
+            font-size: 1.07rem;
+        }
+
+        .calendar .weeks li{
+            font-weight: 500;
+            cursor: default;
+        }
+
+        .calendar .days li{
+            z-index: 1;
+            cursor: pointer;
+            position: relative;
+            margin-top: 30px;
+        }
+
+        .days li.inactive{
+            color: #aaa;
+        }
+
+        .days li.active{
+            color: #fff;
+        }
+
+        .days li::before{
+            position: absolute;
+            content: "";
+            left: 50%;
+            top: 50%;
+            height: 40px;
+            width: 40px;
+            z-index: -1;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .days li.active::before{
+            background: #9B59B6;
+        }
+
+        .days li:not(.active):hover::before{
+            background: #f2f2f2;
+        }
+    </style>
+@endsection
+@section('content')
+    <div class="row m-5 mb-4 d-flex align-items-center">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <div class="text">Trang chủ</div>
             </nav>
         </div>
-    </header>
-
-    <!-- MODAL-LOGOUT -->
-    <div class="modal fade" id="confirmLogoutModal" tabindex="-1" aria-labelledby="confirmLogoutModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered text-center">
-            <div class="modal-content">
-                <div class="modal-header" style="background-color: #378c3f; color: #fff">
-                    <h5 class="modal-title" id="confirmLogoutModalLabel">Confirm Logout</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <div class="row p-4 ms-5 me-5 mt-4 mb-0 d-flex justify-content-center">
+        <div class="wrapper">
+            <header>
+                <p class="current-date"></p>
+                <div class="icons">
+                    <span id="prev" class="material-symbols-rounded"><i class='bx bx-chevron-left'></i></span>
+                    <span id="next" class="material-symbols-rounded"><i class='bx bx-chevron-right'></i></span>
                 </div>
-                <div class="modal-body fs-5">
-                    Are you sure you want to log out?
-                </div>
-                <div class="modal-footer d-flex justify-content-center">
-                    <button type="button" class="btn btn-danger me-2" onclick="confirmLogout()">Logout</button>
-                    <button type="button" class="btn btn-secondary ms-2" data-bs-dismiss="modal">Cancel</button>
-                </div>
+            </header>
+            <div class="calendar">
+                <ul class="weeks">
+                    <li>Chủ nhật</li>
+                    <li>Thứ hai</li>
+                    <li>Thứ ba</li>
+                    <li>Thứ tư</li>
+                    <li>Thứ năm</li>
+                    <li>Thứ sáu</li>
+                    <li>Thứ bảy</li>
+                </ul>
+                <ul class="days"></ul>
             </div>
         </div>
     </div>
-
-    <!-- Libraries Js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+@endsection
+@section('scripts')
     <script>
-        AOS.init();
-        function confirmLogout() {
-            document.getElementById('logout-form').submit();
+        const daysTag = document.querySelector(".days"),
+            currentDate = document.querySelector(".current-date"),
+            prevNextIcon = document.querySelectorAll(".icons span");
+
+        let date = new Date(),
+            currYear = date.getFullYear(),
+            currMonth = date.getMonth();
+
+        const months = ["Tháng một - ", "Tháng hai - ", "Tháng ba - ", "Tháng tư - ", "Tháng năm - ", "Tháng sáu - ", "Tháng bảy - ",
+            "Tháng tám - ", "Tháng chín - ", "Tháng mười - ", "Tháng mười một - ", "Tháng mười hai - "];
+
+        const renderCalendar = () => {
+            let firstDayofMonth = new Date(currYear, currMonth, 1).getDay(),
+                lastDateofMonth = new Date(currYear, currMonth + 1, 0).getDate(),
+                lastDayofMonth = new Date(currYear, currMonth, lastDateofMonth).getDay(),
+                lastDateofLastMonth = new Date(currYear, currMonth, 0).getDate();
+            let liTag = "";
+
+            for (let i = firstDayofMonth; i > 0; i--) {
+                liTag += `<li class="inactive">${lastDateofLastMonth - i + 1}</li>`;
+            }
+
+            for (let i = 1; i <= lastDateofMonth; i++) {
+                let isToday = i === date.getDate() && currMonth === new Date().getMonth()
+                && currYear === new Date().getFullYear() ? "active" : "";
+                liTag += `<li class="${isToday}">${i}</li>`;
+            }
+
+            for (let i = lastDayofMonth; i < 6; i++) {
+                liTag += `<li class="inactive">${i - lastDayofMonth + 1}</li>`
+            }
+            currentDate.innerText = `${months[currMonth]} ${currYear}`;
+            daysTag.innerHTML = liTag;
         }
+        renderCalendar();
+
+        prevNextIcon.forEach(icon => {
+            icon.addEventListener("click", () => {
+                currMonth = icon.id === "prev" ? currMonth - 1 : currMonth + 1;
+
+                if(currMonth < 0 || currMonth > 11) {
+                    date = new Date(currYear, currMonth, new Date().getDate());
+                    currYear = date.getFullYear();
+                    currMonth = date.getMonth();
+                } else {
+                    date = new Date();
+                }
+                renderCalendar();
+            });
+        });
     </script>
-</body>
-</html>
+@endsection

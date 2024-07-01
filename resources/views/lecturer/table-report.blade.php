@@ -19,7 +19,7 @@
                         <tr>
                             <th scope="row" class="text-center">{{ $index + 1 }}</th>
                             <td class="text-center">{{ $report->content }}</td>
-                            <td class="text-center">
+                            <td class="text-center align-middle">
                                 <span class="p-1 rounded bg-opacity-75
                                     @switch($report->status)
                                         @case('pending')
@@ -55,7 +55,7 @@
                                     @endswitch
                                 </span>
                             </td>
-                            <td class="text-center">{{ $report->created_at->format('H:m:i d-m-Y') }}</td>
+                            <td class="text-center align-middle">{{ $report->created_at->format('H:m:i d-m-Y') }}</td>
                         </tr>
                     @endforeach
                 @else

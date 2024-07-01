@@ -52,8 +52,8 @@
                         <span class="text nav-text">Lịch dạy học</span>
                     </a>
                 </li>
-                <li class="nav-link {{ request()->routeIs('student.get-list-class') ? 'active' : '' }}">
-                    <a href="{{ route('student.get-list-class') }}">
+                <li class="nav-link {{ request()->routeIs('lecturer.get-list-class', 'lecturer.get-list-student-class') ? 'active' : '' }}">
+                    <a href="{{ route('lecturer.get-list-class') }}">
                         <i class='bx bxs-grid icon'></i>
                         <span class="text nav-text">Lớp học tiếp quản</span>
                     </a>

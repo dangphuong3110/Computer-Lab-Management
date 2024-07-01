@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Imports\StudentClassImport;
 use App\Models\Attendance;
 use App\Models\Building;
 use App\Models\ClassSession;
@@ -10,6 +11,7 @@ use App\Models\CreditClass;
 use App\Models\Lecturer;
 use App\Models\Report;
 use App\Models\Room;
+use App\Models\Student;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -18,6 +20,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Maatwebsite\Excel\Facades\Excel;
 
 class LecturerController extends Controller
 {
@@ -233,5 +236,146 @@ class LecturerController extends Controller
         $table_report = view('lecturer.table-student-report', compact('reports'))->render();
 
         return ['table_report' => $table_report, 'reports' => $reports];
+    }
+
+    public function getListClass()
+    {
+        $title = 'Lớp học tiếp quản';
+        $user = Auth::user();
+
+        $lecturer = $user->lecturer;
+
+        $classes = $lecturer->creditClasses()
+            ->where('status', 'active')
+            ->orderBy('classes.created_at', 'desc')
+            ->paginate(7);
+
+        return view('lecturer.list-class', compact('title', 'user', 'classes'));
+    }
+
+    public function getListStudentClass(string $class_id)
+    {
+        $title = 'Sinh viên lớp học phần';
+        $user = Auth::user();
+
+        $class = CreditClass::where('id', $class_id)->first();
+        $students = $class->students()->orderBy('class_student.created_at', 'desc')->paginate(7);
+
+        return view('lecturer.list-student-class', compact('title','user', 'students', 'class'));
+    }
+
+    public function getStudentByStudentCodeAPI(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'student-code' => 'required',
+        ], [
+            'student-code.required' => 'Vui lòng nhập mã sinh viên!',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()]);
+        }
+
+        $student = Student::where('student_code', $request->input('student-code'))->first();
+
+        if (!$student) {
+            return response()->json(['errors' => ['student-code' => 'Không tìm thấy sinh viên!']]);
+        } else {
+            return response()->json(['success' => 'Đã tìm thấy sinh viên!','student' => $student]);
+        }
+    }
+
+    public function storeStudentClassAPI(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'student-code' => 'required',
+        ], [
+            'student-code.required' => 'Vui lòng nhập mã sinh viên!',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()]);
+        }
+
+        $student = Student::where('student_code', $request->input('student-code'))->first();
+
+        if (!$student) {
+            return response()->json(['errors' => ['student-code' => 'Không tìm thấy sinh viên!']]);
+        } else {
+            $class_id = $request->input('class_id');
+            $student = Student::where('student_code', $request->input('student-code'))->first();
+
+            if ($student->creditClasses()->where('id', $class_id)->exists()) {
+                return response()->json(['errors' => ['student-class' => 'Sinh viên đã có trong lớp học!']]);
+            }
+
+            $newClass = CreditClass::findOrFail($class_id);
+            $newClassSessions = $newClass->classSessions;
+
+            $currentClasses = $student->creditClasses;
+
+            foreach ($currentClasses as $currentClass) {
+                if (Carbon::parse($newClass->start_date)->between($currentClass->start_date, $currentClass->end_date) ||
+                    Carbon::parse($newClass->end_date)->between($currentClass->start_date, $currentClass->end_date)) {
+                    $currentClassSessions = $currentClass->classSessions;
+
+                    foreach ($newClassSessions as $newClassSession) {
+                        foreach ($currentClassSessions as $currentClassSession) {
+                            if ($newClassSession->day_of_week == $currentClassSession->day_of_week &&
+                                $newClassSession->start_lesson <= $currentClassSession->end_lesson &&
+                                $newClassSession->end_lesson >= $currentClassSession->start_lesson) {
+                                return response()->json(['errors' => ['student-class' => 'Sinh viên đã có lớp trùng tiết học với lớp mới! (' . $currentClass->name . ')']]);
+                            }
+                        }
+                    }
+                }
+            }
+
+            $student->creditClasses()->attach($class_id, ['created_at' => now(), 'updated_at' => now()]);
+
+            $class = CreditClass::where('id', $class_id)->first();
+            $students = $class->students()->orderBy('class_student.created_at', 'desc')->paginate(7);
+            $table_student_class = view('lecturer.table-student-class', compact('students', 'class'))->render();
+
+            return response()->json(['success' => 'Đã thêm sinh viên vào lớp học!', 'table_student_class' => $table_student_class, 'links' => $students->render('pagination::bootstrap-5')->toHtml()]);
+        }
+    }
+
+    public function destroyStudentClassAPI(Request $request, string $student_id)
+    {
+        $student = Student::findOrFail($student_id);
+
+        $student->creditClasses()->detach($request->input('class_id'));
+
+        $class = CreditClass::where('id', $request->input('class_id'))->first();
+        $students = $class->students()->orderBy('class_student.created_at', 'desc')->paginate(7);
+        $table_student_class = view('lecturer.table-student-class', compact('students', 'class'))->render();
+
+        return response()->json(['success' => 'Xóa sinh viên khỏi lớp học phần thành công!', 'table_student_class' => $table_student_class, 'links' => $students->render('pagination::bootstrap-5')->toHtml()]);
+    }
+
+    public function importStudentClassAPI(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'student-class-file' => 'required|mimes:xlsx,xls',
+        ], [
+            'student-class-file.required' => 'Vui lòng nhập file!',
+            'student-class-file.mimes' => 'Vui lòng nhập đúng định dạng file excel (.xlsx, .xls)!',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()]);
+        }
+
+        $file = $request->file('student-class-file');
+
+        $class_id = $request->input('class_id');
+        $import = new StudentClassImport($class_id);
+        Excel::import($import, $file);
+
+        $class = CreditClass::where('id', $class_id)->first();
+        $students = $class->students()->orderBy('class_student.created_at', 'desc')->paginate(7);
+        $table_student_class = view('lecturer.table-student-class', compact('students', 'class'))->render();
+
+        return response()->json(['success' => 'Nhập file sinh viên vào lớp học phần thành công!', 'table_student_class' => $table_student_class, 'links' => $students->render('pagination::bootstrap-5')->toHtml()]);
     }
 }

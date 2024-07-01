@@ -1,13 +1,13 @@
-@extends('technician.layout')
+@extends('lecturer.layout')
 @section('content')
     <div class="row m-5 mb-4 d-flex align-items-center">
         <div class="col-12">
             <nav aria-label="breadcrumb" class="d-flex align-items-center">
                 <div class="text" style="min-width: 310px;">Sinh viên lớp học phần</div>
                 <ol class="breadcrumb my-auto ms-4" style="min-width: 375px;">
-                    <li class="breadcrumb-item"><a href="{{ route('technician.index') }}">Trang chủ</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('technician.get-list-class') }}">Lớp học phần</a></li>
-                    <li class="breadcrumb-item active" aria-current="page"><a href="{{ route('technician.get-list-student-class', $class->id) }}">Sinh viên lớp học phần</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('lecturer.index') }}">Trang chủ</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('lecturer.get-list-class') }}">Lớp học tiếp quản</a></li>
+                    <li class="breadcrumb-item active" aria-current="page"><a href="{{ route('lecturer.get-list-student-class', $class->id) }}">Sinh viên lớp học phần</a></li>
                 </ol>
             </nav>
         </div>
@@ -26,7 +26,7 @@
                                     <h1 class="modal-title fs-5" id="exampleModalLabel">Thêm sinh viên vào lớp học phần</h1>
                                 </div>
                                 <div class="modal-body">
-                                    <form method="post" action="{{ route('technician.store-student-class-api') }}" id="add-student-form">
+                                    <form method="post" action="{{ route('lecturer.store-student-class-api') }}" id="add-student-form">
                                         @csrf
                                         <div class="row mb-3 mt-4">
                                             <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Mã sinh viên<span class="required">*</span></label>
@@ -58,7 +58,7 @@
                                     <h1 class="modal-title fs-5" id="exampleModalLabel">Nhập file sinh viên vào lớp học phần</h1>
                                 </div>
                                 <div class="modal-body">
-                                    <form method="post" action="{{ route('technician.import-student-class-api', $class->id) }}" enctype="multipart/form-data" id="import-student-class-form">
+                                    <form method="post" action="{{ route('lecturer.import-student-class-api', $class->id) }}" enctype="multipart/form-data" id="import-student-class-form">
                                         @csrf
                                         <div class="row mb-3 mt-4 d-flex justify-content-center align-items-center">
                                             <label class="col-md-3 col-label-form fs-6 fw-bold text-md-end">Chọn file</label>
@@ -108,7 +108,7 @@
                                     <div class="wrap-button m-1" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Xóa sinh viên khỏi lớp học phần">
                                         <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#destroy-student-class-modal-{{ $student->id }}"><i class='bx bx-trash'></i></button>
                                     </div>
-                                    <form method="post" action="{{ route('technician.destroy-student-class-api', $student->id) }}" id="destroy-student-class-form-{{ $student->id }}">
+                                    <form method="post" action="{{ route('lecturer.destroy-student-class-api', $student->id) }}" id="destroy-student-class-form-{{ $student->id }}">
                                         @csrf
                                         @method('DELETE')
                                         <!----- Modal xóa sinh viên ----->
@@ -167,7 +167,7 @@
                     type: 'POST',
                     data: JSON.stringify(formDataObj),
                     contentType: 'application/json',
-                    url: '{{ route("technician.store-student-class-api") }}',
+                    url: '{{ route("lecturer.store-student-class-api") }}',
                     success: function (response) {
                         if (response.success) {
                             showToastSuccess(response.success);
@@ -207,7 +207,7 @@
                     type: 'POST',
                     data: JSON.stringify(formDataObj),
                     contentType: 'application/json',
-                    url: '{{ route("technician.search-student-api") }}',
+                    url: '{{ route("lecturer.search-student-api") }}',
                     success: function (response) {
                         if (response.success) {
                             showToastSuccess(response.success);
@@ -238,7 +238,7 @@
 
                 formDataObj['class_id'] = '{{ $class->id }}';
 
-                let url = `{{ route("technician.destroy-student-class-api", ":studentId") }}`;
+                let url = `{{ route("lecturer.destroy-student-class-api", ":studentId") }}`;
                 url = url.replace(':studentId', studentId);
                 $.ajax({
                     type: 'DELETE',
@@ -273,7 +273,7 @@
                     data: formData,
                     contentType: false,
                     processData: false,
-                    url: '{{ route("technician.import-student-class-api") }}',
+                    url: '{{ route("lecturer.import-student-class-api") }}',
                     success: function (response) {
                         if (response.success) {
                             showToastSuccess(response.success);
