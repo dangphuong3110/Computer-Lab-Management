@@ -135,7 +135,7 @@ class StudentController extends Controller
         $attendances = Attendance::where('session_id', $class_session_id)
             ->whereBetween('attendance_time', [$startLesson, $endLesson])
             ->get();
-        $reports = $student->reports;
+        $reports = $student->reports()->orderBy('submitted_at', 'desc')->get();
 
         return view('student.class-session', compact('title', 'user', 'student', 'classSession', 'room', 'building', 'computers', 'attendances', 'reports'));
     }
@@ -163,7 +163,11 @@ class StudentController extends Controller
         $report->student_id = Auth::user()->student->id;
         $report->save();
 
-        return response()->json(['success' => 'Gửi báo cáo thành công!']);
+        $student = Auth::user()->student;
+        $reports = $student->reports()->orderBy('submitted_at', 'desc')->get();
+        $table_report = view('student.table-report', compact('reports'))->render();
+
+        return response()->json(['success' => 'Gửi báo cáo thành công!', 'table_report' => $table_report]);
     }
 
     public function attendanceAPI(Request $request, string $class_session_id)

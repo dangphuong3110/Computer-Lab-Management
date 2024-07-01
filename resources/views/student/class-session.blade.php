@@ -172,6 +172,8 @@
                     success: function (response) {
                         if (response.success) {
                             showToastSuccess(response.success);
+                            form[0].reset();
+                            $('#view-report-history-modal').html(response.table_report);
                             $('#send-report-modal-' + computerId).modal('hide');
                             $('body').css('overflow', 'auto');
                         } else {
