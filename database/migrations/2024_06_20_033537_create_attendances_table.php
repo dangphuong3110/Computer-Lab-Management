@@ -12,7 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('attendances', function (Blueprint $table) {
-            $table->dateTime('attendance_time');
+            $table->id();
+            $table->date('attendance_date');
             $table->unsignedBigInteger('student_id');
             $table->unsignedBigInteger('session_id');
             $table->unsignedBigInteger('computer_id');
