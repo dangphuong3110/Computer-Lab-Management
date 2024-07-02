@@ -58,7 +58,11 @@ class AttendancesExport implements FromCollection, WithHeadings, WithTitle, With
                 $attendanceRow[$date] = '';
             }
 
-            foreach ($student->attendances as $attendance) {
+            $sessionIds = $this->class->classSessions->pluck('id');
+
+            $filteredAttendances = $student->attendances->whereIn('session_id', $sessionIds);
+
+            foreach ($filteredAttendances as $attendance) {
                 $attendanceDate = Carbon::parse($attendance->attendance_date)->format('d-m-Y');
                 if (in_array($attendanceDate, $this->dates)) {
                     $attendanceRow[$attendanceDate] = 'x';
