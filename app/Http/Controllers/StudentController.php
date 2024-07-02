@@ -336,27 +336,4 @@ class StudentController extends Controller
 
         return response()->json(['success' => 'Cập nhật thông tin cá nhân thành công!', 'table_personal_info' => $table_personal_info]);
     }
-
-    public function updatePasswordAPI(Request $request, string $id)
-    {
-        $validator = Validator::make($request->all(), [
-            'new-password' => 'required|min:6',
-            're-enter-new-password' => 'same:new-password',
-        ], [
-            'new-password.required' => 'Vui lòng nhập mật khẩu mới!',
-            'new-password.min' => 'Mật khẩu phải chứa ít nhất 6 ký tự!',
-            're-enter-new-password.same' => 'Mật khẩu nhập lại không khớp!',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()]);
-        }
-
-        $user = User::findOrFail($id);
-        $user->password = $request->input('new-password');
-
-        $user->save();
-
-        return response()->json(['success' => 'Đổi mật khẩu tài khoản thành công!']);
-    }
 }

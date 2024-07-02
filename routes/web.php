@@ -50,7 +50,7 @@ Route::middleware(['auth'])->group(function () {
         // Personal Info
         Route::get('/get-personal-info', [StudentController::class, 'getPersonalInfo'])->name('student.get-personal-info')->middleware('check.role:student');
         Route::put('/update-personal-info-api/{student}', [StudentController::class, 'updatePersonalInfoAPI'])->name('student.update-personal-info-api');
-        Route::put('/update-password-api/{user}', [StudentController::class, 'updatePasswordAPI'])->name('student.update-password-api');
+        Route::put('/update-password-api/{user}', [UserController::class, 'updatePasswordAPI'])->name('student.update-password-api');
     });
 });
 
@@ -77,6 +77,11 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/approve-report-api/{report}', [LecturerController::class, 'approveReportAPI'])->name('lecturer.approve-report-api');
         Route::put('/disapprove-report-api/{report}', [LecturerController::class, 'disapproveReportAPI'])->name('lecturer.disapprove-report-api');
         Route::delete('/delete-report-api/{report}', [LecturerController::class, 'destroyReportAPI'])->name('lecturer.destroy-report-api');
+
+        // Personal Info
+        Route::get('/get-personal-info', [LecturerController::class, 'getPersonalInfo'])->name('lecturer.get-personal-info')->middleware('check.role:lecturer');
+        Route::put('/update-personal-info-api/{student}', [LecturerController::class, 'updatePersonalInfoAPI'])->name('lecturer.update-personal-info-api');
+        Route::put('/update-password-api/{user}', [UserController::class, 'updatePasswordAPI'])->name('lecturer.update-password-api');
     });
 });
 

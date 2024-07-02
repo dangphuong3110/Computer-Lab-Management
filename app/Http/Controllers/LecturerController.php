@@ -9,6 +9,7 @@ use App\Models\Building;
 use App\Models\ClassSession;
 use App\Models\Computer;
 use App\Models\CreditClass;
+use App\Models\Lecturer;
 use App\Models\Report;
 use App\Models\Room;
 use App\Models\Student;
@@ -382,5 +383,47 @@ class LecturerController extends Controller
         $class = CreditClass::find($class_id);
         $export = new AttendancesExport($class);
         return $export->download('Danh sách điểm danh lớp ' . $class->name . '.xlsx');
+    }
+
+    public function getPersonalInfo()
+    {
+        $title = 'Thông tin cá nhân';
+
+        $user = Auth::user();
+
+        return view('lecturer.personal-info', compact('title', 'user'));
+    }
+
+    public function updatePersonalInfoAPI(Request $request, string $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'full-name' => 'required|max:255',
+        ], [
+            'full-name.required' => 'Vui lòng nhập họ và tên!',
+            'full-name.max' => 'Họ và tên không được vượt quá 255 ký tự!',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()]);
+        }
+
+        $lecturer = Lecturer::findOrFail($id);
+
+        $user = $lecturer->user;
+        $user->phone = $request->input('phone');
+
+        $user->save();
+
+        $lecturer->full_name = $request->input('full-name');
+        $lecturer->academic_rank = $request->input('academic-rank');
+        $lecturer->department = $request->input('department');
+        $lecturer->faculty = $request->input('faculty');
+        $lecturer->position = $request->input('position');
+
+        $lecturer->save();
+
+        $table_personal_info = view('lecturer.table-personal-info', compact('user'))->render();
+
+        return response()->json(['success' => 'Cập nhật thông tin cá nhân thành công!', 'table_personal_info' => $table_personal_info]);
     }
 }

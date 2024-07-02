@@ -46,7 +46,7 @@
                                             </div>
                                         </div>
                                         <div class="row mb-3 mt-4">
-                                            <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Học vị</label>
+                                            <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Học hàm/Học vị</label>
                                             <div class="col-md-7">
                                                 <input type="text" name="academic-rank" class="form-control fs-6"/>
                                             </div>
@@ -203,7 +203,7 @@
                                                                     </div>
                                                                 </div>
                                                                 <div class="row mb-3 mt-4">
-                                                                    <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Học vị</label>
+                                                                    <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Học hàm/Học vị</label>
                                                                     <div class="col-md-7">
                                                                         <input type="text" name="academic-rank" class="form-control fs-6" value="{{ $lecturer->academic_rank }}" data-initial-value="{{ $lecturer->academic_rank }}"/>
                                                                     </div>

@@ -64,8 +64,8 @@
                         <span class="text nav-text">Xét duyệt báo cáo</span>
                     </a>
                 </li>
-                <li class="nav-link {{ request()->routeIs('student.get-personal-info') ? 'active' : '' }}">
-                    <a href="{{ route('student.get-personal-info') }}">
+                <li class="nav-link {{ request()->routeIs('lecturer.get-personal-info') ? 'active' : '' }}">
+                    <a href="{{ route('lecturer.get-personal-info') }}">
                         <i class='bx bxs-user-detail icon'></i>
                         <span class="text nav-text">Thông tin cá nhân</span>
                     </a>
