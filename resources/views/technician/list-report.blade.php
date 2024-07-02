@@ -1,12 +1,12 @@
-@extends('lecturer.layout')
+@extends('technician.layout')
 @section('content')
     <div class="row m-5 mb-4 d-flex align-items-center">
         <div class="col-12">
             <nav aria-label="breadcrumb" class="d-flex align-items-center">
-                <div class="text">Xét duyệt báo cáo</div>
+                <div class="text">Báo cáo sự cố</div>
                 <ol class="breadcrumb my-auto ms-4">
-                    <li class="breadcrumb-item"><a href="{{ route('lecturer.index') }}">Trang chủ</a></li>
-                    <li class="breadcrumb-item active" aria-current="page"><a href="{{ route('lecturer.get-list-student-report') }}">Xét duyệt báo cáo</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('technician.index') }}">Trang chủ</a></li>
+                    <li class="breadcrumb-item active" aria-current="page"><a href="{{ route('technician.get-list-report') }}">Báo cáo sự cố</a></li>
                 </ol>
             </nav>
         </div>
@@ -14,7 +14,7 @@
     <div class="row p-4 ms-5 me-5 mt-5 mb-0 main-content">
         <div class="col-12">
             <div class="d-flex mb-3">
-                <div class="text fs-4">Danh sách báo cáo sự cố của sinh viên lớp học tiếp quản</div>
+                <div class="text fs-4">Danh sách báo cáo sự cố</div>
             </div>
             <div class="table-responsive" id="table-report">
                 <table class="table table-bordered border-black">
@@ -34,32 +34,64 @@
                             <tr>
                                 <th scope="row" class="text-center">{{ $reports->firstItem() + $index }}</th>
                                 <td class="text-center">
-                                    Tên: {{ $report->student->full_name }}<br>
-                                    Mã sinh viên: {{ $report->student->student_code }}
+                                    @if ($report->student_id)
+                                        Sinh viên: {{ $report->student->full_name }}<br>
+                                        Mã sinh viên: {{ $report->student->student_code }}
+                                    @else
+                                        Giảng viên: {{ $report->lecturer->full_name }}<br>
+                                    @endif
                                 </td>
                                 <td class="text-center">{{ $report->content }}</td>
                                 <td class="text-center align-middle">
-                                    <span class="p-1 rounded bg-opacity-75 {{ $report->is_approved ? 'bg-success' : 'bg-warning' }}">
-                                        {{ $report->is_approved ? 'Đã duyệt' : 'Chưa duyệt' }}
+                                    <span class="p-1 rounded bg-opacity-75
+                                        @switch($report->status)
+                                            @case('pending')
+                                                bg-warning
+                                                @break
+                                            @case('processing')
+                                                bg-primary
+                                                @break
+                                            @case('processed')
+                                                bg-success
+                                                @break
+                                            @default
+                                                bg-secondary
+                                        @endswitch">
+                                        @switch($report->status)
+                                            @case('pending')
+                                                Chờ xử lý
+                                                @break
+                                            @case('processing')
+                                                Đang xử lý
+                                                @break
+                                            @case('processed')
+                                                Đã xử lý
+                                                @break
+                                            @default
+                                                Không xác định
+                                        @endswitch
                                     </span>
                                 </td>
                                 <td class="text-center align-middle">{{ \Carbon\Carbon::parse($report->submitted_at)->format('H:i:s d-m-Y') }}</td>
                                 <td class="text-center align-middle">
                                     <div class="d-flex justify-content-center">
-                                        <div class="wrap-button m-1" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Duyệt báo cáo">
-                                            <button class="btn btn-sm btn-success my-auto approve-report" data-report-id="{{ $report->id }}" {{ $report->is_approved ? 'disabled' : '' }}><i class='bx bx-check-square'></i></button>
+                                        <div class="wrap-button m-1" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Nhận xử lý">
+                                            <button class="btn btn-sm btn-primary my-auto processing-report" data-report-id="{{ $report->id }}" {{ $report->status == 'processing' ? 'disabled' : '' }}><i class='bx bx-loader-circle'></i></button>
                                         </div>
-                                        <div class="wrap-button m-1" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Hủy duyệt báo cáo">
-                                            <button class="btn btn-sm btn-warning my-auto disapprove-report" data-report-id="{{ $report->id }}" {{ $report->is_approved ? '' : 'disabled' }}><i class='bx bx-no-entry'></i></button>
+                                        <div class="wrap-button m-1" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Hủy nhận xử lý">
+                                            <button class="btn btn-sm btn-warning my-auto pending-report" data-report-id="{{ $report->id }}" {{ $report->status == 'pending' ? 'disabled' : '' }}><i class='bx bx-loader-circle'></i></button>
+                                        </div>
+                                        <div class="wrap-button m-1" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Đã xử lý">
+                                            <button class="btn btn-sm btn-success my-auto processed-report" data-report-id="{{ $report->id }}" {{ $report->status == 'processed' ? 'disabled' : '' }}><i class='bx bx-check-square'></i></button>
                                         </div>
                                         <div class="wrap-button m-1" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Xóa báo cáo">
-                                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#destroy-student-report-modal-{{ $report->id }}"><i class='bx bx-trash'></i></button>
+                                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#destroy-report-modal-{{ $report->id }}"><i class='bx bx-trash'></i></button>
                                         </div>
-                                        <form method="post" action="{{ route('lecturer.destroy-report-api', $report->id) }}" id="destroy-student-report-form-{{ $report->id }}">
+                                        <form method="post" action="{{ route('technician.destroy-report-api', $report->id) }}" id="destroy-report-form-{{ $report->id }}">
                                             @csrf
                                             @method('DELETE')
                                             <!----- Modal xóa báo cáo sự cố ----->
-                                            <div class="modal fade" id="destroy-student-report-modal-{{ $report->id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="destroyStudentReportLabel" aria-hidden="true">
+                                            <div class="modal fade" id="destroy-report-modal-{{ $report->id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="destroyReportLabel" aria-hidden="true">
                                                 <div class="modal-dialog modal-dialog-centered">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
@@ -104,7 +136,7 @@
             });
 
             function submitFormDestroyReport (reportId, overlay) {
-                let url = `{{ route("lecturer.destroy-report-api", ":reportId") }}`;
+                let url = `{{ route("technician.destroy-report-api", ":reportId") }}`;
                 url = url.replace(':reportId', reportId);
                 $.ajax({
                     type: 'DELETE',
@@ -117,7 +149,7 @@
                             $('#paginate-report').html(response.links);
                             updatePagination();
                             addEventForButtons();
-                            $('#destroy-student-report-modal-' + reportId).modal('hide');
+                            $('#destroy-report-modal-' + reportId).modal('hide');
                             $('body').css('overflow', 'auto');
                         }
                         overlay.classList.remove('show');
@@ -150,8 +182,9 @@
                 const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 
                 $('.btn-destroy-lecturer').off('click');
-                $('.approve-report').off('click');
-                $('.disapprove-report').off('click');
+                $('.processing-report').off('click');
+                $('.pending-report').off('click');
+                $('.processed-report').off('click');
                 $('.close-btn').off('click');
 
                 $('.btn-destroy-report').click('click', function(e) {
@@ -165,7 +198,7 @@
                     submitFormDestroyReport(reportId, overlay);
                 });
 
-                $('.approve-report').click(function(e) {
+                $('.processing-report').click(function(e) {
                     e.preventDefault();
                     $('[data-bs-toggle="tooltip"]').tooltip('hide');
                     const overlay = document.getElementById('overlay');
@@ -177,7 +210,7 @@
                     $.ajax({
                         type: 'PUT',
                         contentType: 'application/json',
-                        url: `{{ route("lecturer.approve-report-api", ":reportId") }}`.replace(':reportId', reportId),
+                        url: `{{ route("technician.processing-report-api", ":reportId") }}`.replace(':reportId', reportId),
                         success: function (response) {
                             if (response.success) {
                                 showToastSuccess(response.success);
@@ -195,7 +228,7 @@
                     });
                 });
 
-                $('.disapprove-report').click(function(e) {
+                $('.pending-report').click(function(e) {
                     e.preventDefault();
                     $('[data-bs-toggle="tooltip"]').tooltip('hide');
                     const overlay = document.getElementById('overlay');
@@ -207,7 +240,37 @@
                     $.ajax({
                         type: 'PUT',
                         contentType: 'application/json',
-                        url: `{{ route("lecturer.disapprove-report-api", ":reportId") }}`.replace(':reportId', reportId),
+                        url: `{{ route("technician.pending-report-api", ":reportId") }}`.replace(':reportId', reportId),
+                        success: function (response) {
+                            if (response.success) {
+                                showToastSuccess(response.success);
+                                $('#table-report tbody').html(response.table_report);
+                                $('#paginate-report').html(response.links);
+                                updatePagination();
+                                addEventForButtons();
+                            }
+
+                            overlay.classList.remove('show');
+                        },
+                        error: function (error) {
+                            console.error(error);
+                        }
+                    });
+                });
+
+                $('.processed-report').click(function(e) {
+                    e.preventDefault();
+                    $('[data-bs-toggle="tooltip"]').tooltip('hide');
+                    const overlay = document.getElementById('overlay');
+                    overlay.classList.add('show');
+                    $('.modal-backdrop').remove();
+
+                    const reportId = $(this).data('report-id');
+
+                    $.ajax({
+                        type: 'PUT',
+                        contentType: 'application/json',
+                        url: `{{ route("technician.processed-report-api", ":reportId") }}`.replace(':reportId', reportId),
                         success: function (response) {
                             if (response.success) {
                                 showToastSuccess(response.success);

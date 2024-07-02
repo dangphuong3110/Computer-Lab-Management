@@ -11,6 +11,7 @@ use App\Models\Computer;
 use App\Models\CreditClass;
 use App\Models\Lecturer;
 use App\Models\Lesson;
+use App\Models\Report;
 use App\Models\Room;
 use App\Models\Student;
 use App\Models\User;
@@ -138,6 +139,16 @@ class TechnicianController extends Controller
         $students = $class->students()->orderBy('class_student.created_at', 'desc')->paginate(7);
 
         return view('technician.list-student-class', compact('title','user', 'students', 'class'));
+    }
+
+    public function getListReport()
+    {
+        $title = 'Báo cáo sự cố';
+        $user = Auth::user();
+
+        $reports = Report::where('is_approved', 1)->orderBy('submitted_at', 'desc')->paginate(7);
+
+        return view('technician.list-report', compact('title','user', 'reports'));
     }
 
     public function getStudentByStudentCodeAPI(Request $request)
@@ -1136,6 +1147,18 @@ class TechnicianController extends Controller
         return response()->json(['success' => 'Xóa máy tính thành công!', 'table_computer' => $table_computer]);
     }
 
+    public function destroyReportAPI(string $report_id)
+    {
+        $report = Report::findOrFail($report_id);
+
+        $report->delete();
+
+        $reports = Report::where('is_approved', 1)->orderBy('submitted_at', 'desc')->paginate(7);
+        $table_report = view('technician.table-report', compact('reports'))->render();
+
+        return response()->json(['success' => 'Xóa báo cáo thành công!', 'table_report' => $table_report, 'links' => $reports->render('pagination::bootstrap-5')->toHtml()]);
+    }
+
     public function importLecturerAPI(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -1206,5 +1229,47 @@ class TechnicianController extends Controller
         $table_student_class = view('technician.table-student-class', compact('students', 'class'))->render();
 
         return response()->json(['success' => 'Nhập file sinh viên vào lớp học phần thành công!', 'table_student_class' => $table_student_class, 'links' => $students->render('pagination::bootstrap-5')->toHtml()]);
+    }
+
+    public function processingReportAPI(string $report_id)
+    {
+        $report = Report::findOrFail($report_id);
+        $report->status = 'processing';
+        $report->processed_at = null;
+        $report->technician_id = Auth::user()->technician->id;
+        $report->save();
+
+        $reports = Report::where('is_approved', 1)->orderBy('submitted_at', 'desc')->paginate(7);
+        $table_report = view('technician.table-report', compact('reports'))->render();
+
+        return response()->json(['success' => 'Cập nhật trạng thái báo cáo thành công!', 'table_report' => $table_report, 'links' => $reports->render('pagination::bootstrap-5')->toHtml()]);
+    }
+
+    public function pendingReportAPI(string $report_id)
+    {
+        $report = Report::findOrFail($report_id);
+        $report->status = 'pending';
+        $report->processed_at = null;
+        $report->technician_id = null;
+        $report->save();
+
+        $reports = Report::where('is_approved', 1)->orderBy('submitted_at', 'desc')->paginate(7);
+        $table_report = view('technician.table-report', compact('reports'))->render();
+
+        return response()->json(['success' => 'Cập nhật trạng thái báo cáo thành công!', 'table_report' => $table_report, 'links' => $reports->render('pagination::bootstrap-5')->toHtml()]);
+    }
+
+    public function processedReportAPI(string $report_id)
+    {
+        $report = Report::findOrFail($report_id);
+        $report->status = 'processed';
+        $report->technician_id = Auth::user()->technician->id;
+        $report->processed_at = Carbon::now();
+        $report->save();
+
+        $reports = Report::where('is_approved', 1)->orderBy('submitted_at', 'desc')->paginate(7);
+        $table_report = view('technician.table-report', compact('reports'))->render();
+
+        return response()->json(['success' => 'Cập nhật trạng thái báo cáo thành công!', 'table_report' => $table_report, 'links' => $reports->render('pagination::bootstrap-5')->toHtml()]);
     }
 }

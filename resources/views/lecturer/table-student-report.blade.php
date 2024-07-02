@@ -27,7 +27,7 @@
                     <form method="post" action="{{ route('lecturer.destroy-report-api', $report->id) }}" id="destroy-student-report-form-{{ $report->id }}">
                         @csrf
                         @method('DELETE')
-                        <!----- Modal xóa giảng viên ----->
+                        <!----- Modal xóa báo cáo sự cố ----->
                         <div class="modal fade" id="destroy-student-report-modal-{{ $report->id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="destroyStudentReportLabel" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content">

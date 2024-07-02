@@ -134,7 +134,7 @@ Route::middleware(['auth'])->group(function () {
        Route::put('/update-room-api/{room}', [TechnicianController::class, 'updateRoomAPI'])->name('technician.update-room-api');
        Route::delete('/delete-room-api/{room}', [TechnicianController::class, 'destroyRoomAPI'])->name('technician.destroy-room-api');
 
-       // Room
+       // Computer
        Route::get('/get-list-computer/{room}', [TechnicianController::class, 'getListComputer'])->name('technician.get-list-computer')->middleware('check.role:technician');
        Route::get('/get-list-computer-api', [TechnicianController::class, 'getListComputerAPI'])->name('technician.get-list-computer-api');
        Route::post('/store-computer-api', [TechnicianController::class, 'storeComputerAPI'])->name('technician.store-computer-api');
@@ -142,6 +142,13 @@ Route::middleware(['auth'])->group(function () {
        Route::put('/start-maintenance-computer-api/{computer}', [TechnicianController::class, 'startMaintenanceClassAPI'])->name('technician.start-maintenance-computer-api');
        Route::put('/end-maintenance-computer-api/{computer}', [TechnicianController::class, 'endMaintenanceClassAPI'])->name('technician.end-maintenance-computer-api');
        Route::delete('/delete-computer-api/{computer}', [TechnicianController::class, 'destroyComputerAPI'])->name('technician.destroy-computer-api');
+
+       // Report
+       Route::get('/get-list-report', [TechnicianController::class, 'getListReport'])->name('technician.get-list-report')->middleware('check.role:technician');
+       Route::put('/processing-report-api/{report}', [TechnicianController::class, 'processingReportAPI'])->name('technician.processing-report-api');
+       Route::put('/pending-report-api/{report}', [TechnicianController::class, 'pendingReportAPI'])->name('technician.pending-report-api');
+       Route::put('/processed-report-api/{report}', [TechnicianController::class, 'processedReportAPI'])->name('technician.processed-report-api');
+       Route::delete('/delete-report-api/{report}', [TechnicianController::class, 'destroyReportAPI'])->name('technician.destroy-report-api');
    });
 });
 

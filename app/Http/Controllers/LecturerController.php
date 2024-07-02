@@ -125,7 +125,7 @@ class LecturerController extends Controller
         $attendances = Attendance::where('session_id', $class_session_id)
             ->whereBetween('created_at', [$startLesson, $endLesson])
             ->get();
-        $reports = $lecturer->reports;
+        $reports = $lecturer->reports()->orderBy('submitted_at', 'desc')->get();
 
         return view('lecturer.class-session', compact('title', 'user', 'lecturer', 'classSession', 'room', 'building', 'computers', 'attendances', 'reports'));
     }
@@ -148,6 +148,7 @@ class LecturerController extends Controller
         $report = new Report();
 
         $report->content = $request->input('content') . ' (Phòng: ' . $room->name . ' - Tòa nhà: ' . $building->name . ')';
+        $report->is_approved = true;
         $report->submitted_at = Carbon::now();
         $report->lecturer_id = Auth::user()->lecturer->id;
         $report->save();

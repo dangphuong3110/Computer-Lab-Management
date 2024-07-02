@@ -31,9 +31,6 @@
                                         @case('processed')
                                             bg-success
                                             @break
-                                        @case('cancel')
-                                            bg-danger
-                                            @break
                                         @default
                                             bg-secondary
                                     @endswitch">
@@ -46,9 +43,6 @@
                                             @break
                                         @case('processed')
                                             Đã xử lý
-                                            @break
-                                        @case('cancel')
-                                            Không xử lý
                                             @break
                                         @default
                                             Không xác định

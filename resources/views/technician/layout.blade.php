@@ -70,8 +70,8 @@
                         <span class="text nav-text">Nhà thực hành</span>
                     </a>
                 </li>
-                <li class="nav-link">
-                    <a href="#">
+                <li class="nav-link {{ request()->routeIs('technician.get-list-report') ? 'active' : '' }}">
+                    <a href="{{ route('technician.get-list-report') }}">
                         <i class='bx bx-comment-error bx-tada icon' ></i>
                         <span class="text nav-text">Báo cáo sự cố</span>
                     </a>
