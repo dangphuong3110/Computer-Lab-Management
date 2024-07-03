@@ -280,12 +280,6 @@
                 const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
                 const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 
-                $('.btn-add-computer').off('click');
-                $('.btn-update-computer').off('click');
-                $('.btn-destroy-computer').off('click');
-                $('.close-btn').off('click');
-                $('.close-update-btn').off('click');
-
                 $('.btn-add-computer').click(function(e) {
                     e.preventDefault();
                     const overlay = document.getElementById('overlay');
@@ -298,7 +292,7 @@
                     submitFormCreateComputer(form, position, overlay);
                 });
 
-                $('.btn-update-computer').click(function(e) {
+                $('.btn-update-computer').off('click').click(function(e) {
                     e.preventDefault();
                     const overlay = document.getElementById('overlay');
                     overlay.classList.add('show');
@@ -310,7 +304,7 @@
                     submitFormUpdateComputer(form, computerId, overlay);
                 });
 
-                $('.btn-destroy-computer').click('click', function(e) {
+                $('.btn-destroy-computer').off('click').click(function(e) {
                     e.preventDefault();
                     const overlay = document.getElementById('overlay');
                     overlay.classList.add('show');
@@ -321,7 +315,7 @@
                     submitFormDestroyComputer(computerId, overlay);
                 });
 
-                $('.btn-start-maintenance').click('click', function() {
+                $('.btn-start-maintenance').off('click').click(function() {
                     const overlay = document.getElementById('overlay');
                     overlay.classList.add('show');
 
@@ -351,7 +345,7 @@
                     });
                 })
 
-                $('.btn-end-maintenance').click('click', function() {
+                $('.btn-end-maintenance').off('click').click(function() {
                     const overlay = document.getElementById('overlay');
                     overlay.classList.add('show');
 
@@ -380,11 +374,11 @@
                     });
                 })
 
-                $('.close-btn').click(function() {
+                $('.close-btn').off('click').click(function() {
                     $('.modal-backdrop.fade.show').remove();
                 });
 
-                $('.close-update-btn').click(function() {
+                $('.close-update-btn').off('click').click(function() {
                     $('.modal-backdrop.fade.show').remove();
                 });
             }

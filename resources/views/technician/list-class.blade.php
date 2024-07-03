@@ -154,10 +154,10 @@
                     <thead>
                     <tr>
                         <th scope="col" class="text-center" width="5%">STT</th>
-                        <th scope="col" class="text-center" width="30%">Lớp học phần</th>
-                        <th scope="col" class="text-center" width="20%">Giảng viên</th>
+                        <th scope="col" class="text-center" data-sort="name" width="30%">Lớp học phần <i class="bx bx-sort-alt-2"></i></th>
+                        <th scope="col" class="text-center" data-sort="lecturer" width="20%">Giảng viên <i class="bx bx-sort-alt-2"></i></th>
                         <th scope="col" class="text-center" width="20%">Bắt đầu - kết thúc</th>
-                        <th scope="col" class="text-center" width="10%">Đóng/mở lớp</th>
+                        <th scope="col" class="text-center" data-sort="status" width="15%">Đóng/mở lớp <i class="bx bx-sort-alt-2"></i></th>
                         <th scope="col" class="text-center">Hành động</th>
                     </tr>
                     </thead>
@@ -425,6 +425,9 @@
                             $('#paginate-class').html(response.links);
                             classSessions = response.class_sessions;
                             lessons = response.lessons;
+
+                            const currentUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+                            window.history.pushState({path: currentUrl}, '', currentUrl);
                             updatePagination();
                             addEventForModalUpdate();
                             addEventForButtons();
@@ -480,6 +483,9 @@
                             $('#paginate-class').html(response.links);
                             classSessions = response.class_sessions;
                             lessons = response.lessons;
+
+                            const currentUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+                            window.history.pushState({path: currentUrl}, '', currentUrl);
                             updatePagination();
                             addEventForModalUpdate();
                             addEventForButtons();
@@ -522,6 +528,9 @@
                             $('#paginate-class').html(response.links);
                             classSessions = response.class_sessions;
                             lessons = response.lessons;
+
+                            const currentUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+                            window.history.pushState({path: currentUrl}, '', currentUrl);
                             updatePagination();
                             addEventForModalUpdate();
                             addEventForButtons();
@@ -549,7 +558,7 @@
                 $('.pagination .page-link').each(function() {
                     const link = $(this);
                     if (link.attr('href')) {
-                        const newUrl = new URL(link.attr('href'));
+                        const newUrl = new URL(link.attr('href'), window.location.origin);
                         searchParams.set('page', newUrl.searchParams.get('page'));
 
                         const updatedUrl = currentPath + '?' + searchParams.toString();
@@ -572,8 +581,22 @@
                 const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
                 const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 
-                $('.btn-update-student').off('click');
-                $('.btn-update-password-student').off('click');
+                $('th[data-sort]').each(function() {
+                    const currentUrl = new URL(window.location.href);
+                    const currentField = currentUrl.searchParams.get('sort-field');
+                    const currentOrder = currentUrl.searchParams.get('sort-order');
+                    const field = $(this).data('sort');
+
+                    if (currentField === field) {
+                        if (currentOrder === 'asc') {
+                            $(this).find('i').attr('class', 'bx bx-sort-up');
+                        } else if (currentOrder === 'desc') {
+                            $(this).find('i').attr('class', 'bx bx-sort-down');
+                        }
+                    } else {
+                        $(this).find('i').attr('class', 'bx bx-sort-alt-2');
+                    }
+                });
 
                 $('.btn-update-class').off('click').click(function(e) {
                     e.preventDefault();
@@ -587,7 +610,7 @@
                     submitFormUpdateClass(form, classId, overlay);
                 });
 
-                $('.btn-destroy-class').off('click').click('click', function(e) {
+                $('.btn-destroy-class').off('click').click(function(e) {
                     e.preventDefault();
                     const overlay = document.getElementById('overlay');
                     overlay.classList.add('show');
@@ -715,6 +738,38 @@
                     }
                 });
 
+                $('th[data-sort]').off('click').click(function() {
+                    const field = $(this).data('sort');
+                    const order = $(this).hasClass('ascending') ? 'desc' : 'asc';
+
+                    const currentUrl = new URL(window.location.href);
+                    currentUrl.searchParams.set('sort-field', field);
+                    currentUrl.searchParams.set('sort-order', order);
+                    history.pushState(null, '', currentUrl.toString());
+
+                    $.ajax({
+                        url: `{{ route('technician.sort-class-api') }}`,
+                        type: 'GET',
+                        data: {sortField: field, sortOrder: order},
+                        success: function(response) {
+                            $('#table-class tbody').html(response.table_class);
+                            $('#paginate-class').html(response.links);
+                            classSessions = response.class_sessions;
+                            lessons = response.lessons;
+                            updatePagination();
+                            addEventForModalUpdate();
+                            addEventForButtons();
+
+                            $('th[data-sort] i').attr('class', 'bx bx-sort-alt-2');
+                            const iconClass = order === 'asc' ? 'bx-sort-up' : 'bx-sort-down';
+                            $(`th[data-sort="${field}"] i`).attr('class', `bx ${iconClass}`);
+
+                            $('th[data-sort]').removeClass('ascending descending');
+                            $(`th[data-sort="${field}"]`).addClass(order === 'asc' ? 'ascending' : 'descending');
+                        }
+                    });
+                });
+
                 $('.close-btn').off('click').click(function() {
                     $('#error-message-full-name-create').text('');
                     $('#error-message-class-code-create').text('');
@@ -746,7 +801,6 @@
                     });
                 });
             }
-
 
             function addEventForSelectOption() {
                 const buildings = @json($buildings);
@@ -857,9 +911,102 @@
                     const numberOfSession = $(this).val();
                     const sessionContainer = $('#session-container-update-' + classId);
 
-                    sessionContainer.html('');
-                    for (let i = 1; i <= numberOfSession; i++) {
-                        const session = `
+                    $.ajax({
+                        type: 'GET',
+                        url: `{{ route('technician.get-class-sessions-api', ":classId") }}` . replace(':classId', classId),
+                        success: function(response) {
+                            console.log(response.classSessions);
+                            console.log(response.lessons);
+                            sessionContainer.html('');
+                            for (let i = 1; i <= numberOfSession; i++) {
+                                const sessionData = response.classSessions[i-1];
+                                const lessonData = response.lessons[i-1];
+                                if (sessionData && lessonData) {
+                                    const session = `
+                                    <div class="row mb-3 mt-4 pb-3">
+                                        <label class="col-12 col-label-form fs-6 fw-bold fst-italic text-center">Buổi học ${i}:</label>
+                                    </div>
+                                    <div class="col-lg-6 ${i != numberOfSession ? 'border-bottom' : ''}">
+                                        <div class="row mb-3 mt-4">
+                                            <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Thứ trong tuần</label>
+                                            <div class="col-md-7">
+                                                <select name="day-of-week[]" class="form-select form-control fs-6">
+                                                    <option value="2" ${sessionData.day_of_week == 2 ? 'selected' : ''}>Thứ 2</option>
+                                                    <option value="3" ${sessionData.day_of_week == 3 ? 'selected' : ''}>Thứ 3</option>
+                                                    <option value="4" ${sessionData.day_of_week == 4 ? 'selected' : ''}>Thứ 4</option>
+                                                    <option value="5" ${sessionData.day_of_week == 5 ? 'selected' : ''}>Thứ 5</option>
+                                                    <option value="6" ${sessionData.day_of_week == 6 ? 'selected' : ''}>Thứ 6</option>
+                                                    <option value="7" ${sessionData.day_of_week == 7 ? 'selected' : ''}>Thứ 7</option>
+                                                    <option value="8" ${sessionData.day_of_week == 8 ? 'selected' : ''}>Chủ nhật</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3 mt-4">
+                                            <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Tòa nhà</label>
+                                            <div class="col-md-7">
+                                                <select id="building-update-${classId}-${i}" name="building[]" class="form-select form-control fs-6">
+                                                    ${buildings.map(building => `<option value="${building.id}" ${building.id == rooms.find(room => room.id === sessionData.room_id).building_id ? 'selected' : ''}>${building.name}</option>`).join('')}
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 ${i != numberOfSession ? 'border-bottom' : ''}">
+                                        <div class="row mb-3 mt-4">
+                                            <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Tiết học</label>
+                                            <div class="col-md-7">
+                                                <div id="label-lesson-of-class-session-update-${classId}-${i}" class="fs-6 text-center"></div>
+                                                <div id="lesson-of-class-session-update-${classId}-${i}"></div>
+                                                <input type="hidden" id="start-lesson-input-update-${classId}-${i}" name="start-lesson[]">
+                                                <input type="hidden" id="end-lesson-input-update-${classId}-${i}" name="end-lesson[]">
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3 mt-4">
+                                            <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Phòng học</label>
+                                            <div class="col-md-7">
+                                                <select id="room-update-${classId}-${i}" name="room[]" class="form-select form-control fs-6">
+                                                    ${rooms.filter(room => room.building_id == rooms.find(room => room.id === sessionData.room_id).building_id).map(room => `<option value="${room.id}" ${room.id == sessionData.room_id ? 'selected' : ''}>${room.name}</option>`).join('')}
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                                    sessionContainer.append(session);
+
+                                    $(`#building-update-${classId}-${i}`).off('change').change(function () {
+                                        const buildingId = $(this).val();
+                                        const roomSelect = $(`#room-update-${classId}-${i}`);
+                                        roomSelect.html('');
+                                        rooms.forEach(room => {
+                                            if (room.building_id == buildingId) {
+                                                const option = `<option value="${room.id}">${room.name}</option>`;
+                                                roomSelect.append(option);
+                                            }
+                                        });
+                                    });
+
+                                    const lessonIds = lessonData.map(lesson => lesson.id);
+                                    const minLessonId = Math.min(...lessonIds);
+                                    const maxLessonId = Math.max(...lessonIds);
+
+                                    $(function () {
+                                        $(`#lesson-of-class-session-update-${classId}-${i}`).slider({
+                                            range: true,
+                                            min: 1,
+                                            max: 15,
+                                            values: [minLessonId, maxLessonId],
+                                            slide: function (event, ui) {
+                                                $(`#label-lesson-of-class-session-update-${classId}-${i}`).html("Tiết " + ui.values[0] + "<i class='bx bx-right-arrow-alt'></i> Tiết " + ui.values[1]);
+                                                $(`#start-lesson-input-update-${classId}-${i}`).val(ui.values[0]);
+                                                $(`#end-lesson-input-update-${classId}-${i}`).val(ui.values[1]);
+                                            }
+                                        });
+
+                                        $(`#label-lesson-of-class-session-update-${classId}-${i}`).html("Tiết " + $(`#lesson-of-class-session-update-${classId}-${i}`).slider("values", 0) + "<i class='bx bx-right-arrow-alt'></i> Tiết " + $(`#lesson-of-class-session-update-${classId}-${i}`).slider("values", 1));
+                                        $(`#start-lesson-input-update-${classId}-${i}`).val($(`#lesson-of-class-session-update-${classId}-${i}`).slider("values", 0));
+                                        $(`#end-lesson-input-update-${classId}-${i}`).val($(`#lesson-of-class-session-update-${classId}-${i}`).slider("values", 1));
+                                    });
+                                } else {
+                                    const session = `
                             <div class="row mb-3 mt-4 pb-3">
                                 <label class="col-12 col-label-form fs-6 fw-bold fst-italic text-center">Buổi học ${i}:</label>
                             </div>
@@ -881,7 +1028,7 @@
                                 <div class="row mb-3 mt-4">
                                     <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Tòa nhà</label>
                                     <div class="col-md-7">
-                                        <select id="building-update-${classId}-${i}" name="building[]" class="form-select form-control fs-6">
+                                        <select id="building-create-${i}" name="building[]" class="form-select form-control fs-6">
                                             ${buildings.map(building => `<option value="${building.id}">${building.name}</option>`).join('')}
                                         </select>
                                     </div>
@@ -891,54 +1038,57 @@
                                 <div class="row mb-3 mt-4">
                                     <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Tiết học</label>
                                     <div class="col-md-7">
-                                        <div id="label-lesson-of-class-session-update-${classId}-${i}" class="fs-6 text-center"></div>
-                                        <div id="lesson-of-class-session-update-${classId}-${i}"></div>
-                                        <input type="hidden" id="start-lesson-input-update-${classId}-${i}" name="start-lesson[]">
-                                        <input type="hidden" id="end-lesson-input-update-${classId}-${i}" name="end-lesson[]">
+                                        <div id="label-lesson-of-class-session-create-${i}" class="fs-6 text-center"></div>
+                                        <div id="lesson-of-class-session-create-${i}"></div>
+                                        <input type="hidden" id="start-lesson-input-create-${i}" name="start-lesson[]">
+                                        <input type="hidden" id="end-lesson-input-create-${i}" name="end-lesson[]">
                                     </div>
                                 </div>
                                 <div class="row mb-3 mt-4">
                                     <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Phòng học</label>
                                     <div class="col-md-7">
-                                        <select id="room-update-${classId}-${i}" name="room[]" class="form-select form-control fs-6">
+                                        <select id="room-create-${i}" name="room[]" class="form-select form-control fs-6">
                                             ${rooms.filter(room => room.building_id == 1).map(room => `<option value="${room.id}">${room.name}</option>`).join('')}
                                         </select>
                                     </div>
                                 </div>
                             </div>
                         `;
-                        sessionContainer.append(session);
+                                    sessionContainer.append(session);
 
-                        $(`#building-update-${classId}-${i}`).off('change').change(function () {
-                            const buildingId = $(this).val();
-                            const roomSelect = $(`#room-update-${classId}-${i}`);
-                            roomSelect.html('');
-                            rooms.forEach(room => {
-                                if (room.building_id == buildingId) {
-                                    const option = `<option value="${room.id}">${room.name}</option>`;
-                                    roomSelect.append(option);
+                                    $(`#building-create-${i}`).off('change').change(function() {
+                                        const buildingId = $(this).val();
+                                        const roomSelect = $(`#room-create-${i}`);
+                                        roomSelect.html('');
+                                        rooms.forEach(room => {
+                                            if (room.building_id == buildingId) {
+                                                const option = `<option value="${room.id}">${room.name}</option>`;
+                                                roomSelect.append(option);
+                                            }
+                                        });
+                                    });
+
+                                    $(function() {
+                                        $(`#lesson-of-class-session-create-${i}`).slider({
+                                            range: true,
+                                            min: 1,
+                                            max: 15,
+                                            values: [1, 3],
+                                            slide: function(event, ui) {
+                                                $(`#label-lesson-of-class-session-create-${i}`).html("Tiết " + ui.values[0] + "<i class='bx bx-right-arrow-alt'></i> Tiết " + ui.values[1]);
+                                                $(`#start-lesson-input-create-${i}`).val(ui.values[0]);
+                                                $(`#end-lesson-input-create-${i}`).val(ui.values[1]);
+                                            }
+                                        });
+
+                                        $(`#label-lesson-of-class-session-create-${i}`).html("Tiết " + $(`#lesson-of-class-session-create-${i}`).slider("values", 0) + "<i class='bx bx-right-arrow-alt'></i> Tiết " + $(`#lesson-of-class-session-create-${i}`).slider("values", 1));
+                                        $(`#start-lesson-input-create-${i}`).val($(`#lesson-of-class-session-create-${i}`).slider("values", 0));
+                                        $(`#end-lesson-input-create-${i}`).val($(`#lesson-of-class-session-create-${i}`).slider("values", 1));
+                                    });
                                 }
-                            });
-                        });
-
-                        $(function () {
-                            $(`#lesson-of-class-session-update-${classId}-${i}`).slider({
-                                range: true,
-                                min: 1,
-                                max: 15,
-                                values: [1, 3],
-                                slide: function (event, ui) {
-                                    $(`#label-lesson-of-class-session-update-${classId}-${i}`).html("Tiết " + ui.values[0] + "<i class='bx bx-right-arrow-alt'></i> Tiết " + ui.values[1]);
-                                    $(`#start-lesson-input-update-${classId}-${i}`).val(ui.values[0]);
-                                    $(`#end-lesson-input-update-${classId}-${i}`).val(ui.values[1]);
-                                }
-                            });
-
-                            $(`#label-lesson-of-class-session-update-${classId}-${i}`).html("Tiết " + $(`#lesson-of-class-session-update-${classId}-${i}`).slider("values", 0) + "<i class='bx bx-right-arrow-alt'></i> Tiết " + $(`#lesson-of-class-session-update-${classId}-${i}`).slider("values", 1));
-                            $(`#start-lesson-input-update-${classId}-${i}`).val($(`#lesson-of-class-session-update-${classId}-${i}`).slider("values", 0));
-                            $(`#end-lesson-input-update-${classId}-${i}`).val($(`#lesson-of-class-session-update-${classId}-${i}`).slider("values", 1));
-                        });
-                    }
+                            }
+                        }
+                    });
                 });
             }
 

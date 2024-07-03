@@ -250,7 +250,7 @@
             });
 
             function addEventForButtons() {
-                $('#btn-update-personal-info').click(function(e) {
+                $('#btn-update-personal-info').off('click').click(function(e) {
                     e.preventDefault();
                     const overlay = document.getElementById('overlay');
                     overlay.classList.add('show');

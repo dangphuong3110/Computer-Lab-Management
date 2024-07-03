@@ -48,7 +48,7 @@
                         <button class="btn btn-sm btn-primary my-auto processing-report" data-report-id="{{ $report->id }}" {{ $report->status == 'processing' ? 'disabled' : '' }}><i class='bx bx-loader-circle'></i></button>
                     </div>
                     <div class="wrap-button m-1" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Hủy nhận xử lý">
-                        <button class="btn btn-sm btn-warning my-auto pending-report" data-report-id="{{ $report->id }}" {{ $report->status == 'pending' ? 'disabled' : '' }}><i class='bx bx-loader-circle'></i></button>
+                        <button class="btn btn-sm btn-warning my-auto pending-report" data-report-id="{{ $report->id }}" {{ $report->status == 'pending' ? 'disabled' : '' }}><i class='bx bx-transfer'></i></button>
                     </div>
                     <div class="wrap-button m-1" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Đã xử lý">
                         <button class="btn btn-sm btn-success my-auto processed-report" data-report-id="{{ $report->id }}" {{ $report->status == 'processed' ? 'disabled' : '' }}><i class='bx bx-check-square'></i></button>

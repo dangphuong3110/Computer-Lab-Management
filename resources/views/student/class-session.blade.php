@@ -34,8 +34,8 @@
                                             <tr>
                                                 <th scope="col" class="text-center" width="5%">STT</th>
                                                 <th scope="col" class="text-center" width="30%">Nội dung</th>
-                                                <th scope="col" class="text-center" width="30%">Trạng thái</th>
-                                                <th scope="col" class="text-center" width="20%">Thời gian gửi</th>
+                                                <th scope="col" class="text-center" data-sort="is_approved" width="30%">Trạng thái <i class="bx bx-sort-alt-2"></i></th>
+                                                <th scope="col" class="text-center" data-sort="submitted_at" width="20%">Thời gian gửi <i class="bx bx-sort-alt-2"></i></th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -191,11 +191,24 @@
             }
 
             function addEventForButtons() {
-                $('.btn-attendance').off('click');
-                $('.btn-send-report').off('click');
-                $('.close-btn').off('click');
+                $('th[data-sort]').each(function() {
+                    const currentUrl = new URL(window.location.href);
+                    const currentField = currentUrl.searchParams.get('sort-field');
+                    const currentOrder = currentUrl.searchParams.get('sort-order');
+                    const field = $(this).data('sort');
 
-                $('.btn-attendance').click('click', function() {
+                    if (currentField === field) {
+                        if (currentOrder === 'asc') {
+                            $(this).find('i').attr('class', 'bx bx-sort-up');
+                        } else if (currentOrder === 'desc') {
+                            $(this).find('i').attr('class', 'bx bx-sort-down');
+                        }
+                    } else {
+                        $(this).find('i').attr('class', 'bx bx-sort-alt-2');
+                    }
+                });
+
+                $('.btn-attendance').off('click').click(function() {
                     const overlay = document.getElementById('overlay');
                     overlay.classList.add('show');
 
@@ -230,7 +243,7 @@
                     });
                 })
 
-                $('.btn-send-report').click('click', function(e) {
+                $('.btn-send-report').off('click').click(function(e) {
                     e.preventDefault();
                     const overlay = document.getElementById('overlay');
                     overlay.classList.add('show');
@@ -242,7 +255,29 @@
                     submitFormSendReport(form, computerId, overlay);
                 });
 
-                $('.close-btn').click(function() {
+                $('th[data-sort]').off('click').click(function() {
+                    const field = $(this).data('sort');
+                    const order = $(this).hasClass('ascending') ? 'desc' : 'asc';
+
+                    $.ajax({
+                        url: `{{ route('student.sort-report-api') }}`,
+                        type: 'GET',
+                        data: {sortField: field, sortOrder: order},
+                        success: function(response) {
+                            $('#view-report-history-modal').html(response.table_report);
+                            addEventForButtons();
+
+                            $('th[data-sort] i').attr('class', 'bx bx-sort-alt-2');
+                            const iconClass = order === 'asc' ? 'bx-sort-up' : 'bx-sort-down';
+                            $(`th[data-sort="${field}"] i`).attr('class', `bx ${iconClass}`);
+
+                            $('th[data-sort]').removeClass('ascending descending');
+                            $(`th[data-sort="${field}"]`).addClass(order === 'asc' ? 'ascending' : 'descending');
+                        }
+                    });
+                });
+
+                $('.close-btn').off('click').click(function() {
                     $('.modal-backdrop.fade.show').remove();
                 });
             }

@@ -240,12 +240,7 @@
                 const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
                 const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 
-                $('.btn-update-building').off('click');
-                $('.btn-destroy-building').off('click');
-                $('.close-btn').off('click');
-                $('.close-update-btn').off('click');
-
-                $('.btn-update-building').click(function(e) {
+                $('.btn-update-building').off('click').click(function(e) {
                     e.preventDefault();
                     const overlay = document.getElementById('overlay');
                     overlay.classList.add('show');
@@ -257,7 +252,7 @@
                     submitFormUpdateBuilding(form[0], buildingId, overlay);
                 });
 
-                $('.btn-destroy-building').click('click', function(e) {
+                $('.btn-destroy-building').off('click').click(function(e) {
                     e.preventDefault();
                     const overlay = document.getElementById('overlay');
                     overlay.classList.add('show');
@@ -268,11 +263,11 @@
                     submitFormDestroyBuilding(buildingId, overlay);
                 });
 
-                $('.close-btn').click(function() {
+                $('.close-btn').off('click').click(function() {
                     $('.modal-backdrop.fade.show').remove();
                 });
 
-                $('.close-update-btn').click(function() {
+                $('.close-update-btn').off('click').click(function() {
                     $('.modal-backdrop.fade.show').remove();
                 });
             }

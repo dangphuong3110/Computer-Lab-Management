@@ -86,9 +86,9 @@
                     <thead>
                     <tr>
                         <th scope="col" class="text-center" width="5%">STT</th>
-                        <th scope="col" class="text-center" width="15%">Họ và tên</th>
-                        <th scope="col" class="text-center" width="15%">Mã sinh viên</th>
-                        <th scope="col" class="text-center" width="15%">Lớp</th>
+                        <th scope="col" class="text-center" data-sort="full_name" width="15%">Họ và tên <i class="bx bx-sort-alt-2"></i></th>
+                        <th scope="col" class="text-center" data-sort="student_code" width="15%">Mã sinh viên <i class="bx bx-sort-alt-2"></i></th>
+                        <th scope="col" class="text-center" data-sort="class" width="15%">Lớp <i class="bx bx-sort-alt-2"></i></th>
                         <th scope="col" class="text-center" width="20%">Email</th>
                         <th scope="col" class="text-center" width="20%">Số điện thoại</th>
                         <th scope="col" class="text-center action-column">Hành động</th>
@@ -174,6 +174,9 @@
                             form[0].reset();
                             $('#table-student-class tbody').html(response.table_student_class);
                             $('#paginate-student-class').html(response.links);
+
+                            const currentUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+                            window.history.pushState({path: currentUrl}, '', currentUrl);
                             updatePagination();
                             addEventForModalUpdate();
                             addEventForButtons();
@@ -250,6 +253,9 @@
                             showToastSuccess(response.success);
                             $('#table-student-class tbody').html(response.table_student_class);
                             $('#paginate-student-class').html(response.links);
+
+                            const currentUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+                            window.history.pushState({path: currentUrl}, '', currentUrl);
                             updatePagination();
                             addEventForModalUpdate();
                             addEventForButtons();
@@ -280,6 +286,9 @@
                             form[0].reset();
                             $('#table-student-class tbody').html(response.table_student_class);
                             $('#paginate-student-class').html(response.links);
+
+                            const currentUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+                            window.history.pushState({path: currentUrl}, '', currentUrl);
                             updatePagination();
                             addEventForModalUpdate();
                             addEventForButtons();
@@ -306,7 +315,7 @@
                 $('.pagination .page-link').each(function() {
                     const link = $(this);
                     if (link.attr('href')) {
-                        const newUrl = new URL(link.attr('href'));
+                        const newUrl = new URL(link.attr('href'), window.location.origin);
                         searchParams.set('page', newUrl.searchParams.get('page'));
 
                         const updatedUrl = currentPath + '?' + searchParams.toString();
@@ -349,10 +358,24 @@
                 const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
                 const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 
-                $('.btn-destroy-student').off('click');
-                $('.close-btn').off('click');
+                $('th[data-sort]').each(function() {
+                    const currentUrl = new URL(window.location.href);
+                    const currentField = currentUrl.searchParams.get('sort-field');
+                    const currentOrder = currentUrl.searchParams.get('sort-order');
+                    const field = $(this).data('sort');
 
-                $('.btn-destroy-student-class').click('click', function(e) {
+                    if (currentField === field) {
+                        if (currentOrder === 'asc') {
+                            $(this).find('i').attr('class', 'bx bx-sort-up');
+                        } else if (currentOrder === 'desc') {
+                            $(this).find('i').attr('class', 'bx bx-sort-down');
+                        }
+                    } else {
+                        $(this).find('i').attr('class', 'bx bx-sort-alt-2');
+                    }
+                });
+
+                $('.btn-destroy-student-class').off('click').click(function(e) {
                     e.preventDefault();
                     const overlay = document.getElementById('overlay');
                     overlay.classList.add('show');
@@ -363,7 +386,37 @@
                     submitFormDestroyStudentClass(studentId, overlay);
                 });
 
-                $('.close-btn').click(function() {
+                $('th[data-sort]').off('click').click(function() {
+                    const field = $(this).data('sort');
+                    const order = $(this).hasClass('ascending') ? 'desc' : 'asc';
+
+                    const currentUrl = new URL(window.location.href);
+                    currentUrl.searchParams.set('sort-field', field);
+                    currentUrl.searchParams.set('sort-order', order);
+                    history.pushState(null, '', currentUrl.toString());
+
+                    $.ajax({
+                        url: `{{ route('technician.sort-student-class-api') }}`,
+                        type: 'GET',
+                        data: {sortField: field, sortOrder: order, classId: {{ $class->id }}},
+                        success: function(response) {
+                            $('#table-student-class tbody').html(response.table_student_class);
+                            $('#paginate-student-class').html(response.links);
+                            updatePagination();
+                            addEventForModalUpdate();
+                            addEventForButtons();
+
+                            $('th[data-sort] i').attr('class', 'bx bx-sort-alt-2');
+                            const iconClass = order === 'asc' ? 'bx-sort-up' : 'bx-sort-down';
+                            $(`th[data-sort="${field}"] i`).attr('class', `bx ${iconClass}`);
+
+                            $('th[data-sort]').removeClass('ascending descending');
+                            $(`th[data-sort="${field}"]`).addClass(order === 'asc' ? 'ascending' : 'descending');
+                        }
+                    });
+                });
+
+                $('.close-btn').off('click').click(function() {
                     $('.modal-backdrop.fade.show').remove();
                 });
             }
@@ -439,6 +492,7 @@
             resetInitialValue();
             addEventForModalUpdate();
             addEventForButtons();
+            updatePagination();
         });
     </script>
 @endsection

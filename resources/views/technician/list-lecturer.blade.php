@@ -118,8 +118,8 @@
                     <thead>
                     <tr>
                         <th scope="col" class="text-center" width="5%">STT</th>
-                        <th scope="col" class="text-center" width="20%">Họ và tên</th>
-                        <th scope="col" class="text-center" width="25%">Khoa</th>
+                        <th scope="col" class="text-center" data-sort="full_name" width="20%">Họ và tên <i class="bx bx-sort-alt-2"></i></th>
+                        <th scope="col" class="text-center" data-sort="faculty" width="25%">Khoa <i class="bx bx-sort-alt-2"></i></th>
                         <th scope="col" class="text-center" width="20%">Email</th>
                         <th scope="col" class="text-center" width="20%">Số điện thoại</th>
                         <th scope="col" class="text-center action-column">Hành động</th>
@@ -303,6 +303,9 @@
                             form[0].reset();
                             $('#table-lecturer tbody').html(response.table_lecturer);
                             $('#paginate-lecturer').html(response.links);
+
+                            const currentUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+                            window.history.pushState({path: currentUrl}, '', currentUrl);
                             updatePagination();
                             addEventForModalUpdate();
                             addEventForButtons();
@@ -340,11 +343,16 @@
                             showToastSuccess(response.success);
                             $('#table-lecturer tbody').html(response.table_lecturer);
                             $('#paginate-lecturer').html(response.links);
+
+                            const currentUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+                            window.history.pushState({path: currentUrl}, '', currentUrl);
                             updatePagination();
                             addEventForModalUpdate();
                             addEventForButtons();
                             $('#update-lecturer-modal-' + lecturerId).modal('hide');
                             $('body').css('overflow', 'auto');
+
+                            overlay.classList.remove('show');
                         } else {
                             if (response.errors['full-name']) {
                                 showToastError(response.errors['full-name']);
@@ -354,7 +362,6 @@
                             }
                             $('body').append('<div class="modal-backdrop fade show"></div>');
                         }
-                        overlay.classList.remove('show');
                     },
                     error: function (error) {
                         console.error(error);
@@ -410,6 +417,9 @@
                             showToastSuccess(response.success);
                             $('#table-lecturer tbody').html(response.table_lecturer);
                             $('#paginate-lecturer').html(response.links);
+
+                            const currentUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+                            window.history.pushState({path: currentUrl}, '', currentUrl);
                             updatePagination();
                             addEventForModalUpdate();
                             addEventForButtons();
@@ -443,6 +453,9 @@
                             form[0].reset();
                             $('#table-lecturer tbody').html(response.table_lecturer);
                             $('#paginate-lecturer').html(response.links);
+
+                            const currentUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+                            window.history.pushState({path: currentUrl}, '', currentUrl);
                             updatePagination();
                             addEventForModalUpdate();
                             addEventForButtons();
@@ -461,7 +474,7 @@
                 });
             }
 
-            function updatePagination () {
+            function updatePagination() {
                 const currentUrl = new URL(window.location.href);
                 const currentPath = currentUrl.pathname;
                 const searchParams = currentUrl.searchParams;
@@ -469,7 +482,7 @@
                 $('.pagination .page-link').each(function() {
                     const link = $(this);
                     if (link.attr('href')) {
-                        const newUrl = new URL(link.attr('href'));
+                        const newUrl = new URL(link.attr('href'), window.location.origin);
                         searchParams.set('page', newUrl.searchParams.get('page'));
 
                         const updatedUrl = currentPath + '?' + searchParams.toString();
@@ -498,17 +511,29 @@
                 submitFormImportLecturer(form, overlay);
             });
 
+
             function addEventForButtons () {
                 const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
                 const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 
-                $('.btn-update-lecturer').off('click');
-                $('.btn-update-password-lecturer').off('click');
-                $('.btn-destroy-lecturer').off('click');
-                $('.close-btn').off('click');
-                $('.close-update-btn').off('click');
+                $('th[data-sort]').each(function() {
+                    const currentUrl = new URL(window.location.href);
+                    const currentField = currentUrl.searchParams.get('sort-field');
+                    const currentOrder = currentUrl.searchParams.get('sort-order');
+                    const field = $(this).data('sort');
 
-                $('.btn-update-lecturer').click(function(e) {
+                    if (currentField === field) {
+                        if (currentOrder === 'asc') {
+                            $(this).find('i').attr('class', 'bx bx-sort-up');
+                        } else if (currentOrder === 'desc') {
+                            $(this).find('i').attr('class', 'bx bx-sort-down');
+                        }
+                    } else {
+                        $(this).find('i').attr('class', 'bx bx-sort-alt-2');
+                    }
+                });
+
+                $('.btn-update-lecturer').off('click').click(function(e) {
                     e.preventDefault();
                     const overlay = document.getElementById('overlay');
                     overlay.classList.add('show');
@@ -520,7 +545,7 @@
                     submitFormUpdateLecturer(form[0], lecturerId, overlay);
                 });
 
-                $('.btn-update-password-lecturer').click(function(e) {
+                $('.btn-update-password-lecturer').off('click').click(function(e) {
                     e.preventDefault();
                     const overlay = document.getElementById('overlay');
                     overlay.classList.add('show');
@@ -529,12 +554,10 @@
                     const lecturerId = $(this).data('lecturer-id');
                     const form = $('#update-password-lecturer-form-' + lecturerId);
 
-                    console.log(form);
-
                     submitFormUpdatePasswordLecturer(form, lecturerId, overlay);
                 });
 
-                $('.btn-destroy-lecturer').click('click', function(e) {
+                $('.btn-destroy-lecturer').off('click').click(function(e) {
                     e.preventDefault();
                     const overlay = document.getElementById('overlay');
                     overlay.classList.add('show');
@@ -545,11 +568,41 @@
                     submitFormDestroyLecturer(lecturerId, overlay);
                 });
 
-                $('.close-btn').click(function() {
+                $('th[data-sort]').off('click').click(function() {
+                    const field = $(this).data('sort');
+                    const order = $(this).hasClass('ascending') ? 'desc' : 'asc';
+
+                    const currentUrl = new URL(window.location.href);
+                    currentUrl.searchParams.set('sort-field', field);
+                    currentUrl.searchParams.set('sort-order', order);
+                    history.pushState(null, '', currentUrl.toString());
+
+                    $.ajax({
+                        url: `{{ route('technician.sort-lecturer-api') }}`,
+                        type: 'GET',
+                        data: {sortField: field, sortOrder: order},
+                        success: function(response) {
+                            $('#table-lecturer tbody').html(response.table_lecturer);
+                            $('#paginate-lecturer').html(response.links);
+                            updatePagination();
+                            addEventForModalUpdate();
+                            addEventForButtons();
+
+                            $('th[data-sort] i').attr('class', 'bx bx-sort-alt-2');
+                            const iconClass = order === 'asc' ? 'bx-sort-up' : 'bx-sort-down';
+                            $(`th[data-sort="${field}"] i`).attr('class', `bx ${iconClass}`);
+
+                            $('th[data-sort]').removeClass('ascending descending');
+                            $(`th[data-sort="${field}"]`).addClass(order === 'asc' ? 'ascending' : 'descending');
+                        }
+                    });
+                });
+
+                $('.close-btn').off('click').click(function() {
                     $('.modal-backdrop.fade.show').remove();
                 });
 
-                $('.close-update-btn').click(function() {
+                $('.close-update-btn').off('click').click(function() {
                     $('.modal-backdrop.fade.show').remove();
                 });
             }
@@ -620,6 +673,7 @@
             resetInitialValue();
             addEventForModalUpdate();
             addEventForButtons();
+            updatePagination();
         });
     </script>
 @endsection

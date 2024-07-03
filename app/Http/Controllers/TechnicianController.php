@@ -33,31 +33,55 @@ class TechnicianController extends Controller
         return view('technician.index', compact( 'title','user'));
     }
 
-    public function getListLecturer()
+    public function getListLecturer(Request $request)
     {
         $title = 'Giảng viên';
         $user = Auth::user();
 
-        $lecturers = Lecturer::orderBy('updated_at', 'desc')->paginate(7);
+        $sortField = $request->input('sort-field', 'updated_at');
+        $sortOrder = $request->input('sort-order', 'desc');
+
+        if ($sortField == 'full_name') {
+            $lecturers = Lecturer::orderByRaw("SUBSTRING_INDEX(full_name, ' ', -1) $sortOrder")->paginate(5);
+        } else {
+            $lecturers = Lecturer::orderBy($sortField, $sortOrder)->paginate(5);
+        }
 
         return view('technician.list-lecturer', compact('title','user', 'lecturers'));
     }
 
-    public function getListStudent()
+    public function getListStudent(Request $request)
     {
         $title = 'Sinh viên';
         $user = Auth::user();
 
-        $students = Student::orderBy('updated_at', 'desc')->paginate(7);
+        $sortField = $request->input('sort-field', 'updated_at');
+        $sortOrder = $request->input('sort-order', 'desc');
+
+        if ($sortField == 'full_name') {
+            $students = Student::orderByRaw("SUBSTRING_INDEX(full_name, ' ', -1) $sortOrder")->paginate(5);
+        } else {
+            $students = Student::orderBy($sortField, $sortOrder)->paginate(5);
+        }
 
         return view('technician.list-student', compact('title','user', 'students'));
     }
 
-    public function getListClass() {
+    public function getListClass(Request $request) {
         $title = 'Lớp học phần';
         $user = Auth::user();
 
-        $classes = CreditClass::withCount('classSessions')->orderBy('updated_at', 'desc')->paginate(7);
+        $sortField = $request->input('sortField', 'updated_at');
+        $sortOrder = $request->input('sortOrder', 'desc');
+
+        if ($sortField == 'lecturer') {
+            $classes = CreditClass::withCount('classSessions')
+                ->join('lecturers', 'classes.lecturer_id', '=', 'lecturers.id')
+                ->orderByRaw("SUBSTRING_INDEX(lecturers.full_name, ' ', -1) $sortOrder")
+                ->paginate(5);
+        } else {
+            $classes = CreditClass::withCount('classSessions')->orderBy($sortField, $sortOrder)->paginate(5);
+        }
 
         $classes->transform(function ($class) {
             $class->start_date = Carbon::parse($class->start_date)->format('d-m-Y');
@@ -130,23 +154,33 @@ class TechnicianController extends Controller
         return view('technician.list-computer', compact('title','user', 'building', 'room', 'computers'));
     }
 
-    public function getListStudentClass(string $class_id)
+    public function getListStudentClass(Request $request, string $class_id)
     {
         $title = 'Sinh viên lớp học phần';
         $user = Auth::user();
 
+        $sortField = $request->input('sort-field', 'created_at');
+        $sortOrder = $request->input('sort-order', 'desc');
+
         $class = CreditClass::where('id', $class_id)->first();
-        $students = $class->students()->orderBy('class_student.created_at', 'desc')->paginate(7);
+        if ($sortField == 'full_name') {
+            $students = $class->students()->orderByRaw("SUBSTRING_INDEX(full_name, ' ', -1) $sortOrder")->paginate(5);
+        } else {
+            $students = $class->students()->orderBy($sortField, $sortOrder)->paginate(5);
+        }
 
         return view('technician.list-student-class', compact('title','user', 'students', 'class'));
     }
 
-    public function getListReport()
+    public function getListReport(Request $request)
     {
         $title = 'Báo cáo sự cố';
         $user = Auth::user();
 
-        $reports = Report::where('is_approved', 1)->orderBy('submitted_at', 'desc')->paginate(7);
+        $sortField = $request->input('sort-field', 'submitted_at');
+        $sortOrder = $request->input('sort-order', 'desc');
+
+        $reports = Report::where('is_approved', 1)->orderBy($sortField, $sortOrder)->paginate(5);
 
         return view('technician.list-report', compact('title','user', 'reports'));
     }
@@ -170,6 +204,16 @@ class TechnicianController extends Controller
         } else {
             return response()->json(['success' => 'Đã tìm thấy sinh viên!','student' => $student]);
         }
+    }
+
+    public function getClassSessionsAPI(string $class_id)
+    {
+        $class = CreditClass::with('classSessions')->findOrFail($class_id);
+        $classSessions = $class->classSessions;
+
+        return response()->json(['classSessions' => $classSessions, 'lessons' => $classSessions->map(function ($session) {
+            return $session->lessons;
+        })]);
     }
 
     public function storeLecturerAPI(Request $request)
@@ -215,7 +259,7 @@ class TechnicianController extends Controller
 
         $lecturer->save();
 
-        $lecturers = Lecturer::orderBy('updated_at', 'desc')->paginate(7);
+        $lecturers = Lecturer::orderBy('updated_at', 'desc')->paginate(5);
         $table_lecturer = view('technician.table-lecturer', compact('lecturers'))->render();
 
         return response()->json(['success' => 'Thêm giảng viên thành công!', 'table_lecturer' => $table_lecturer, 'links' => $lecturers->render('pagination::bootstrap-5')->toHtml()]);
@@ -259,7 +303,7 @@ class TechnicianController extends Controller
 
         $student->save();
 
-        $students = Student::orderBy('updated_at', 'desc')->paginate(7);
+        $students = Student::orderBy('updated_at', 'desc')->paginate(5);
         $table_student = view('technician.table-student', compact('students'))->render();
 
         return response()->json(['success' => 'Thêm sinh viên thành công!', 'table_student' => $table_student, 'links' => $students->render('pagination::bootstrap-5')->toHtml()]);
@@ -379,7 +423,7 @@ class TechnicianController extends Controller
             $classSession->lessons()->attach(range($lessonStart->id, $lessonEnd->id));
         }
 
-        $classes = CreditClass::withCount('classSessions')->orderBy('updated_at', 'desc')->paginate(7);
+        $classes = CreditClass::withCount('classSessions')->orderBy('updated_at', 'desc')->paginate(5);
 
         $classes->transform(function ($class) {
             $class->start_date = Carbon::parse($class->start_date)->format('d-m-Y');
@@ -459,7 +503,7 @@ class TechnicianController extends Controller
             $student->creditClasses()->attach($class_id, ['created_at' => now(), 'updated_at' => now()]);
 
             $class = CreditClass::where('id', $class_id)->first();
-            $students = $class->students()->orderBy('class_student.created_at', 'desc')->paginate(7);
+            $students = $class->students()->orderBy('class_student.created_at', 'desc')->paginate(5);
             $table_student_class = view('technician.table-student-class', compact('students', 'class'))->render();
 
             return response()->json(['success' => 'Đã thêm sinh viên vào lớp học!', 'table_student_class' => $table_student_class, 'links' => $students->render('pagination::bootstrap-5')->toHtml()]);
@@ -590,7 +634,7 @@ class TechnicianController extends Controller
 
         $lecturer->save();
 
-        $lecturers = Lecturer::orderBy('updated_at', 'desc')->paginate(7);
+        $lecturers = Lecturer::orderBy('updated_at', 'desc')->paginate(5);
         $table_lecturer = view('technician.table-lecturer', compact('lecturers'))->render();
 
         return response()->json(['success' => 'Chỉnh sửa thông tin giảng viên thành công!', 'table_lecturer' => $table_lecturer, 'links' => $lecturers->render('pagination::bootstrap-5')->toHtml()]);
@@ -654,7 +698,7 @@ class TechnicianController extends Controller
 
         $student->save();
 
-        $students = Student::orderBy('updated_at', 'desc')->paginate(7);
+        $students = Student::orderBy('updated_at', 'desc')->paginate(5);
         $table_student = view('technician.table-student', compact('students'))->render();
 
         return response()->json(['success' => 'Chỉnh sửa thông tin sinh viên thành công!', 'table_student' => $table_student, 'links' => $students->render('pagination::bootstrap-5')->toHtml()]);
@@ -787,12 +831,29 @@ class TechnicianController extends Controller
 
         $classSessions = ClassSession::where('class_id', $id)->get();
 
-        foreach ($classSessions as $classSession) {
-            $classSession->lessons()->detach();
-            $classSession->delete();
+        $oldSessions = $classSessions->count();
+        $newSessions = $request->input('number-of-session');
+
+        foreach ($classSessions as $index => $classSession) {
+            if ($index < $newSessions) {
+                $lessonStart = Lesson::where('id', $request->input('start-lesson[]')[$index])->first();
+                $lessonEnd = Lesson::where('id', $request->input('end-lesson[]')[$index])->first();
+
+                $classSession->start_lesson = $lessonStart->start_time;
+                $classSession->end_lesson = $lessonEnd->end_time;
+                $classSession->day_of_week = $request->input('day-of-week[]')[$index];
+                $classSession->room_id = $request->input('room[]')[$index];
+
+                $classSession->save();
+
+                $classSession->lessons()->sync(range($lessonStart->id, $lessonEnd->id));
+            } else {
+                $classSession->lessons()->detach();
+                $classSession->delete();
+            }
         }
 
-        for ($i = 0; $i < $request->input('number-of-session'); $i++) {
+        for ($i = $oldSessions; $i < $newSessions; $i++) {
             $classSession = new ClassSession();
             $lessonStart = Lesson::where('id', $request->input('start-lesson[]')[$i])->first();
             $lessonEnd = Lesson::where('id', $request->input('end-lesson[]')[$i])->first();
@@ -805,10 +866,11 @@ class TechnicianController extends Controller
 
             $classSession->save();
 
+            // Gán lessons cho session mới
             $classSession->lessons()->attach(range($lessonStart->id, $lessonEnd->id));
         }
 
-        $classes = CreditClass::withCount('classSessions')->orderBy('updated_at', 'desc')->paginate(7);
+        $classes = CreditClass::withCount('classSessions')->orderBy('updated_at', 'desc')->paginate(5);
 
         $classes->transform(function ($class) {
             $class->start_date = Carbon::parse($class->start_date)->format('d-m-Y');
@@ -1001,7 +1063,7 @@ class TechnicianController extends Controller
         $user = User::findOrFail($userId);
         $user->delete();
 
-        $lecturers = Lecturer::orderBy('updated_at', 'desc')->paginate(7);
+        $lecturers = Lecturer::orderBy('updated_at', 'desc')->paginate(5);
         $table_lecturer = view('technician.table-lecturer', compact('lecturers'))->render();
 
         return response()->json(['success' => 'Xóa giảng viên thành công!', 'table_lecturer' => $table_lecturer, 'links' => $lecturers->render('pagination::bootstrap-5')->toHtml()]);
@@ -1032,7 +1094,7 @@ class TechnicianController extends Controller
         $user = User::findOrFail($userId);
         $user->delete();
 
-        $students = Student::orderBy('updated_at', 'desc')->paginate(7);
+        $students = Student::orderBy('updated_at', 'desc')->paginate(5);
         $table_student = view('technician.table-student', compact('students'))->render();
 
         return response()->json(['success' => 'Xóa sinh viên thành công!', 'table_student' => $table_student, 'links' => $students->render('pagination::bootstrap-5')->toHtml()]);
@@ -1055,7 +1117,7 @@ class TechnicianController extends Controller
 
         $creditClass->delete();
 
-        $classes = CreditClass::withCount('classSessions')->orderBy('updated_at', 'desc')->paginate(7);
+        $classes = CreditClass::withCount('classSessions')->orderBy('updated_at', 'desc')->paginate(5);
 
         $classes->transform(function ($class) {
             $class->start_date = Carbon::parse($class->start_date)->format('d-m-Y');
@@ -1094,7 +1156,7 @@ class TechnicianController extends Controller
         $student->creditClasses()->detach($request->input('class_id'));
 
         $class = CreditClass::where('id', $request->input('class_id'))->first();
-        $students = $class->students()->orderBy('class_student.created_at', 'desc')->paginate(7);
+        $students = $class->students()->orderBy('class_student.created_at', 'desc')->paginate(5);
         $table_student_class = view('technician.table-student-class', compact('students', 'class'))->render();
 
         return response()->json(['success' => 'Xóa sinh viên khỏi lớp học phần thành công!', 'table_student_class' => $table_student_class, 'links' => $students->render('pagination::bootstrap-5')->toHtml()]);
@@ -1153,7 +1215,7 @@ class TechnicianController extends Controller
 
         $report->delete();
 
-        $reports = Report::where('is_approved', 1)->orderBy('submitted_at', 'desc')->paginate(7);
+        $reports = Report::where('is_approved', 1)->orderBy('submitted_at', 'desc')->paginate(5);
         $table_report = view('technician.table-report', compact('reports'))->render();
 
         return response()->json(['success' => 'Xóa báo cáo thành công!', 'table_report' => $table_report, 'links' => $reports->render('pagination::bootstrap-5')->toHtml()]);
@@ -1176,7 +1238,7 @@ class TechnicianController extends Controller
         $import = new LecturersImport();
         Excel::import($import, $file);
 
-        $lecturers = Lecturer::orderBy('updated_at', 'desc')->paginate(7);
+        $lecturers = Lecturer::orderBy('updated_at', 'desc')->paginate(5);
         $table_lecturer = view('technician.table-lecturer', compact('lecturers'))->render();
 
         return response()->json(['success' => 'Nhập file giảng viên thành công!', 'table_lecturer' => $table_lecturer, 'links' => $lecturers->render('pagination::bootstrap-5')->toHtml()]);
@@ -1199,7 +1261,7 @@ class TechnicianController extends Controller
         $import = new StudentsImport();
         Excel::import($import, $file);
 
-        $students = Student::orderBy('updated_at', 'desc')->paginate(7);
+        $students = Student::orderBy('updated_at', 'desc')->paginate(5);
         $table_student = view('technician.table-student', compact('students'))->render();
 
         return response()->json(['success' => 'Nhập file sinh viên thành công!', 'table_student' => $table_student, 'links' => $students->render('pagination::bootstrap-5')->toHtml()]);
@@ -1225,7 +1287,7 @@ class TechnicianController extends Controller
         Excel::import($import, $file);
 
         $class = CreditClass::where('id', $class_id)->first();
-        $students = $class->students()->orderBy('class_student.created_at', 'desc')->paginate(7);
+        $students = $class->students()->orderBy('class_student.created_at', 'desc')->paginate(5);
         $table_student_class = view('technician.table-student-class', compact('students', 'class'))->render();
 
         return response()->json(['success' => 'Nhập file sinh viên vào lớp học phần thành công!', 'table_student_class' => $table_student_class, 'links' => $students->render('pagination::bootstrap-5')->toHtml()]);
@@ -1239,7 +1301,7 @@ class TechnicianController extends Controller
         $report->technician_id = Auth::user()->technician->id;
         $report->save();
 
-        $reports = Report::where('is_approved', 1)->orderBy('submitted_at', 'desc')->paginate(7);
+        $reports = Report::where('is_approved', 1)->orderBy('submitted_at', 'desc')->paginate(5);
         $table_report = view('technician.table-report', compact('reports'))->render();
 
         return response()->json(['success' => 'Cập nhật trạng thái báo cáo thành công!', 'table_report' => $table_report, 'links' => $reports->render('pagination::bootstrap-5')->toHtml()]);
@@ -1253,7 +1315,7 @@ class TechnicianController extends Controller
         $report->technician_id = null;
         $report->save();
 
-        $reports = Report::where('is_approved', 1)->orderBy('submitted_at', 'desc')->paginate(7);
+        $reports = Report::where('is_approved', 1)->orderBy('submitted_at', 'desc')->paginate(5);
         $table_report = view('technician.table-report', compact('reports'))->render();
 
         return response()->json(['success' => 'Cập nhật trạng thái báo cáo thành công!', 'table_report' => $table_report, 'links' => $reports->render('pagination::bootstrap-5')->toHtml()]);
@@ -1267,9 +1329,116 @@ class TechnicianController extends Controller
         $report->processed_at = Carbon::now();
         $report->save();
 
-        $reports = Report::where('is_approved', 1)->orderBy('submitted_at', 'desc')->paginate(7);
+        $reports = Report::where('is_approved', 1)->orderBy('submitted_at', 'desc')->paginate(5);
         $table_report = view('technician.table-report', compact('reports'))->render();
 
         return response()->json(['success' => 'Cập nhật trạng thái báo cáo thành công!', 'table_report' => $table_report, 'links' => $reports->render('pagination::bootstrap-5')->toHtml()]);
+    }
+
+    public function sortLecturerAPI(Request $request)
+    {
+        $sortField = $request->input('sortField', 'updated_at');
+        $sortOrder = $request->input('sortOrder', 'desc');
+
+        if ($sortField == 'full_name') {
+            $lecturers = Lecturer::orderByRaw("SUBSTRING_INDEX(full_name, ' ', -1) $sortOrder")->paginate(5);
+        } else {
+            $lecturers = Lecturer::orderBy($sortField, $sortOrder)->paginate(5);
+        }
+
+        $table_lecturer = view('technician.table-lecturer', compact('lecturers'))->render();
+
+        return response()->json(['table_lecturer' => $table_lecturer, 'links' => $lecturers->render('pagination::bootstrap-5')->toHtml()]);
+    }
+
+    public function sortStudentAPI(Request $request)
+    {
+        $sortField = $request->input('sortField', 'updated_at');
+        $sortOrder = $request->input('sortOrder', 'desc');
+
+        if ($sortField == 'full_name') {
+            $students = Student::orderByRaw("SUBSTRING_INDEX(full_name, ' ', -1) $sortOrder")->paginate(5);
+        } else {
+            $students = Student::orderBy($sortField, $sortOrder)->paginate(5);
+        }
+
+        $table_student = view('technician.table-student', compact('students'))->render();
+
+        return response()->json(['table_student' => $table_student, 'links' => $students->render('pagination::bootstrap-5')->toHtml()]);
+    }
+
+    public function sortClassAPI(Request $request)
+    {
+        $sortField = $request->input('sortField', 'updated_at');
+        $sortOrder = $request->input('sortOrder', 'desc');
+
+        if ($sortField == 'lecturer') {
+            $classes = CreditClass::withCount('classSessions')
+                ->join('lecturers', 'classes.lecturer_id', '=', 'lecturers.id')
+                ->orderByRaw("SUBSTRING_INDEX(lecturers.full_name, ' ', -1) $sortOrder")
+                ->paginate(5);
+        } else {
+            $classes = CreditClass::withCount('classSessions')->orderBy($sortField, $sortOrder)->paginate(5);
+        }
+
+        $classes->transform(function ($class) {
+            $class->start_date = Carbon::parse($class->start_date)->format('d-m-Y');
+            $class->end_date = Carbon::parse($class->end_date)->format('d-m-Y');
+            return $class;
+        });
+
+        $classSessions = $classes->map(function ($class) {
+            return $class->classSessions;
+        });
+
+        $lessons = $classSessions->map(function ($sessions) {
+            return $sessions->map(function ($session) {
+                return $session->lessons;
+            });
+        });
+
+        $lecturers = Lecturer::all();
+        $buildings = Building::all();
+        $rooms = Room::all();
+
+        $table_class = view('technician.table-class', compact('classes', 'lecturers', 'buildings', 'rooms'))->render();
+
+        return response()->json([
+            'table_class' => $table_class,
+            'links' => $classes->render('pagination::bootstrap-5')->toHtml(),
+            'class_sessions' => $classSessions,
+            'lessons' => $lessons
+        ]);
+    }
+
+    public function sortStudentClassAPI(Request $request)
+    {
+        $sortField = $request->input('sortField', 'created_at');
+        $sortOrder = $request->input('sortOrder', 'desc');
+
+        $class = CreditClass::where('id', $request->input('classId'))->first();
+        if ($sortField == 'full_name') {
+            $students = $class->students()->orderByRaw("SUBSTRING_INDEX(full_name, ' ', -1) $sortOrder")->paginate(5);
+        } else {
+            $students = $class->students()->orderBy($sortField, $sortOrder)->paginate(5);
+        }
+        $table_student_class = view('technician.table-student-class', compact('students', 'class'))->render();
+
+        return response()->json(['table_student_class' => $table_student_class, 'links' => $students->render('pagination::bootstrap-5')->toHtml()]);
+    }
+
+    public function sortReportAPI(Request $request)
+    {
+        $sortField = $request->input('sortField', 'submitted_at');
+        $sortOrder = $request->input('sortOrder', 'desc');
+
+        if ($sortField == 'student_lecturer') {
+            $reports = Report::where('is_approved', 1)->orderBy('lecturer_id', $sortOrder)->paginate(5);
+        } else {
+            $reports = Report::where('is_approved', 1)->orderBy($sortField, $sortOrder)->paginate(5);
+        }
+        $table_report = view('technician.table-report', compact('reports'))->render();
+
+        return response()->json(['table_report' => $table_report, 'links' => $reports->render('pagination::bootstrap-5')->toHtml()]);
     }
 }

@@ -160,16 +160,16 @@ class LecturerController extends Controller
         return response()->json(['success' => 'Gửi báo cáo thành công!', 'table_report' => $table_report]);
     }
 
-    public function getListStudentReport()
+    public function getListStudentReport(Request $request)
     {
         $title = 'Xét duyệt báo cáo';
         $user = Auth::user();
 
-        $renderedReportTable = $this->renderReportTable($user);
+        $renderedReportTable = $this->renderReportTable($request, $user);
         return view('lecturer.list-student-report', compact('title', 'user'))->with('reports', $renderedReportTable['reports']);
     }
 
-    public function approveReportAPI(string $report_id)
+    public function approveReportAPI(Request $request, string $report_id)
     {
         $report = Report::findOrFail($report_id);
         $report->is_approved = true;
@@ -177,11 +177,11 @@ class LecturerController extends Controller
 
         $user = Auth::user();
 
-        $renderedReportTable = $this->renderReportTable($user);
+        $renderedReportTable = $this->renderReportTable($request, $user);
         return response()->json(['success' => 'Duyệt báo cáo thành công!', 'table_report' => $renderedReportTable['table_report'], 'links' => $renderedReportTable['reports']->render('pagination::bootstrap-5')->toHtml()]);
     }
 
-    public function disapproveReportAPI(string $report_id)
+    public function disapproveReportAPI(Request $request, string $report_id)
     {
         $report = Report::findOrFail($report_id);
         $report->is_approved = false;
@@ -189,11 +189,11 @@ class LecturerController extends Controller
 
         $user = Auth::user();
 
-        $renderedReportTable = $this->renderReportTable($user);
+        $renderedReportTable = $this->renderReportTable($request, $user);
         return response()->json(['success' => 'Hủy duyệt báo cáo thành công!', 'table_report' => $renderedReportTable['table_report'], 'links' => $renderedReportTable['reports']->render('pagination::bootstrap-5')->toHtml()]);
     }
 
-    public function destroyReportAPI(string $report_id)
+    public function destroyReportAPI(Request $request, string $report_id)
     {
         $report = Report::findOrFail($report_id);
 
@@ -201,12 +201,15 @@ class LecturerController extends Controller
 
         $user = Auth::user();
 
-        $renderedReportTable = $this->renderReportTable($user);
+        $renderedReportTable = $this->renderReportTable($request, $user);
         return response()->json(['success' => 'Xóa báo cáo thành công!', 'table_report' => $renderedReportTable['table_report'], 'links' => $renderedReportTable['reports']->render('pagination::bootstrap-5')->toHtml()]);
     }
 
-    public function renderReportTable(User $user)
+    public function renderReportTable(Request $request, User $user)
     {
+        $sortField = $request->input('sort-field', 'submitted_at');
+        $sortOrder = $request->input('sort-order', 'desc');
+
         $lecturer = $user->lecturer;
 
         $creditClasses = $lecturer->creditClasses()
@@ -220,7 +223,7 @@ class LecturerController extends Controller
         foreach ($creditClasses as $creditClass) {
             $students = $creditClass->students;
             foreach ($students as $student) {
-                $student_reports = $student->reports()->orderBy('submitted_at', 'desc')->get();
+                $student_reports = $student->reports()->orderBy($sortField, $sortOrder)->get();
                 foreach ($student_reports as $student_report) {
                     if (!$reports->contains('id', $student_report->id)) {
                         $reports->push($student_report);
@@ -230,7 +233,7 @@ class LecturerController extends Controller
         }
 
         $currentPage = LengthAwarePaginator::resolveCurrentPage();
-        $perPage = 7;
+        $perPage = 5;
         $currentItems = $reports->slice(($currentPage * $perPage) - $perPage, $perPage)->all();
         $reports = new LengthAwarePaginator($currentItems, count($reports), $perPage, $currentPage, ['path' => LengthAwarePaginator::resolveCurrentPath()]);
         $table_report = view('lecturer.table-student-report', compact('reports'))->render();
@@ -248,18 +251,25 @@ class LecturerController extends Controller
         $classes = $lecturer->creditClasses()
             ->where('status', 'active')
             ->orderBy('classes.created_at', 'desc')
-            ->paginate(7);
+            ->paginate(5);
 
         return view('lecturer.list-class', compact('title', 'user', 'classes'));
     }
 
-    public function getListStudentClass(string $class_id)
+    public function getListStudentClass(Request $request, string $class_id)
     {
         $title = 'Sinh viên lớp học phần';
         $user = Auth::user();
 
+        $sortField = $request->input('sort-field', 'created_at');
+        $sortOrder = $request->input('sort-order', 'desc');
+
         $class = CreditClass::where('id', $class_id)->first();
-        $students = $class->students()->orderBy('class_student.created_at', 'desc')->paginate(7);
+        if ($sortField == 'full_name') {
+            $students = $class->students()->orderByRaw("SUBSTRING_INDEX(full_name, ' ', -1) $sortOrder")->paginate(5);
+        } else {
+            $students = $class->students()->orderBy($sortField, $sortOrder)->paginate(5);
+        }
 
         return view('lecturer.list-student-class', compact('title','user', 'students', 'class'));
     }
@@ -333,7 +343,7 @@ class LecturerController extends Controller
             $student->creditClasses()->attach($class_id, ['created_at' => now(), 'updated_at' => now()]);
 
             $class = CreditClass::where('id', $class_id)->first();
-            $students = $class->students()->orderBy('class_student.created_at', 'desc')->paginate(7);
+            $students = $class->students()->orderBy('class_student.created_at', 'desc')->paginate(5);
             $table_student_class = view('lecturer.table-student-class', compact('students', 'class'))->render();
 
             return response()->json(['success' => 'Đã thêm sinh viên vào lớp học!', 'table_student_class' => $table_student_class, 'links' => $students->render('pagination::bootstrap-5')->toHtml()]);
@@ -347,7 +357,7 @@ class LecturerController extends Controller
         $student->creditClasses()->detach($request->input('class_id'));
 
         $class = CreditClass::where('id', $request->input('class_id'))->first();
-        $students = $class->students()->orderBy('class_student.created_at', 'desc')->paginate(7);
+        $students = $class->students()->orderBy('class_student.created_at', 'desc')->paginate(5);
         $table_student_class = view('lecturer.table-student-class', compact('students', 'class'))->render();
 
         return response()->json(['success' => 'Xóa sinh viên khỏi lớp học phần thành công!', 'table_student_class' => $table_student_class, 'links' => $students->render('pagination::bootstrap-5')->toHtml()]);
@@ -373,7 +383,7 @@ class LecturerController extends Controller
         Excel::import($import, $file);
 
         $class = CreditClass::where('id', $class_id)->first();
-        $students = $class->students()->orderBy('class_student.created_at', 'desc')->paginate(7);
+        $students = $class->students()->orderBy('class_student.created_at', 'desc')->paginate(5);
         $table_student_class = view('lecturer.table-student-class', compact('students', 'class'))->render();
 
         return response()->json(['success' => 'Nhập file sinh viên vào lớp học phần thành công!', 'table_student_class' => $table_student_class, 'links' => $students->render('pagination::bootstrap-5')->toHtml()]);
@@ -426,5 +436,72 @@ class LecturerController extends Controller
         $table_personal_info = view('lecturer.table-personal-info', compact('user'))->render();
 
         return response()->json(['success' => 'Cập nhật thông tin cá nhân thành công!', 'table_personal_info' => $table_personal_info]);
+    }
+
+    public function sortReportAPI(Request $request)
+    {
+        $sortField = $request->input('sortField', 'submitted_at');
+        $sortOrder = $request->input('sortOrder', 'desc');
+
+        $user = Auth::user();
+        $lecturer = $user->lecturer;
+
+        $reports = Report::where('lecturer_id', $lecturer->id)->orderBy($sortField, $sortOrder)->get();
+        $table_report = view('lecturer.table-report', compact('reports'))->render();
+
+        return response()->json(['table_report' => $table_report]);
+    }
+
+    public function sortStudentClassAPI(Request $request)
+    {
+        $sortField = $request->input('sortField', 'created_at');
+        $sortOrder = $request->input('sortOrder', 'desc');
+
+        $class = CreditClass::where('id', $request->input('classId'))->first();
+        if ($sortField == 'full_name') {
+            $students = $class->students()->orderByRaw("SUBSTRING_INDEX(full_name, ' ', -1) $sortOrder")->paginate(5);
+        } else {
+            $students = $class->students()->orderBy($sortField, $sortOrder)->paginate(5);
+        }
+        $table_student_class = view('lecturer.table-student-class', compact('students', 'class'))->render();
+
+        return response()->json(['table_student_class' => $table_student_class, 'links' => $students->render('pagination::bootstrap-5')->toHtml()]);
+    }
+
+    public function sortStudentReportAPI(Request $request)
+    {
+        $sortField = $request->input('sortField', 'submitted_at');
+        $sortOrder = $request->input('sortOrder', 'desc');
+
+        $user = Auth::user();
+        $lecturer = $user->lecturer;
+
+        $creditClasses = $lecturer->creditClasses()
+            ->where('status', 'active')
+            ->where('start_date', '<=', now())
+            ->where('end_date', '>=', now())
+            ->get();
+
+        $reports = collect();
+
+        foreach ($creditClasses as $creditClass) {
+            $students = $creditClass->students;
+            foreach ($students as $student) {
+                $student_reports = $student->reports()->orderBy($sortField, $sortOrder)->get();
+                foreach ($student_reports as $student_report) {
+                    if (!$reports->contains('id', $student_report->id)) {
+                        $reports->push($student_report);
+                    }
+                }
+            }
+        }
+
+        $currentPage = LengthAwarePaginator::resolveCurrentPage();
+        $perPage = 5;
+        $currentItems = $reports->slice(($currentPage * $perPage) - $perPage, $perPage)->all();
+        $reports = new LengthAwarePaginator($currentItems, count($reports), $perPage, $currentPage, ['path' => LengthAwarePaginator::resolveCurrentPath()]);
+        $table_report = view('lecturer.table-student-report', compact('reports'))->render();
+
+        return response()->json(['table_report' => $table_report, 'links' => $reports->render('pagination::bootstrap-5')->toHtml()]);
     }
 }

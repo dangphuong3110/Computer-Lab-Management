@@ -9,8 +9,8 @@
                 <tr>
                     <th scope="col" class="text-center" width="5%">STT</th>
                     <th scope="col" class="text-center" width="30%">Nội dung</th>
-                    <th scope="col" class="text-center" width="30%">Trạng thái xử lý</th>
-                    <th scope="col" class="text-center" width="20%">Thời gian gửi</th>
+                    <th scope="col" class="text-center" data-sort="status" width="30%">Trạng thái xử lý <i class="bx bx-sort-alt-2"></i></th>
+                    <th scope="col" class="text-center" data-sort="submitted_at" width="20%">Thời gian gửi <i class="bx bx-sort-alt-2"></i></th>
                 </tr>
                 </thead>
                 <tbody>

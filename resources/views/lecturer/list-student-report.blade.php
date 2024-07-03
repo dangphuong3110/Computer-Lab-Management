@@ -23,8 +23,8 @@
                         <th scope="col" class="text-center" width="5%">STT</th>
                         <th scope="col" class="text-center" width="20%">Người gửi</th>
                         <th scope="col" class="text-center" width="30%">Nội dung báo cáo</th>
-                        <th scope="col" class="text-center" width="20%">Trạng thái</th>
-                        <th scope="col" class="text-center" width="15%">Ngày gửi</th>
+                        <th scope="col" class="text-center" data-sort="is_approved" width="20%">Trạng thái <i class="bx bx-sort-alt-2"></i></th>
+                        <th scope="col" class="text-center" data-sort="submitted_at" width="15%">Ngày gửi <i class="bx bx-sort-alt-2"></i></th>
                         <th scope="col" class="text-center action-column">Hành động</th>
                     </tr>
                     </thead>
@@ -115,6 +115,9 @@
                             showToastSuccess(response.success);
                             $('#table-report tbody').html(response.table_report);
                             $('#paginate-report').html(response.links);
+
+                            const currentUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+                            window.history.pushState({path: currentUrl}, '', currentUrl);
                             updatePagination();
                             addEventForButtons();
                             $('#destroy-student-report-modal-' + reportId).modal('hide');
@@ -136,7 +139,7 @@
                 $('.pagination .page-link').each(function() {
                     const link = $(this);
                     if (link.attr('href')) {
-                        const newUrl = new URL(link.attr('href'));
+                        const newUrl = new URL(link.attr('href'), window.location.origin);
                         searchParams.set('page', newUrl.searchParams.get('page'));
 
                         const updatedUrl = currentPath + '?' + searchParams.toString();
@@ -149,12 +152,24 @@
                 const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
                 const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 
-                $('.btn-destroy-lecturer').off('click');
-                $('.approve-report').off('click');
-                $('.disapprove-report').off('click');
-                $('.close-btn').off('click');
+                $('th[data-sort]').each(function() {
+                    const currentUrl = new URL(window.location.href);
+                    const currentField = currentUrl.searchParams.get('sort-field');
+                    const currentOrder = currentUrl.searchParams.get('sort-order');
+                    const field = $(this).data('sort');
 
-                $('.btn-destroy-report').click('click', function(e) {
+                    if (currentField === field) {
+                        if (currentOrder === 'asc') {
+                            $(this).find('i').attr('class', 'bx bx-sort-up');
+                        } else if (currentOrder === 'desc') {
+                            $(this).find('i').attr('class', 'bx bx-sort-down');
+                        }
+                    } else {
+                        $(this).find('i').attr('class', 'bx bx-sort-alt-2');
+                    }
+                });
+
+                $('.btn-destroy-report').off('click').click(function(e) {
                     e.preventDefault();
                     const overlay = document.getElementById('overlay');
                     overlay.classList.add('show');
@@ -165,7 +180,7 @@
                     submitFormDestroyReport(reportId, overlay);
                 });
 
-                $('.approve-report').click(function(e) {
+                $('.approve-report').off('click').click(function(e) {
                     e.preventDefault();
                     $('[data-bs-toggle="tooltip"]').tooltip('hide');
                     const overlay = document.getElementById('overlay');
@@ -183,6 +198,9 @@
                                 showToastSuccess(response.success);
                                 $('#table-report tbody').html(response.table_report);
                                 $('#paginate-report').html(response.links);
+
+                                const currentUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+                                window.history.pushState({path: currentUrl}, '', currentUrl);
                                 updatePagination();
                                 addEventForButtons();
                             }
@@ -195,7 +213,7 @@
                     });
                 });
 
-                $('.disapprove-report').click(function(e) {
+                $('.disapprove-report').off('click').click(function(e) {
                     e.preventDefault();
                     $('[data-bs-toggle="tooltip"]').tooltip('hide');
                     const overlay = document.getElementById('overlay');
@@ -213,6 +231,9 @@
                                 showToastSuccess(response.success);
                                 $('#table-report tbody').html(response.table_report);
                                 $('#paginate-report').html(response.links);
+
+                                const currentUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+                                window.history.pushState({path: currentUrl}, '', currentUrl);
                                 updatePagination();
                                 addEventForButtons();
                             }
@@ -225,7 +246,36 @@
                     });
                 });
 
-                $('.close-btn').click(function() {
+                $('th[data-sort]').off('click').click(function() {
+                    const field = $(this).data('sort');
+                    const order = $(this).hasClass('ascending') ? 'desc' : 'asc';
+
+                    const currentUrl = new URL(window.location.href);
+                    currentUrl.searchParams.set('sort-field', field);
+                    currentUrl.searchParams.set('sort-order', order);
+                    history.pushState(null, '', currentUrl.toString());
+
+                    $.ajax({
+                        url: `{{ route('lecturer.sort-student-report-api') }}`,
+                        type: 'GET',
+                        data: {sortField: field, sortOrder: order},
+                        success: function(response) {
+                            $('#table-report tbody').html(response.table_report);
+                            $('#paginate-report').html(response.links);
+                            updatePagination();
+                            addEventForButtons();
+
+                            $('th[data-sort] i').attr('class', 'bx bx-sort-alt-2');
+                            const iconClass = order === 'asc' ? 'bx-sort-up' : 'bx-sort-down';
+                            $(`th[data-sort="${field}"] i`).attr('class', `bx ${iconClass}`);
+
+                            $('th[data-sort]').removeClass('ascending descending');
+                            $(`th[data-sort="${field}"]`).addClass(order === 'asc' ? 'ascending' : 'descending');
+                        }
+                    });
+                });
+
+                $('.close-btn').off('click').click(function() {
                     $('.modal-backdrop.fade.show').remove();
                 });
             }
@@ -269,6 +319,7 @@
             }
 
             addEventForButtons();
+            updatePagination();
         });
     </script>
 @endsection

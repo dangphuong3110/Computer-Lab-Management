@@ -409,6 +409,10 @@ p.note span {
     cursor: pointer;
 }
 
+th[data-sort]:hover {
+    cursor: pointer;
+}
+
 /* ===== Notice when reload ===== */
 .overlay {
     display: none;

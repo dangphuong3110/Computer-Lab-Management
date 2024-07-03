@@ -5,7 +5,7 @@
             <td class="text-center">{{ $class->name }}</td>
             <td class="text-center">{{ $class->lecturer->full_name }}</td>
             <td class="text-center">{{ $class->start_date }} <i class='bx bx-right-arrow-alt'></i> {{ $class->end_date }}</td>
-            <td class="text-center">
+            <td class="text-center align-middle">
                 <div class="form-check form-switch d-flex justify-content-center">
                     <input class="form-check-input status-class" type="checkbox" role="switch" data-class-id="{{ $class->id }}" {{ $class->status == 'active' ? 'checked' : '' }}>
                 </div>

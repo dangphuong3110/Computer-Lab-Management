@@ -88,7 +88,7 @@ class StudentController extends Controller
         $classes = $student->creditClasses()
             ->where('status', 'active')
             ->orderBy('class_student.created_at', 'desc')
-            ->paginate(7);
+            ->paginate(5);
 
         return view('student.list-class', compact('title', 'user', 'classes'));
     }
@@ -288,7 +288,7 @@ class StudentController extends Controller
                 $classes = $student->creditClasses()
                     ->where('status', 'active')
                     ->orderBy('class_student.created_at', 'desc')
-                    ->paginate(7);
+                    ->paginate(5);
                 $table_class = view('student.table-class', compact('classes'))->render();
 
                 return response()->json(['success' => 'Tham gia lớp học thành công!', 'table_class' => $table_class, 'links' => $classes->render('pagination::bootstrap-5')->toHtml()]);
@@ -335,5 +335,19 @@ class StudentController extends Controller
         $table_personal_info = view('student.table-personal-info', compact('user'))->render();
 
         return response()->json(['success' => 'Cập nhật thông tin cá nhân thành công!', 'table_personal_info' => $table_personal_info]);
+    }
+
+    public function sortReportAPI(Request $request)
+    {
+        $sortField = $request->input('sortField', 'submitted_at');
+        $sortOrder = $request->input('sortOrder', 'desc');
+
+        $user = Auth::user();
+        $student = $user->student;
+
+        $reports = Report::where('student_id', $student->id)->orderBy($sortField, $sortOrder)->get();
+        $table_report = view('student.table-report', compact('reports'))->render();
+
+        return response()->json(['table_report' => $table_report]);
     }
 }

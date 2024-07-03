@@ -71,10 +71,7 @@
                 const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
                 const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 
-                $('.btn-copy-class-code').off('click');
-                $('.btn-export-attendances').off('click');
-
-                $('.btn-export-attendances').click(function(e) {
+                $('.btn-export-attendances').off('click').click(function(e) {
                     e.preventDefault();
                     setTimeout(() => {
                         const overlay = document.getElementById('overlay');
@@ -83,7 +80,7 @@
                     window.location.href = $(this).attr('href');
                 });
 
-                $('.btn-copy-class-code').click(function() {
+                $('.btn-copy-class-code').off('click').click(function() {
                     const classCode = $(this).data('class-code');
                     navigator.clipboard.writeText(classCode).then(function() {
                         showToastSuccess('Sao chép mã vào lớp thành công');

@@ -253,7 +253,7 @@
             });
 
             function addEventForButtons() {
-                $('#btn-update-personal-info').click(function(e) {
+                $('#btn-update-personal-info').off('click').click(function(e) {
                     e.preventDefault();
                     const overlay = document.getElementById('overlay');
                     overlay.classList.add('show');
@@ -265,7 +265,7 @@
                     submitFormUpdatePersonalInfo(form, lecturerId, overlay);
                 });
 
-                $('.close-update-btn').click(function() {
+                $('.close-update-btn').off('click').click(function() {
                     $('.modal-backdrop.fade.show').remove();
                 });
             }
