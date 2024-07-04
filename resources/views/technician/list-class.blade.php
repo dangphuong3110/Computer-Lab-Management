@@ -138,11 +138,49 @@
                                     </form>
                                 </div>
                                 <div class="text-center">
-                                    <p class="ps-3 pe-3 note">*Chú ý: Thêm giảng viên trước khi tạo lớp</p>
+                                    <p class="ps-3 pe-3 note">*Chú ý: <a href="{{ route('technician.get-list-lecturer') }}" class="text-danger">Thêm giảng viên</a> trước khi tạo lớp</p>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary close-btn" data-bs-dismiss="modal">Đóng</button>
                                     <button type="button" id="btn-add-class" class="btn btn-primary">Thêm</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="#" class="btn btn-outline-success ms-2" data-bs-toggle="modal" data-bs-target="#update-lesson-modal">Sửa tiết học</a>
+                    <!----- Modal sửa tiết học ----->
+                    <div class="modal fade" id="update-lesson-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="updateLessonModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-xl modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h1 class="modal-title fs-5" id="exampleModalLabel">Chỉnh sửa thông tin tiết học</h1>
+                                </div>
+                                <div class="modal-body">
+                                    <form method="post" action="{{ route('technician.update-lesson-api') }}" id="update-lesson-form">
+                                        @csrf
+                                        <div class="container-fluid">
+                                            <div class="row">
+                                                @foreach($fullLessons->chunk(5) as $lessonsGroup)
+                                                    <div class="col-lg-4">
+                                                        @foreach($lessonsGroup as $index => $lesson)
+                                                            <div class="row mb-3 mt-4">
+                                                                <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Tiết học {{ $index + 1 }}:</label>
+                                                                <div class="col-md-7 text-center">
+                                                                    <input type="time" name="start-lesson[]" value="{{ \Carbon\Carbon::parse($lesson->start_time)->format('H:i') }}" class="form-control fs-6 text-center"/>
+                                                                    <i class='bx bx-down-arrow-alt'></i>
+                                                                    <input type="time" name="end-lesson[]"  value="{{ \Carbon\Carbon::parse($lesson->end_time)->format('H:i') }}" class="form-control fs-6 text-center"/>
+                                                                </div>
+                                                            </div>
+                                                        @endforeach
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary close-btn" data-bs-dismiss="modal">Đóng</button>
+                                    <button type="button" id="btn-update-lesson" class="btn btn-primary">Lưu</button>
                                 </div>
                             </div>
                         </div>
@@ -550,6 +588,48 @@
                 });
             }
 
+            function submitFormUpdateLesson (form, overlay) {
+                const formDataObj = {};
+                form.find('input, select, textarea').each(function() {
+                    const name = $(this).attr('name');
+                    const value = $(this).val();
+                    if (name.includes('[]')) {
+                        if (!formDataObj[name]) {
+                            formDataObj[name] = [];
+                        }
+                        formDataObj[name].push(value);
+                    } else {
+                        formDataObj[name] = value;
+                    }
+                });
+
+                $.ajax({
+                    type: 'PUT',
+                    data: JSON.stringify(formDataObj),
+                    contentType: 'application/json',
+                    url: `{{ route("technician.update-lesson-api") }}`,
+                    success: function (response) {
+                        console.log(response);
+                        if (response.success) {
+                            showToastSuccess(response.success);
+
+                            $('#update-lesson-modal').modal('hide');
+                            $('body').css('overflow', 'auto');
+                        } else {
+                            if (response.errors['lesson']) {
+                                showToastError(response.errors['lesson']);
+                            }
+
+                            $('body').append('<div class="modal-backdrop fade show"></div>');
+                        }
+                        overlay.classList.remove('show');
+                    },
+                    error: function (error) {
+                        console.error(error);
+                    }
+                });
+            }
+
             function updatePagination () {
                 const currentUrl = new URL(window.location.href);
                 const currentPath = currentUrl.pathname;
@@ -576,6 +656,17 @@
                 const form = $('#add-class-form');
                 submitFormCreateClass(form, overlay);
             });
+
+            $('#btn-update-lesson').click(function(e) {
+                e.preventDefault();
+                const overlay = document.getElementById('overlay');
+                overlay.classList.add('show');
+                $('.modal-backdrop').remove();
+
+                const form = $('#update-lesson-form');
+                submitFormUpdateLesson(form, overlay);
+            });
+
 
             function addEventForButtons () {
                 const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');

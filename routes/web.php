@@ -39,7 +39,7 @@ Route::middleware(['auth'])->group(function () {
         // Schedule
         Route::get('/get-list-class-session', [StudentController::class, 'getListClassSession'])->name('student.get-list-class-session')->middleware('check.role:student');
         Route::get('/get-class-session/{classSession}', [StudentController::class, 'getClassSession'])->name('student.get-class-session')->middleware('check.role:student');
-        Route::post('/get-class-session-api/{class}', [StudentController::class, 'getClassSessionAPI'])->name('student.get-class-session-api');
+        Route::post('/get-class-session-api/{classSession}', [StudentController::class, 'getClassSessionAPI'])->name('student.get-class-session-api');
         Route::post('/send-report-api/{computer}', [StudentController::class, 'sendReportAPI'])->name('student.send-report-api');
         Route::post('/attendance-api/{classSession}', [StudentController::class, 'attendanceAPI'])->name('student.attendance-api');
         Route::get('/sort-report-api', [StudentController::class, 'sortReportAPI'])->name('student.sort-report-api');
@@ -61,7 +61,7 @@ Route::middleware(['auth'])->group(function () {
         // Schedule
         Route::get('/get-list-class-session', [LecturerController::class, 'getListClassSession'])->name('lecturer.get-list-class-session')->middleware('check.role:lecturer');
         Route::get('/get-class-session/{classSession}', [LecturerController::class, 'getClassSession'])->name('lecturer.get-class-session')->middleware('check.role:lecturer');
-        Route::post('/get-class-session-api/{class}', [LecturerController::class, 'getClassSessionAPI'])->name('lecturer.get-class-session-api');
+        Route::post('/get-class-session-api/{classSession}', [LecturerController::class, 'getClassSessionAPI'])->name('lecturer.get-class-session-api');
         Route::post('/send-report-api/{room}', [LecturerController::class, 'sendReportAPI'])->name('lecturer.send-report-api');
         Route::get('/sort-report-api', [LecturerController::class, 'sortReportAPI'])->name('lecturer.sort-report-api');
 
@@ -128,6 +128,9 @@ Route::middleware(['auth'])->group(function () {
        Route::post('/import-student-class-api', [TechnicianController::class, 'importStudentClassAPI'])->name('technician.import-student-class-api');
        Route::get('/sort-class-api', [TechnicianController::class, 'sortClassAPI'])->name('technician.sort-class-api');
        Route::get('/sort-student-class-api', [TechnicianController::class, 'sortStudentClassAPI'])->name('technician.sort-student-class-api');
+
+       // Lesson
+       Route::put('/update-lesson-api', [TechnicianController::class, 'updateLessonAPI'])->name('technician.update-lesson-api');
 
        // Building
        Route::get('/get-list-building', [TechnicianController::class, 'getListBuilding'])->name('technician.get-list-building')->middleware('check.role:technician');
