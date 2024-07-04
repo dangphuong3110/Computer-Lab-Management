@@ -1,12 +1,12 @@
-@extends('lecturer.layout')
+@extends('technician.layout')
 @section('content')
     <div class="row m-5 mb-4 d-flex align-items-center">
         <div class="col-12">
             <nav aria-label="breadcrumb" class="d-flex align-items-center">
                 <div class="text">Thông tin cá nhân</div>
                 <ol class="breadcrumb my-auto ms-4">
-                    <li class="breadcrumb-item"><a href="{{ route('lecturer.index') }}">Trang chủ</a></li>
-                    <li class="breadcrumb-item active" aria-current="page"><a href="{{ route('lecturer.get-personal-info') }}">Thông tin cá nhân</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('technician.index') }}">Trang chủ</a></li>
+                    <li class="breadcrumb-item active" aria-current="page"><a href="{{ route('technician.get-personal-info') }}">Thông tin cá nhân</a></li>
                 </ol>
             </nav>
         </div>
@@ -26,7 +26,7 @@
                                     <h1 class="modal-title fs-5" id="exampleModalLabel">Đổi mật khẩu tài khoản</h1>
                                 </div>
                                 <div class="modal-body">
-                                    <form method="post" action="{{ route('lecturer.update-password-api', $user->id) }}" id="update-password-form">
+                                    <form method="post" action="{{ route('technician.update-password-api', $user->id) }}" id="update-password-form">
                                         @csrf
                                         <div class="row mb-3 mt-4">
                                             <label class="col-md-5 col-label-form fs-6 fw-bold text-md-end">Mật khẩu mới<span class="required">*</span></label>
@@ -55,31 +55,7 @@
                 <div class="col-md-6 mb-3">
                     <label class="col-label-form fs-6 fw-bold">Họ và tên</label>
                     <div>
-                        <input type="text" name="full-name" class="form-control fs-6" value="{{ $user->lecturer->full_name ?? '' }}" disabled/>
-                    </div>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label class="col-label-form fs-6 fw-bold">Học hàm/Học vị</label>
-                    <div>
-                        <input type="text" name="academic-rank" class="form-control fs-6" value="{{ $user->lecturer->academic_rank ?? '' }}" disabled/>
-                    </div>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label class="col-label-form fs-6 fw-bold">Bộ môn</label>
-                    <div>
-                        <input type="text" name="department" class="form-control fs-6" value="{{ $user->lecturer->department ?? '' }}" disabled/>
-                    </div>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label class="col-label-form fs-6 fw-bold">Khoa</label>
-                    <div>
-                        <input type="text" name="faculty" class="form-control fs-6" value="{{ $user->lecturer->faculty ?? '' }}" disabled/>
-                    </div>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label class="col-label-form fs-6 fw-bold">Chức vị</label>
-                    <div>
-                        <input type="text" name="position" class="form-control fs-6" value="{{ $user->lecturer->position ?? '' }}" disabled/>
+                        <input type="text" name="full-name" class="form-control fs-6" value="{{ $user->technician->full_name ?? '' }}" disabled/>
                     </div>
                 </div>
                 <div class="col-md-6 mb-3">
@@ -94,7 +70,7 @@
                         <input type="text" name="phone" class="form-control fs-6" value="{{ $user->phone ?? '' }}" disabled/>
                     </div>
                 </div>
-                <!----- Modal sửa thông tin cá nhân giảng viên ----->
+                <!----- Modal sửa thông tin cá nhân kỹ thuật viên ----->
                 <div class="modal fade modal-update" id="update-personal-info-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="updatePersonalInfoModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content">
@@ -102,37 +78,13 @@
                                 <h1 class="modal-title fs-5" id="exampleModalLabel">Chỉnh sửa thông tin cá nhân</h1>
                             </div>
                             <div class="modal-body">
-                                <form method="post" action="{{ route('lecturer.update-personal-info-api', $user->lecturer->id) }}" id="update-personal-info-form">
+                                <form method="post" action="{{ route('technician.update-personal-info-api', $user->technician->id) }}" id="update-personal-info-form">
                                     @csrf
                                     @method('PUT')
                                     <div class="row mb-3 mt-4">
                                         <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Họ và tên<span class="required">*</span></label>
                                         <div class="col-md-7">
-                                            <input type="text" name="full-name" class="form-control fs-6" value="{{ $user->lecturer->full_name }}" data-initial-value="{{ $user->lecturer->full_name }}"/>
-                                        </div>
-                                    </div>
-                                    <div class="row mb-3 mt-4">
-                                        <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Học hàm/Học vị</label>
-                                        <div class="col-md-7">
-                                            <input type="text" name="academic-rank" class="form-control fs-6" value="{{ $user->lecturer->academic_rank }}" data-initial-value="{{ $user->lecturer->academic_rank }}"/>
-                                        </div>
-                                    </div>
-                                    <div class="row mb-3 mt-4">
-                                        <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Bộ môn</label>
-                                        <div class="col-md-7">
-                                            <input type="text" name="department" class="form-control fs-6" value="{{ $user->lecturer->department }}" data-initial-value="{{ $user->lecturer->department }}"/>
-                                        </div>
-                                    </div>
-                                    <div class="row mb-3 mt-4">
-                                        <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Khoa</label>
-                                        <div class="col-md-7">
-                                            <input type="text" name="faculty" class="form-control fs-6" value="{{ $user->lecturer->faculty }}" data-initial-value="{{ $user->lecturer->faculty }}"/>
-                                        </div>
-                                    </div>
-                                    <div class="row mb-3 mt-4">
-                                        <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Chức vị</label>
-                                        <div class="col-md-7">
-                                            <input type="text" name="position" class="form-control fs-6" value="{{ $user->lecturer->position }}" data-initial-value="{{ $user->lecturer->position }}"/>
+                                            <input type="text" name="full-name" class="form-control fs-6" value="{{ $user->technician->full_name }}" data-initial-value="{{ $user->technician->full_name }}"/>
                                         </div>
                                     </div>
                                     <div class="row mb-3 mt-4">
@@ -150,8 +102,8 @@
                                 </form>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary close-update-btn" data-lecturer-id="{{ $user->lecturer->id }}" data-bs-dismiss="modal">Đóng</button>
-                                <button type="button" id="btn-update-personal-info" class="btn btn-primary" data-lecturer-id="{{ $user->lecturer->id }}">Lưu</button>
+                                <button type="button" class="btn btn-secondary close-update-btn" data-technician-id="{{ $user->technician->id }}" data-bs-dismiss="modal">Đóng</button>
+                                <button type="button" id="btn-update-personal-info" class="btn btn-primary" data-technician-id="{{ $user->technician->id }}">Lưu</button>
                             </div>
                         </div>
                     </div>
@@ -169,14 +121,14 @@
                 }
             });
 
-            function submitFormUpdatePersonalInfo (form, lecturerId, overlay) {
+            function submitFormUpdatePersonalInfo (form, technicianId, overlay) {
                 const formDataObj = {};
                 form.find('input, select, textarea').each(function() {
                     formDataObj[$(this).attr('name')] = $(this).val();
                 });
 
-                let url = `{{ route("lecturer.update-personal-info-api", ":lecturer") }}`;
-                url = url.replace(':lecturer', lecturerId);
+                let url = `{{ route("technician.update-personal-info-api", ":technician") }}`;
+                url = url.replace(':technician', technicianId);
                 $.ajax({
                     type: 'PUT',
                     data: JSON.stringify(formDataObj),
@@ -210,7 +162,7 @@
                     formDataObj[$(this).attr('name')] = $(this).val();
                 });
 
-                let url = `{{ route("lecturer.update-password-api", ":userId") }}`;
+                let url = `{{ route("technician.update-password-api", ":userId") }}`;
                 url = url.replace(':userId', userId);
                 $.ajax({
                     type: 'PUT',
@@ -259,10 +211,10 @@
                     overlay.classList.add('show');
                     $('.modal-backdrop').remove();
 
-                    const lecturerId = $(this).data('lecturer-id');
+                    const technicianId = $(this).data('technician-id');
                     const form = $('#update-personal-info-form');
 
-                    submitFormUpdatePersonalInfo(form, lecturerId, overlay);
+                    submitFormUpdatePersonalInfo(form, technicianId, overlay);
                 });
 
                 $('.close-update-btn').off('click').click(function() {

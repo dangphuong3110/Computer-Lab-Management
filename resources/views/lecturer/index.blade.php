@@ -3,7 +3,7 @@
     <style>
         .wrapper{
             width: 100%;
-            background: #fff;
+            background: var(--sidebar-color);
             border-radius: 10px;
             box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
         }
@@ -17,6 +17,7 @@
 
         header .icons{
             display: flex;
+            color: var(--text-color);
         }
 
         header .icons span{
@@ -43,6 +44,7 @@
         header .current-date{
             font-size: 1.45rem;
             font-weight: 500;
+            color: var(--text-color);
         }
 
         .calendar{
@@ -61,7 +63,7 @@
         }
 
         .calendar li{
-            color: #333;
+            color: var(--text-color);
             width: calc(100% / 7);
             font-size: 1.07rem;
         }
@@ -69,6 +71,7 @@
         .calendar .weeks li{
             font-weight: 500;
             cursor: default;
+            color: var(--text-color);
         }
 
         .calendar .days li{
@@ -79,7 +82,7 @@
         }
 
         .days li.inactive{
-            color: #aaa;
+            color: var(--text-day-inactive);
         }
 
         .days li.active{

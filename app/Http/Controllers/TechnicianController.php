@@ -14,6 +14,7 @@ use App\Models\Lesson;
 use App\Models\Report;
 use App\Models\Room;
 use App\Models\Student;
+use App\Models\Technician;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -183,6 +184,15 @@ class TechnicianController extends Controller
         $reports = Report::where('is_approved', 1)->orderBy($sortField, $sortOrder)->paginate(5);
 
         return view('technician.list-report', compact('title','user', 'reports'));
+    }
+
+    public function getPersonalInfo()
+    {
+        $title = 'Thông tin cá nhân';
+
+        $user = Auth::user();
+
+        return view('technician.personal-info', compact('title', 'user'));
     }
 
     public function getStudentByStudentCodeAPI(Request $request)
@@ -1036,6 +1046,35 @@ class TechnicianController extends Controller
         $table_computer = view('technician.table-computer', compact('computers', 'room'))->render();
 
         return response()->json(['success' => 'Kết thúc quá trình bảo trì máy tính thành công!', 'table_computer' => $table_computer]);
+    }
+
+    public function updatePersonalInfoAPI(Request $request, string $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'full-name' => 'required|max:255',
+        ], [
+            'full-name.required' => 'Vui lòng nhập họ và tên!',
+            'full-name.max' => 'Họ và tên không được vượt quá 255 ký tự!',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()]);
+        }
+
+        $technician = Technician::findOrFail($id);
+
+        $user = $technician->user;
+        $user->phone = $request->input('phone');
+
+        $user->save();
+
+        $technician->full_name = $request->input('full-name');
+
+        $technician->save();
+
+        $table_personal_info = view('technician.table-personal-info', compact('user'))->render();
+
+        return response()->json(['success' => 'Cập nhật thông tin cá nhân thành công!', 'table_personal_info' => $table_personal_info]);
     }
 
     public function destroyLecturerAPI(string $id)

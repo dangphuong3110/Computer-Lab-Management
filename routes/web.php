@@ -84,7 +84,7 @@ Route::middleware(['auth'])->group(function () {
 
         // Personal Info
         Route::get('/get-personal-info', [LecturerController::class, 'getPersonalInfo'])->name('lecturer.get-personal-info')->middleware('check.role:lecturer');
-        Route::put('/update-personal-info-api/{student}', [LecturerController::class, 'updatePersonalInfoAPI'])->name('lecturer.update-personal-info-api');
+        Route::put('/update-personal-info-api/{lecturer}', [LecturerController::class, 'updatePersonalInfoAPI'])->name('lecturer.update-personal-info-api');
         Route::put('/update-password-api/{user}', [UserController::class, 'updatePasswordAPI'])->name('lecturer.update-password-api');
     });
 });
@@ -159,6 +159,11 @@ Route::middleware(['auth'])->group(function () {
        Route::put('/processed-report-api/{report}', [TechnicianController::class, 'processedReportAPI'])->name('technician.processed-report-api');
        Route::delete('/delete-report-api/{report}', [TechnicianController::class, 'destroyReportAPI'])->name('technician.destroy-report-api');
        Route::get('/sort-report-api', [TechnicianController::class, 'sortReportAPI'])->name('technician.sort-report-api');
+
+       // Personal Info
+       Route::get('/get-personal-info', [TechnicianController::class, 'getPersonalInfo'])->name('technician.get-personal-info')->middleware('check.role:technician');
+       Route::put('/update-personal-info-api/{technician}', [TechnicianController::class, 'updatePersonalInfoAPI'])->name('technician.update-personal-info-api');
+       Route::put('/update-password-api/{user}', [UserController::class, 'updatePasswordAPI'])->name('technician.update-password-api');
    });
 });
 

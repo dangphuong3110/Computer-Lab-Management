@@ -76,6 +76,12 @@
                         <span class="text nav-text">Báo cáo sự cố</span>
                     </a>
                 </li>
+                <li class="nav-link {{ request()->routeIs('technician.get-personal-info') ? 'active' : '' }}">
+                    <a href="{{ route('technician.get-personal-info') }}">
+                        <i class='bx bxs-user-detail icon'></i>
+                        <span class="text nav-text">Thông tin cá nhân</span>
+                    </a>
+                </li>
             </ul>
         </div>
 
