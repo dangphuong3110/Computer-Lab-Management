@@ -49,7 +49,7 @@ class StudentController extends Controller
             foreach ($classSessions as $classSession) {
                 $room = $classSession->room;
                 $schedule[] = [
-                    'class_id' => $creditClass->id,
+                    'session_id' => $classSession->id,
                     'class_name' => $creditClass->name,
                     'day_of_week' => $classSession->day_of_week,
                     'start_time' => Carbon::parse($classSession->start_lesson)->format('H:i'),
@@ -68,8 +68,11 @@ class StudentController extends Controller
             return $a['start_time'] <=> $b['start_time'];
         });
 
+        $maxCount = 0;
         $dayOfWeekCounts = array_count_values(array_column($schedule, 'day_of_week'));
-        $maxCount = max($dayOfWeekCounts);
+        if ($dayOfWeekCounts) {
+            $maxCount = max($dayOfWeekCounts);
+        }
         $now = Carbon::now();
 
         $startOfWeek = $now->startOfWeek()->format('d-m-Y');
@@ -93,13 +96,13 @@ class StudentController extends Controller
         return view('student.list-class', compact('title', 'user', 'classes'));
     }
 
-    public function getClassSessionAPI(Request $request, string $id) {
-        $creditClass = CreditClass::findOrFail($id);
-
+    public function getClassSessionAPI(Request $request, string $id)
+    {
         $now = Carbon::now();
         $dayOfWeek = $now->dayOfWeekIso + 1;
 
-        $classSession = $creditClass->classSessions()->where('day_of_week', $request->input('day_of_week'))->first();
+
+        $classSession = ClassSession::findOrFail($id);
 
         if ($classSession) {
             $startLesson = Carbon::parse($classSession->start_lesson);

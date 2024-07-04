@@ -17,6 +17,7 @@ use App\Models\Student;
 use App\Models\Technician;
 use App\Models\User;
 use Carbon\Carbon;
+use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -103,7 +104,9 @@ class TechnicianController extends Controller
             });
         });
 
-        return view('technician.list-class', compact('title','user', 'classes', 'lecturers', 'buildings', 'rooms', 'classSessions', 'lessons'));
+        $fullLessons = Lesson::all();
+
+        return view('technician.list-class', compact('title','user', 'classes', 'lecturers', 'buildings', 'rooms', 'classSessions', 'lessons', 'fullLessons'));
     }
 
     public function getLessonOfClassSessionAPI(string $classId)
@@ -1016,6 +1019,51 @@ class TechnicianController extends Controller
         $table_computer = view('technician.table-computer', compact('computers', 'room'))->render();
 
         return response()->json(['success' => 'Chỉnh sửa thông tin máy tính thành công!', 'table_computer' => $table_computer]);
+    }
+
+    public function updateLessonAPI(Request $request)
+    {
+        $startLessons = $request->input('start-lesson[]');
+        $endLessons = $request->input('end-lesson[]');
+
+        foreach ($startLessons as $index => $startLesson) {
+            if (empty($startLesson) || empty($endLessons[$index])) {
+                return response()->json(['errors' => ['lesson' => 'Vui lòng nhập đầy thời gian bắt đầu và kết thúc cho tiết học ' . ($index + 1) . '!']]);
+            }
+
+            $startLessonTime = new DateTime($startLesson);
+            $endLessonTime = new DateTime($endLessons[$index]);
+
+            if ($startLessonTime >= $endLessonTime) {
+                return response()->json(['errors' => ['lesson' => 'Thời gian bắt đầu tiết học ' . ($index + 1) . ' phải trước thời gian kết thúc tiết học ' . ($index + 1) . '!']]);
+            }
+            if ($index > 0) {
+                $previousEndLessonTime = new DateTime($endLessons[$index - 1]);
+                if ($startLessonTime <= $previousEndLessonTime) {
+                    return response()->json(['errors' => ['lesson' => 'Thời gian bắt đầu tiết học ' . ($index + 1) . ' phải sau thời gian kết thúc tiết học ' . $index . '!']]);
+                }
+            }
+        }
+
+        foreach($startLessons as $index => $startLesson) {
+            $lesson = Lesson::findOrFail($index + 1);
+            $lesson->start_time = $startLesson;
+            $lesson->end_time = $endLessons[$index];
+
+            $lesson->save();
+        }
+
+        $classSessions = ClassSession::all();
+        foreach ($classSessions as $classSession) {
+            $minLessonId = $classSession->lessons()->min('lesson_id');
+            $maxLessonId = $classSession->lessons()->max('lesson_id');
+
+            $classSession->start_lesson = Lesson::where('id', $minLessonId)->first()->start_time;
+            $classSession->end_lesson = Lesson::where('id', $maxLessonId)->first()->end_time;
+            $classSession->save();
+        }
+
+        return response()->json(['success' => 'Chỉnh sửa thông tin tiết học thành công!']);
     }
 
     public function startMaintenanceClassAPI(Request $request, string $id) {

@@ -236,7 +236,7 @@
                 setTimeout(() => {
                     const overlay = document.getElementById('overlay');
                     overlay.classList.remove('show');
-                }, 1000);
+                }, 1500);
                 window.location.href = $(this).attr('href');
             });
 

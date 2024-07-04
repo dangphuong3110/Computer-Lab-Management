@@ -38,7 +38,7 @@
                                         @endphp
                                     @endif
                                     <td class="p-0 text-center" colspan="{{ $colspan }}">
-                                        <div class="is-class-session" data-class-id="{{ $session['class_id'] }}" data-day-of-week="{{ $key }}">
+                                        <div class="is-class-session" data-class-session-id="{{ $session['session_id'] }}" data-day-of-week="{{ $key }}">
                                             Thời gian: {{ $session['start_time'] }} <i class='bx bx-right-arrow-alt'></i> {{ $session['end_time'] }} <br>
                                             Tên lớp học phần: {{ $session['class_name'] }} <br>
                                             Địa điểm: {{ $session['room'] . '-' . $session['building'] }}
@@ -70,7 +70,7 @@
             });
 
             $('.is-class-session').click(function() {
-                const classId = $(this).data('class-id');
+                const classSessionId = $(this).data('class-session-id');
                 const dayOfWeek = $(this).data('day-of-week');
                 const formDataObj = {};
                 formDataObj['day_of_week'] = dayOfWeek;
@@ -79,7 +79,7 @@
                     type: 'POST',
                     data: JSON.stringify(formDataObj),
                     contentType: 'application/json',
-                    url: `{{ route("lecturer.get-class-session-api", ":classId") }}`.replace(':classId', classId),
+                    url: `{{ route("lecturer.get-class-session-api", ":classSessionId") }}`.replace(':classSessionId', classSessionId),
                     success: function(response) {
                         if (response.success) {
                             window.location.href = response.success['get-class-session-route'];
