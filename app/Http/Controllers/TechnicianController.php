@@ -1516,6 +1516,7 @@ class TechnicianController extends Controller
 
     public function sortReportAPI(Request $request)
     {
+        $user = Auth::user();
         $sortField = $request->input('sortField', 'submitted_at');
         $sortOrder = $request->input('sortOrder', 'desc');
 
@@ -1524,7 +1525,7 @@ class TechnicianController extends Controller
         } else {
             $reports = Report::where('is_approved', 1)->orderBy($sortField, $sortOrder)->paginate(5);
         }
-        $table_report = view('technician.table-report', compact('reports'))->render();
+        $table_report = view('technician.table-report', compact('reports', 'user'))->render();
 
         return response()->json(['table_report' => $table_report, 'links' => $reports->render('pagination::bootstrap-5')->toHtml()]);
     }

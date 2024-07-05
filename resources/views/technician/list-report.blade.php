@@ -72,17 +72,17 @@
                                         @endswitch
                                     </span>
                                 </td>
-                                <td class="text-center align-middle">{{ \Carbon\Carbon::parse($report->submitted_at)->format('H:i:s d-m-Y') }}</td>
+                                <td class="text-center align-middle">{{ \Carbon\Carbon::parse($report->created_at)->format('H:i:s d-m-Y') }}</td>
                                 <td class="text-center align-middle">
                                     <div class="d-flex justify-content-center">
                                         <div class="wrap-button m-1" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Nhận xử lý">
-                                            <button class="btn btn-sm btn-primary my-auto processing-report" data-report-id="{{ $report->id }}" {{ $report->status == 'processing' ? 'disabled' : '' }}><i class='bx bx-loader-circle'></i></button>
+                                            <button class="btn btn-sm btn-primary my-auto processing-report" data-report-id="{{ $report->id }}" {{ $report->technician_id && $report->technician_id != $user->technician->id ? 'disabled' : '' }} {{ $report->status == 'processing' ? 'disabled' : '' }}><i class='bx bx-loader-circle'></i></button>
                                         </div>
                                         <div class="wrap-button m-1" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Hủy nhận xử lý">
-                                            <button class="btn btn-sm btn-warning my-auto pending-report" data-report-id="{{ $report->id }}" {{ $report->status == 'pending' ? 'disabled' : '' }}><i class='bx bx-transfer'></i></button>
+                                            <button class="btn btn-sm btn-warning my-auto pending-report" data-report-id="{{ $report->id }}" {{ $report->technician_id && $report->technician_id != $user->technician->id ? 'disabled' : '' }} {{ $report->status == 'pending' ? 'disabled' : '' }}><i class='bx bx-transfer'></i></button>
                                         </div>
                                         <div class="wrap-button m-1" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Đã xử lý">
-                                            <button class="btn btn-sm btn-success my-auto processed-report" data-report-id="{{ $report->id }}" {{ $report->status == 'processed' ? 'disabled' : '' }}><i class='bx bx-check-square'></i></button>
+                                            <button class="btn btn-sm btn-success my-auto processed-report" data-report-id="{{ $report->id }}" {{ $report->technician_id && $report->technician_id != $user->technician->id ? 'disabled' : '' }} {{ $report->status == 'processed' ? 'disabled' : '' }}><i class='bx bx-check-square'></i></button>
                                         </div>
                                         <div class="wrap-button m-1" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Xóa báo cáo">
                                             <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#destroy-report-modal-{{ $report->id }}"><i class='bx bx-trash'></i></button>

@@ -175,6 +175,7 @@ class LecturerController extends Controller
     {
         $report = Report::findOrFail($report_id);
         $report->is_approved = true;
+        $report->created_at = now();
         $report->save();
 
         $user = Auth::user();
@@ -227,7 +228,7 @@ class LecturerController extends Controller
             foreach ($students as $student) {
                 $student_reports = $student->reports()->orderBy($sortField, $sortOrder)->get();
                 foreach ($student_reports as $student_report) {
-                    if (!$reports->contains('id', $student_report->id)) {
+                    if (!$reports->contains('id', $student_report->id) && $student_report->status != 'processing' && $student_report->status != 'processed') {
                         $reports->push($student_report);
                     }
                 }
