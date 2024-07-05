@@ -87,6 +87,23 @@
                                 <div class="position-relative dropdown-center border border-black {{ $hasAttendance ? 'bg-warning' : 'bg-info' }} bg-opacity-50" style="width: 6.67%; height: 100px;">
                                     <div class="text-center d-flex justify-content-center align-items-center overflow-hidden h-100"><span style="font-size: 12px;">{{ $hasAttendance ? $attendance->student->full_name : '' }}</span></div>
                                     <a href="#" class="position-absolute top-0 dropdown-toggle" data-bs-toggle="dropdown">{{ $computerNumber }}</a>
+                                    <!----- Modal xác nhận thiết bị sử dụng (điểm danh) ----->
+                                    <div class="modal fade" id="attendance-modal-{{ $computerAtPosition->id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="attendanceModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h1 class="modal-title fs-5" id="exampleModalLabel">Xác nhận thiết bị sử dụng</h1>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <p class="fs-6 m-0 p-3 text-center">Bạn sử dụng loại máy tính nào cho tiết học thực hành này?<br>(Quá trình điểm danh hoàn tất sau khi trả lời câu hỏi)</p>
+                                                </div>
+                                                <div class="modal-footer d-flex justify-content-center">
+                                                    <button type="button" class="btn btn-secondary btn-personal-computer" data-is-lab="false" data-computer-id="{{ $computerAtPosition->id }}" data-class-session-id="{{ $classSession->id }}">Máy tính cá nhân</button>
+                                                    <button type="button" class="btn btn-primary btn-lab-computer" data-is-lab="true" data-computer-id="{{ $computerAtPosition->id }}" data-class-session-id="{{ $classSession->id }}">Máy tính phòng thực hành</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <!----- Modal gửi báo cáo sự cố thiết bị ----->
                                     <div class="modal fade" id="send-report-modal-{{ $computerAtPosition->id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="sendReportModalLabel" aria-hidden="true">
                                         <div class="modal-dialog modal-dialog-centered">
@@ -113,7 +130,7 @@
                                         </div>
                                     </div>
                                     <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item btn-attendance" data-computer-id="{{ $computerAtPosition->id }}" data-class-session-id="{{ $classSession->id }}" href="#">Điểm danh</a></li>
+                                        <li><a class="dropdown-item btn-attendance" href="#" data-bs-toggle="modal" data-bs-target="#attendance-modal-{{ $computerAtPosition->id }}">Điểm danh</a></li>
                                         <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#send-report-modal-{{ $computerAtPosition->id }}">Báo cáo sự cố</a></li>
                                     </ul>
                                 </div>
@@ -208,14 +225,16 @@
                     }
                 });
 
-                $('.btn-attendance').off('click').click(function() {
+                $('.btn-personal-computer, .btn-lab-computer').off('click').click(function() {
                     const overlay = document.getElementById('overlay');
                     overlay.classList.add('show');
 
+                    const isLabComputer = $(this).data('is-lab');
                     const classSessionId = $(this).data('class-session-id');
                     const computerId = $(this).data('computer-id');
 
                     const formDataObj = {};
+                    formDataObj['is_lab_computer'] = isLabComputer;
                     formDataObj['computer_id'] = computerId;
 
                     $.ajax({
@@ -234,6 +253,9 @@
                                 }
                             }
 
+                            $('.modal-backdrop').remove();
+                            $('#attendance-modal-' + computerId).modal('hide');
+                            $('body').css('overflow', 'auto');
                             addEventForButtons();
                             overlay.classList.remove('show');
                         },

@@ -16,6 +16,7 @@ return new class extends Migration
             $table->integer('position');
             $table->text('configuration')->nullable();
             $table->date('purchase_date')->nullable();
+            $table->boolean('is_active')->default(false);
             $table->string('status', 100)->nullable()->default('available');
             $table->unsignedBigInteger('room_id');
             $table->foreign('room_id')->references('id')->on('rooms');

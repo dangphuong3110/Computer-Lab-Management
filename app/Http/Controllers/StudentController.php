@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\UpdateComputerStatus;
 use App\Models\Attendance;
 use App\Models\Building;
 use App\Models\ClassSession;
@@ -9,6 +10,7 @@ use App\Models\Computer;
 use App\Models\CreditClass;
 use App\Models\Report;
 use App\Models\Room;
+use App\Models\Statistic;
 use App\Models\Student;
 use App\Models\User;
 use Carbon\Carbon;
@@ -127,6 +129,15 @@ class StudentController extends Controller
 
         $classSession = ClassSession::findOrFail($class_session_id);
 
+        $now = Carbon::now();
+        $dayOfWeek = $now->dayOfWeekIso + 1;
+        $startLesson = Carbon::parse($classSession->start_lesson);
+        $endLesson = Carbon::parse($classSession->end_lesson);
+
+        if ($dayOfWeek != $classSession->day_of_week || !$now->between($startLesson, $endLesson)) {
+            return redirect()->route('student.get-list-class-session');
+        }
+
         $room_id = $classSession->room_id;
         $room = Room::where('id', $room_id)->first();
         $building = Building::where('id', $room->building_id)->first();
@@ -175,6 +186,7 @@ class StudentController extends Controller
 
     public function attendanceAPI(Request $request, string $class_session_id)
     {
+        $isLabComputer = $request->input('is_lab_computer');
         $computer = Computer::findOrFail($request->input('computer_id'));
         $student = Auth::user()->student;
         $classSession = ClassSession::findOrFail($class_session_id);
@@ -211,6 +223,10 @@ class StudentController extends Controller
             ->first();
 
         if ($studentAttendance) {
+            $oldComputer = Computer::findOrFail($studentAttendance->computer_id);
+            $oldComputer->is_active = false;
+            $oldComputer->save();
+
             Attendance::where('session_id', $class_session_id)
                 ->where('student_id', $student->id)
                 ->whereBetween('created_at', [$startLesson, $endLesson])
@@ -222,6 +238,26 @@ class StudentController extends Controller
             $attendance->session_id = $class_session_id;
             $attendance->computer_id = $computer->id;
             $attendance->save();
+        }
+
+        if ($isLabComputer) {
+            $computer->update(['is_active' => true]);
+
+            $statistic = $computer->statistics()->where('usage_date', $today)->first();
+
+            if ($statistic) {
+                $lessonCount = $classSession->lessons()->count();
+                $statistic->increment('lesson_count', $lessonCount);
+            } else {
+                $statistic = new Statistic();
+                $statistic->computer_id = $computer->id;
+                $statistic->lesson_count = $classSession->lessons()->count();
+                $statistic->usage_date = $today;
+                $statistic->save();
+            }
+            $endTime = Carbon::parse($classSession->end_lesson);
+            $delay = $endTime->diffInSeconds(now());
+            UpdateComputerStatus::dispatch($computer)->delay($delay);
         }
 
         $room = Room::where('id', $computer->room_id)->first();
