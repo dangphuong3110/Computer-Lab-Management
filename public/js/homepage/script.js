@@ -12,7 +12,7 @@ window.addEventListener("unload", function (event) {
 const body = document.querySelector('body'),
     sidebar = body.querySelector('.sidebar'),
     toggle = body.querySelector('.toggle'),
-    searchBtn = body.querySelector('.search-box'),
+    // searchBtn = body.querySelector('.search-box'),
     modeSwitch = body.querySelector('.toggle-switch'),
     modeText = body.querySelector('.mode-text'),
     navLinks = body.querySelectorAll('.nav-link');
@@ -32,10 +32,10 @@ toggle.addEventListener("click", () => {
     sidebar.classList.toggle('close');
 });
 
-searchBtn.addEventListener("click", () => {
-    sidebar.classList.remove('close');
-    localStorage.setItem('sidebarState', 'open');
-});
+// searchBtn.addEventListener("click", () => {
+//     sidebar.classList.remove('close');
+//     localStorage.setItem('sidebarState', 'open');
+// });
 
 navLinks.forEach(navLink => {
     navLink.addEventListener("click", () => {

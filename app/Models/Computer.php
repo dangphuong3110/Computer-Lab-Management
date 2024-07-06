@@ -11,6 +11,15 @@ class Computer extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'position',
+        'configuration',
+        'purchase_date',
+        'status',
+        'room_id',
+        'is_active',
+    ];
+
     public function room()
     {
         return $this->belongsTo(Room::class);
@@ -19,5 +28,10 @@ class Computer extends Model
     public function attendances()
     {
         return $this->hasMany(Attendance::class, 'computer_id', 'id');
+    }
+
+    public function statistics()
+    {
+        return $this->hasMany(Statistic::class, 'computer_id', 'id');
     }
 }

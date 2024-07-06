@@ -27,7 +27,7 @@
             </span>
             <div class="text header-text">
                 <span class="name-university">Đại học Thủy lợi</span>
-                <span class="name">{{ $user->technician->full_name ?? '' }}</span>
+                <span class="name">{{ $user->manager->full_name ?? '' }}</span>
             </div>
         </div>
         <i class='bx bx-chevron-right toggle'></i>
@@ -40,8 +40,8 @@
 {{--                <input type="search" placeholder="Tìm kiếm...">--}}
 {{--            </li>--}}
             <ul class="menu-links">
-                <li class="nav-link {{ request()->routeIs('technician.index') ? 'active' : '' }}">
-                    <a href="{{ route('technician.index') }}">
+                <li class="nav-link {{ request()->routeIs('manager.index') ? 'active' : '' }}">
+                    <a href="{{ route('manager.index') }}">
                         <i class='bx bx-home-alt icon'></i>
                         <span class="text nav-text">Trang chủ</span>
                     </a>
@@ -49,36 +49,12 @@
                 <li class="nav-link {{ request()->routeIs('technician.get-list-lecturer') ? 'active' : '' }}">
                     <a href="{{ route('technician.get-list-lecturer') }}">
                         <i class='bx bx-user icon'></i>
-                        <span class="text nav-text">Giảng viên</span>
+                        <span class="text nav-text">Quản lý tài khoản</span>
                     </a>
                 </li>
                 <li class="nav-link {{ request()->routeIs('technician.get-list-student') ? 'active' : '' }}">
                     <a href="{{ route('technician.get-list-student') }}">
                         <i class='bx bx-group icon'></i>
-                        <span class="text nav-text">Sinh viên</span>
-                    </a>
-                </li>
-                <li class="nav-link {{ request()->routeIs('technician.get-list-class', 'technician.get-list-student-class') ? 'active' : '' }}">
-                    <a href="{{ route('technician.get-list-class') }}">
-                        <i class='bx bxs-grid icon'></i>
-                        <span class="text nav-text">Lớp học phần</span>
-                    </a>
-                </li>
-                <li class="nav-link {{ request()->routeIs('technician.get-list-building', 'technician.get-list-room', 'technician.get-list-computer') ? 'active' : '' }}">
-                    <a href="{{ route('technician.get-list-building') }}">
-                        <i class='bx bx-buildings icon'></i>
-                        <span class="text nav-text">Nhà thực hành</span>
-                    </a>
-                </li>
-                <li class="nav-link {{ request()->routeIs('technician.get-list-report') ? 'active' : '' }}">
-                    <a href="{{ route('technician.get-list-report') }}">
-                        <i class='bx bx-comment-error bx-tada icon' ></i>
-                        <span class="text nav-text">Báo cáo sự cố</span>
-                    </a>
-                </li>
-                <li class="nav-link {{ request()->routeIs('technician.get-personal-info') ? 'active' : '' }}">
-                    <a href="{{ route('technician.get-personal-info') }}">
-                        <i class='bx bxs-user-detail icon'></i>
                         <span class="text nav-text">Thông tin cá nhân</span>
                     </a>
                 </li>
@@ -129,6 +105,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 <script src="https://code.jquery.com/ui/1.13.3/jquery-ui.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="{{ asset('js/homepage/script.js') }}"></script>
 <script>
     AOS.init();

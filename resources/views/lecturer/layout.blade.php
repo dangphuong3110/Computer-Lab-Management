@@ -35,10 +35,10 @@
 
     <div class="menu-bar">
         <div class="menu">
-            <li class="search-box">
-                <i class='bx bx-search icon'></i>
-                <input type="search" placeholder="Tìm kiếm...">
-            </li>
+{{--            <li class="search-box">--}}
+{{--                <i class='bx bx-search icon'></i>--}}
+{{--                <input type="search" placeholder="Tìm kiếm...">--}}
+{{--            </li>--}}
             <ul class="menu-links">
                 <li class="nav-link {{ request()->routeIs('lecturer.index') ? 'active' : '' }}">
                     <a href="{{ route('lecturer.index') }}">

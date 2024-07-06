@@ -106,7 +106,41 @@ class TechnicianController extends Controller
 
         $fullLessons = Lesson::all();
 
-        return view('technician.list-class', compact('title','user', 'classes', 'lecturers', 'buildings', 'rooms', 'classSessions', 'lessons', 'fullLessons'));
+        // Schedule
+        $creditClassesSchedule = CreditClass::where('status', 'active')
+            ->where('start_date', '<=', now())
+            ->where('end_date', '>=', now())
+            ->get();
+
+        $daysOfWeek = ['2' => 'Thứ hai', '3' => 'Thứ ba', '4' => 'Thứ tư', '5' => 'Thứ năm', '6' => 'Thứ sáu', '7' => 'Thứ bảy', '8' => 'Chủ nhật'];
+
+        $schedule = [];
+
+        foreach ($creditClassesSchedule as $creditClass) {
+            $classSessionsSchedule = $creditClass->classSessions()->orderBy('start_lesson', 'asc')->get();
+
+            foreach ($classSessionsSchedule as $classSession) {
+                $room = $classSession->room;
+                $startLesson = $classSession->lessons()->min('lesson_id');
+                $endLesson = $classSession->lessons()->max('lesson_id');
+                $schedule[] = [
+                    'session_id' => $classSession->id,
+                    'class_id' => $creditClass->id,
+                    'class_name' => $creditClass->name,
+                    'day_of_week' => $classSession->day_of_week,
+                    'start_lesson' => $startLesson,
+                    'end_lesson' => $endLesson,
+                    'room_id' => $room->id,
+                    'building_id' => $room->building->id,
+                ];
+            }
+        }
+        usort($schedule, function ($a, $b) {
+            return $a['day_of_week'] <=> $b['day_of_week'];
+        });
+
+        return view('technician.list-class', compact('title','user', 'classes', 'lecturers', 'buildings', 'rooms', 'classSessions', 'lessons',
+            'fullLessons', 'daysOfWeek', 'schedule'));
     }
 
     public function getLessonOfClassSessionAPI(string $classId)
@@ -181,7 +215,7 @@ class TechnicianController extends Controller
         $title = 'Báo cáo sự cố';
         $user = Auth::user();
 
-        $sortField = $request->input('sort-field', 'submitted_at');
+        $sortField = $request->input('sort-field', 'created_at');
         $sortOrder = $request->input('sort-order', 'desc');
 
         $reports = Report::where('is_approved', 1)->orderBy($sortField, $sortOrder)->paginate(5);
@@ -1298,12 +1332,13 @@ class TechnicianController extends Controller
 
     public function destroyReportAPI(string $report_id)
     {
+        $user = Auth::user();
         $report = Report::findOrFail($report_id);
 
         $report->delete();
 
-        $reports = Report::where('is_approved', 1)->orderBy('submitted_at', 'desc')->paginate(5);
-        $table_report = view('technician.table-report', compact('reports'))->render();
+        $reports = Report::where('is_approved', 1)->orderBy('created_at', 'desc')->paginate(5);
+        $table_report = view('technician.table-report', compact('reports', 'user'))->render();
 
         return response()->json(['success' => 'Xóa báo cáo thành công!', 'table_report' => $table_report, 'links' => $reports->render('pagination::bootstrap-5')->toHtml()]);
     }
@@ -1382,42 +1417,45 @@ class TechnicianController extends Controller
 
     public function processingReportAPI(string $report_id)
     {
+        $user = Auth::user();
         $report = Report::findOrFail($report_id);
         $report->status = 'processing';
         $report->processed_at = null;
         $report->technician_id = Auth::user()->technician->id;
         $report->save();
 
-        $reports = Report::where('is_approved', 1)->orderBy('submitted_at', 'desc')->paginate(5);
-        $table_report = view('technician.table-report', compact('reports'))->render();
+        $reports = Report::where('is_approved', 1)->orderBy('created_at', 'desc')->paginate(5);
+        $table_report = view('technician.table-report', compact('reports', 'user'))->render();
 
         return response()->json(['success' => 'Cập nhật trạng thái báo cáo thành công!', 'table_report' => $table_report, 'links' => $reports->render('pagination::bootstrap-5')->toHtml()]);
     }
 
     public function pendingReportAPI(string $report_id)
     {
+        $user = Auth::user();
         $report = Report::findOrFail($report_id);
         $report->status = 'pending';
         $report->processed_at = null;
         $report->technician_id = null;
         $report->save();
 
-        $reports = Report::where('is_approved', 1)->orderBy('submitted_at', 'desc')->paginate(5);
-        $table_report = view('technician.table-report', compact('reports'))->render();
+        $reports = Report::where('is_approved', 1)->orderBy('created_at', 'desc')->paginate(5);
+        $table_report = view('technician.table-report', compact('reports', 'user'))->render();
 
         return response()->json(['success' => 'Cập nhật trạng thái báo cáo thành công!', 'table_report' => $table_report, 'links' => $reports->render('pagination::bootstrap-5')->toHtml()]);
     }
 
     public function processedReportAPI(string $report_id)
     {
+        $user = Auth::user();
         $report = Report::findOrFail($report_id);
         $report->status = 'processed';
         $report->technician_id = Auth::user()->technician->id;
         $report->processed_at = Carbon::now();
         $report->save();
 
-        $reports = Report::where('is_approved', 1)->orderBy('submitted_at', 'desc')->paginate(5);
-        $table_report = view('technician.table-report', compact('reports'))->render();
+        $reports = Report::where('is_approved', 1)->orderBy('created_at', 'desc')->paginate(5);
+        $table_report = view('technician.table-report', compact('reports', 'user'))->render();
 
         return response()->json(['success' => 'Cập nhật trạng thái báo cáo thành công!', 'table_report' => $table_report, 'links' => $reports->render('pagination::bootstrap-5')->toHtml()]);
     }

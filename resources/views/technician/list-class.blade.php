@@ -387,6 +387,81 @@
             </div>
         </div>
     </div>
+    <div class="row p-4 ms-5 me-5 mt-5 mb-0 main-content">
+        <div class="fs-6 fw-bold mb-3">Thời khóa biểu các lớp học thực hành</div>
+        <div class="table-responsive">
+            <table class="table table-bordered border-black schedule-table">
+                <thead>
+                <tr>
+                    <td rowspan="2" class="text-center align-middle fw-bold" width="1%">Tòa nhà</td>
+                    <td rowspan="2" class="text-center align-middle fw-bold" width="1%">Phòng</td>
+                    <td colspan="15" class="text-center fw-bold">Thứ Hai</td>
+                    <td colspan="15" class="text-center fw-bold">Thứ Ba</td>
+                    <td colspan="15" class="text-center fw-bold">Thứ Tư</td>
+                    <td colspan="15" class="text-center fw-bold">Thứ Năm</td>
+                    <td colspan="15" class="text-center fw-bold">Thứ Sáu</td>
+                    <td colspan="15" class="text-center fw-bold">Thứ Bảy</td>
+                    <td colspan="15" class="text-center fw-bold">Chủ Nhật</td>
+                </tr>
+                <tr>
+                    @for($i=1; $i<=7; $i++)
+                        @for($j=1; $j<=15; $j++)
+                            <td class="text-center">{!! $j < 10 ? '&nbsp;' . $j . '&nbsp;' : $j !!} </td>
+                        @endfor
+                    @endfor
+                </tr>
+                </thead>
+                <tbody>
+                @foreach($buildings as $building)
+                    @php $firstRoom = true; @endphp
+                    @foreach($building->rooms as $index => $room)
+{{--                        @if ($room->classSessions()->count() == 0)--}}
+{{--                            @php continue; @endphp--}}
+{{--                        @endif--}}
+                        <tr>
+                            @if ($firstRoom)
+                                <td rowspan="{{ $building->rooms()->count() }}" class="text-center align-middle">{{ $building->name }}</td>
+                                @php $firstRoom = false; @endphp
+                            @endif
+                            <td class="text-center align-middle">{{ $room->name }}</td>
+                            @foreach($daysOfWeek as $dayIndex => $dayName)
+                                @for ($lesson = 1; $lesson <= 15; $lesson++)
+                                    @php
+                                        $foundSession = false;
+                                        $colspan = 1;
+                                        $backgroundColor = '';
+                                    @endphp
+                                    @foreach ($schedule as $session)
+                                        @if ($session['day_of_week'] == $dayIndex && $lesson >= $session['start_lesson'] && $lesson <= $session['end_lesson'] && $session['room_id'] == $room->id)
+                                            @if (!$foundSession)
+                                                @php
+                                                    $colspan = $session['end_lesson'] - $session['start_lesson'] + 1;
+                                                    $backgroundColor = 'background-color: ' . '#' . substr(md5($session['class_name'] . $session['class_id']), 0, 6) . ';';
+                                                @endphp
+                                                <td class="text-center schedule" colspan="{{ $colspan }}" style="{{ $backgroundColor }}" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="{{ $session['class_name'] }} ({{ $room->name }}-{{ $building->name }})">
+{{--                                                    {{ $session['class_name'] }}--}}
+                                                </td>
+                                                @php
+                                                    $foundSession = true;
+                                                    $lesson += $colspan - 1;
+                                                @endphp
+                                            @else
+                                                @php $colspan--; @endphp
+                                            @endif
+                                        @endif
+                                    @endforeach
+                                    @if (!$foundSession)
+                                        <td class="text-center"></td>
+                                    @endif
+                                @endfor
+                            @endforeach
+                        </tr>
+                    @endforeach
+                @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
 @endsection
 @section('scripts')
     <script>
