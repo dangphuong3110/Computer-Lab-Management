@@ -8,6 +8,7 @@ use App\Models\Building;
 use App\Models\ClassSession;
 use App\Models\Computer;
 use App\Models\CreditClass;
+use App\Models\Lesson;
 use App\Models\Report;
 use App\Models\Room;
 use App\Models\Statistic;
@@ -50,37 +51,31 @@ class StudentController extends Controller
 
             foreach ($classSessions as $classSession) {
                 $room = $classSession->room;
+                $startLesson = $classSession->lessons()->min('lesson_id');
+                $endLesson = $classSession->lessons()->max('lesson_id');
                 $schedule[] = [
                     'session_id' => $classSession->id,
                     'class_name' => $creditClass->name,
                     'day_of_week' => $classSession->day_of_week,
-                    'start_time' => Carbon::parse($classSession->start_lesson)->format('H:i'),
-                    'end_time' => Carbon::parse($classSession->end_lesson)->format('H:i'),
+                    'start_lesson' => $startLesson,
+                    'end_lesson' => $endLesson,
                     'room' => $room->name,
                     'building' => $room->building->name,
                 ];
             }
         }
         usort($schedule, function ($a, $b) {
-            $dayOfWeekComparison = $a['day_of_week'] <=> $b['day_of_week'];
-            if ($dayOfWeekComparison !== 0) {
-                return $dayOfWeekComparison;
-            }
-
-            return $a['start_time'] <=> $b['start_time'];
+            return $a['day_of_week'] <=> $b['day_of_week'];
         });
 
-        $maxCount = 0;
-        $dayOfWeekCounts = array_count_values(array_column($schedule, 'day_of_week'));
-        if ($dayOfWeekCounts) {
-            $maxCount = max($dayOfWeekCounts);
-        }
         $now = Carbon::now();
 
         $startOfWeek = $now->startOfWeek()->format('d-m-Y');
         $endOfWeek = $now->endOfWeek()->format('d-m-Y');
 
-        return view('student.list-class-session', compact('title', 'user', 'daysOfWeek', 'schedule', 'maxCount', 'dayOfWeekCounts', 'startOfWeek', 'endOfWeek'));
+        $fullLessons = Lesson::all();
+
+        return view('student.list-class-session', compact('title', 'user', 'fullLessons', 'daysOfWeek', 'schedule', 'startOfWeek', 'endOfWeek'));
     }
 
     public function getListClass()

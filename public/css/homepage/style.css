@@ -405,14 +405,23 @@ p.note span {
     display: none;
 }
 
-.is-class-session:hover {
-    opacity: 0.85;
-    background-color: rgba(0, 0, 0, 0.2);
-    cursor: pointer;
-}
+/*.is-class-session:hover {*/
+/*    opacity: 0.85;*/
+/*    background-color: rgba(0, 0, 0, 0.2);*/
+/*    cursor: pointer;*/
+/*}*/
 
 th[data-sort]:hover {
     cursor: pointer;
+}
+
+td.schedule {
+    transition: transform .3s ease;
+}
+
+td.schedule:hover {
+    cursor: pointer;
+    transform: scale(1.1);
 }
 
 /* ===== Notice when reload ===== */

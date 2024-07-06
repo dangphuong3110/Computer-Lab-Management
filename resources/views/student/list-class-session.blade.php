@@ -19,41 +19,71 @@
             </div>
             <div class="table-responsive">
                 <table class="table table-bordered border-black schedule-table">
-                    <tbody>
-                    @foreach ($daysOfWeek as $key => $day)
+                    <thead>
                         <tr>
-                            <td class="text-center align-middle"><span class="fw-bold">{{ $day }}</span></td>
-                            @php
-                                $count = 0;
-                                $colspan = 1;
-                            @endphp
-                            @foreach ($schedule as $session)
-                                @if ($session['day_of_week'] == $key)
-                                    @php
-                                        $count++;
-                                    @endphp
-                                    @if ($count == $dayOfWeekCounts[$key])
-                                        @php
-                                            $colspan = $maxCount - $count + 1;
-                                        @endphp
-                                    @endif
-                                    <td class="p-0 text-center" colspan="{{ $colspan }}">
-                                        <div class="is-class-session" data-class-session-id="{{ $session['session_id'] }}" data-day-of-week="{{ $key }}">
-                                            Thời gian: {{ $session['start_time'] }} <i class='bx bx-right-arrow-alt'></i> {{ $session['end_time'] }} <br>
-                                            Tên lớp học phần: {{ $session['class_name'] }} <br>
-                                            Địa điểm: {{ $session['room'] . '-' . $session['building'] }}
-                                        </div>
-                                    </td>
-                                    @php
-                                        $colspan = 1;
-                                    @endphp
-                                @endif
-                            @endforeach
-                            @if ($count == 0)
-                                <td class="text-center" colspan="{{ $maxCount }}">Không có lịch</td>
-                            @endif
+                            <td rowspan="3" width="10%" class="text-center align-middle"><span class="fw-bold">Ngày</span></td>
+                            <td colspan="15" class="text-center"><span class="fw-bold">Tiết</span></td>
                         </tr>
-                    @endforeach
+                        <tr>
+                            <td class="text-center" width="6%">1</td>
+                            <td class="text-center" width="6%">2</td>
+                            <td class="text-center" width="6%">3</td>
+                            <td class="text-center" width="6%">4</td>
+                            <td class="text-center" width="6%">5</td>
+                            <td class="text-center" width="6%">6</td>
+                            <td class="text-center" width="6%">7</td>
+                            <td class="text-center" width="6%">8</td>
+                            <td class="text-center" width="6%">9</td>
+                            <td class="text-center" width="6%">10</td>
+                            <td class="text-center" width="6%">11</td>
+                            <td class="text-center" width="6%">12</td>
+                            <td class="text-center" width="6%">13</td>
+                            <td class="text-center" width="6%">14</td>
+                            <td class="text-center" width="6%">15</td>
+                        </tr>
+                        <tr>
+                            @foreach($fullLessons as $lesson)
+                                <td class="text-center">
+                                    ({{ \Carbon\Carbon::parse($lesson->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($lesson->end_time)->format('H:i') }})
+                                </td>
+                            @endforeach
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($daysOfWeek as $dayIndex => $dayName)
+                            <tr>
+                                <td class="text-center align-middle"><span class="fw-bold">{{ $dayName }}</span></td>
+                                @for ($lesson = 1; $lesson <= 15; $lesson++)
+                                    @php
+                                        $foundSession = false;
+                                        $colspan = 1;
+                                        $backgroundColor = '';
+                                    @endphp
+                                    @foreach ($schedule as $session)
+                                        @if ($session['day_of_week'] == $dayIndex && $lesson >= $session['start_lesson'] && $lesson <= $session['end_lesson'])
+                                            @if (!$foundSession)
+                                                @php
+                                                    $colspan = $session['end_lesson'] - $session['start_lesson'] + 1;
+                                                    $backgroundColor = 'background-color: ' . '#' . substr(md5($session['class_name']), 0, 6) . ';';
+                                                @endphp
+                                                <td class="text-center schedule is-class-session" colspan="{{ $colspan }}" style="{{ $backgroundColor }}" data-class-session-id="{{ $session['session_id'] }}" data-day-of-week="{{ $dayIndex }}" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="{{ $session['class_name'] }} ({{ $session['room'] }}-{{ $session['building'] }})">
+                                                    {{ $session['class_name'] }}
+                                                </td>
+                                                @php
+                                                    $foundSession = true;
+                                                    $lesson += $colspan - 1;
+                                                @endphp
+                                            @else
+                                                @php $colspan--; @endphp
+                                            @endif
+                                        @endif
+                                    @endforeach
+                                    @if (!$foundSession)
+                                        <td class="text-center"></td>
+                                    @endif
+                                @endfor
+                            </tr>
+                        @endforeach
                     </tbody>
                 </table>
             </div>
@@ -63,6 +93,9 @@
 @section('scripts')
     <script>
         $(document).ready(function() {
+            const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+            const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+
             $.ajaxSetup({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
