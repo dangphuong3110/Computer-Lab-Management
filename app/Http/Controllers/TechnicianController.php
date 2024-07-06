@@ -107,6 +107,13 @@ class TechnicianController extends Controller
         $fullLessons = Lesson::all();
 
         // Schedule
+        $schedule = $this->getSchedule();
+
+        return view('technician.list-class', compact('title','user', 'classes', 'lecturers', 'buildings', 'rooms', 'classSessions', 'lessons',
+            'fullLessons'))->with('schedule', $schedule['schedule'])->with('daysOfWeek', $schedule['daysOfWeek']);
+    }
+
+    public function getSchedule() {
         $creditClassesSchedule = CreditClass::where('status', 'active')
             ->where('start_date', '<=', now())
             ->where('end_date', '>=', now())
@@ -139,8 +146,7 @@ class TechnicianController extends Controller
             return $a['day_of_week'] <=> $b['day_of_week'];
         });
 
-        return view('technician.list-class', compact('title','user', 'classes', 'lecturers', 'buildings', 'rooms', 'classSessions', 'lessons',
-            'fullLessons', 'daysOfWeek', 'schedule'));
+        return ['schedule' => $schedule, 'daysOfWeek' => $daysOfWeek];
     }
 
     public function getLessonOfClassSessionAPI(string $classId)
@@ -493,12 +499,16 @@ class TechnicianController extends Controller
 
         $table_class = view('technician.table-class', compact('classes', 'lecturers', 'buildings', 'rooms'))->render();
 
+        $schedule = $this->getSchedule();
+        $table_schedule = view('technician.table-schedule', compact('buildings', 'rooms'))->with('schedule', $schedule['schedule'])->with('daysOfWeek', $schedule['daysOfWeek'])->render();
+
         return response()->json([
             'success' => 'Thêm lớp học phần thành công!',
             'table_class' => $table_class,
             'links' => $classes->render('pagination::bootstrap-5')->toHtml(),
             'class_sessions' => $classSessions,
-            'lessons' => $lessons
+            'lessons' => $lessons,
+            'table_schedule' => $table_schedule,
         ]);
     }
 
@@ -527,6 +537,12 @@ class TechnicianController extends Controller
 
             $newClass = CreditClass::findOrFail($class_id);
             $newClassSessions = $newClass->classSessions;
+            $studentsCount = $newClass->students()->count();
+            $minRoomCapacity = $newClassSessions->pluck('room.capacity')->min();
+
+            if ($studentsCount == $minRoomCapacity) {
+                return response()->json(['errors' => ['student-class' => 'Lớp học đã hết chỗ ngồi!']]);
+            }
 
             $currentClasses = $student->creditClasses;
 
@@ -940,12 +956,16 @@ class TechnicianController extends Controller
 
         $table_class = view('technician.table-class', compact('classes', 'lecturers', 'buildings', 'rooms'))->render();
 
+        $schedule = $this->getSchedule();
+        $table_schedule = view('technician.table-schedule', compact('buildings', 'rooms'))->with('schedule', $schedule['schedule'])->with('daysOfWeek', $schedule['daysOfWeek'])->render();
+
         return response()->json([
             'success' => 'Chỉnh sửa thông tin lớp học phần thành công!',
             'table_class' => $table_class,
             'links' => $classes->render('pagination::bootstrap-5')->toHtml(),
             'class_sessions' => $classSessions,
-            'lessons' => $lessons
+            'lessons' => $lessons,
+            'table_schedule' => $table_schedule,
         ]);
     }
 
@@ -1261,12 +1281,16 @@ class TechnicianController extends Controller
 
         $table_class = view('technician.table-class', compact('classes', 'lecturers', 'buildings', 'rooms'))->render();
 
+        $schedule = $this->getSchedule();
+        $table_schedule = view('technician.table-schedule', compact('buildings', 'rooms'))->with('schedule', $schedule['schedule'])->with('daysOfWeek', $schedule['daysOfWeek'])->render();
+
         return response()->json([
             'success' => 'Xóa lớp học phần thành công!',
             'table_class' => $table_class,
             'links' => $classes->render('pagination::bootstrap-5')->toHtml(),
             'class_sessions' => $classSessions,
-            'lessons' => $lessons
+            'lessons' => $lessons,
+            'table_schedule' => $table_schedule,
         ]);
     }
 

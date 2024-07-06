@@ -122,6 +122,10 @@ body.dark {
     align-items: center;
 }
 
+.sidebar .menu-links {
+    overflow: hidden;
+}
+
 header .image-text .header-text {
     display: flex;
     flex-direction: column;

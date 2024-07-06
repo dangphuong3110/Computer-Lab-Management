@@ -298,6 +298,12 @@ class StudentController extends Controller
                 }
 
                 $newClassSessions = $newClass->classSessions;
+                $studentsCount = $newClass->students()->count();
+                $minRoomCapacity = $newClassSessions->pluck('room.capacity')->min();
+
+                if ($studentsCount == $minRoomCapacity) {
+                    return response()->json(['errors' => ['student-class' => 'Lớp học đã hết chỗ ngồi!']]);
+                }
 
                 $currentClasses = $student->creditClasses;
 

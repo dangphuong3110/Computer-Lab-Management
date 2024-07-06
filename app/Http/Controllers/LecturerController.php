@@ -317,6 +317,12 @@ class LecturerController extends Controller
 
             $newClass = CreditClass::findOrFail($class_id);
             $newClassSessions = $newClass->classSessions;
+            $studentsCount = $newClass->students()->count();
+            $minRoomCapacity = $newClassSessions->pluck('room.capacity')->min();
+
+            if ($studentsCount == $minRoomCapacity) {
+                return response()->json(['errors' => ['student-class' => 'Lớp học đã hết chỗ ngồi!']]);
+            }
 
             $currentClasses = $student->creditClasses;
 

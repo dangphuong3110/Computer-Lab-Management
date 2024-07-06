@@ -11,7 +11,7 @@
             </nav>
         </div>
     </div>
-    <div class="row p-4 ms-5 me-5 mt-5 mb-0 main-content">
+    <div class="row p-4 ms-5 me-5 mt-5 mb-3 main-content">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <div class="text fs-4">Danh sách lớp học</div>
@@ -125,7 +125,7 @@
                                                                 <select id="room-create" name="room[]" class="form-select form-control fs-6">
                                                                     @foreach($rooms as $room)
                                                                         @if ($room->building_id == 1)
-                                                                            <option value="{{ $room->id }}">{{ $room->name }}</option>
+                                                                            <option value="{{ $room->id }}">{{ $room->name }} (Sức chứa: {{ $room->capacity }})</option>
                                                                         @endif
                                                                     @endforeach
                                                                 </select>
@@ -327,7 +327,7 @@
                                                                                     <select id="room-update-{{ $class->id }}" name="room[]" class="form-select form-control fs-6">
                                                                                         @foreach($rooms as $room)
                                                                                             @if ($room->building_id == 1)
-                                                                                                <option value="{{ $room->id }}">{{ $room->name }}</option>
+                                                                                                <option value="{{ $room->id }}">{{ $room->name }} (Sức chứa: {{ $room->capacity }})</option>
                                                                                             @endif
                                                                                         @endforeach
                                                                                     </select>
@@ -387,14 +387,14 @@
             </div>
         </div>
     </div>
-    <div class="row p-4 ms-5 me-5 mt-5 mb-0 main-content">
+    <div class="row p-4 ms-5 me-5 mb-0 main-content">
         <div class="fs-6 fw-bold mb-3">Thời khóa biểu các lớp học thực hành</div>
         <div class="table-responsive">
-            <table class="table table-bordered border-black schedule-table">
+            <table class="table table-bordered border-black" id="table-schedule">
                 <thead>
                 <tr>
-                    <td rowspan="2" class="text-center align-middle fw-bold" width="1%">Tòa nhà</td>
-                    <td rowspan="2" class="text-center align-middle fw-bold" width="1%">Phòng</td>
+                    <td rowspan="2" class="text-center align-middle fw-bold">Tòa nhà</td>
+                    <td rowspan="2" class="text-center align-middle fw-bold">Phòng</td>
                     <td colspan="15" class="text-center fw-bold">Thứ Hai</td>
                     <td colspan="15" class="text-center fw-bold">Thứ Ba</td>
                     <td colspan="15" class="text-center fw-bold">Thứ Tư</td>
@@ -538,6 +538,7 @@
                             $('#paginate-class').html(response.links);
                             classSessions = response.class_sessions;
                             lessons = response.lessons;
+                            $('#table-schedule tbody').html(response.table_schedule);
 
                             const currentUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
                             window.history.pushState({path: currentUrl}, '', currentUrl);
@@ -596,6 +597,7 @@
                             $('#paginate-class').html(response.links);
                             classSessions = response.class_sessions;
                             lessons = response.lessons;
+                            $('#table-schedule tbody').html(response.table_schedule);
 
                             const currentUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
                             window.history.pushState({path: currentUrl}, '', currentUrl);
@@ -641,6 +643,7 @@
                             $('#paginate-class').html(response.links);
                             classSessions = response.class_sessions;
                             lessons = response.lessons;
+                            $('#table-schedule tbody').html(response.table_schedule);
 
                             const currentUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
                             window.history.pushState({path: currentUrl}, '', currentUrl);
@@ -860,7 +863,7 @@
                                     <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Phòng học</label>
                                     <div class="col-md-7">
                                         <select id="room-update-${classId}-${i}" name="room[]" class="form-select form-control fs-6">
-                                            ${rooms.filter(room => room.building_id == rooms.find(room => room.id === sessionData.room_id).building_id).map(room => `<option value="${room.id}" ${room.id == sessionData.room_id ? 'selected' : ''}>${room.name}</option>`).join('')}
+                                            ${rooms.filter(room => room.building_id == rooms.find(room => room.id === sessionData.room_id).building_id).map(room => `<option value="${room.id}" ${room.id == sessionData.room_id ? 'selected' : ''}>${room.name} (Sức chứa: ${room.capacity})</option>`).join('')}
                                         </select>
                                     </div>
                                 </div>
@@ -874,7 +877,7 @@
                             roomSelect.html('');
                             rooms.forEach(room => {
                                 if (room.building_id == buildingId) {
-                                    const option = `<option value="${room.id}">${room.name}</option>`;
+                                    const option = `<option value="${room.id}">${room.name} (Sức chứa: ${room.capacity})</option>`;
                                     roomSelect.append(option);
                                 }
                             });
@@ -978,7 +981,7 @@
                     roomSelect.html('');
                     rooms.forEach(room => {
                         if (room.building_id == buildingId) {
-                            const option = `<option value="${room.id}">${room.name}</option>`;
+                            const option = `<option value="${room.id}">${room.name} (Sức chứa: ${room.capacity})</option>`;
                             roomSelect.append(option);
                         }
                     });
@@ -1032,7 +1035,7 @@
                                     <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Phòng học</label>
                                     <div class="col-md-7">
                                         <select id="room-create-${i}" name="room[]" class="form-select form-control fs-6">
-                                            ${rooms.filter(room => room.building_id == 1).map(room => `<option value="${room.id}">${room.name}</option>`).join('')}
+                                            ${rooms.filter(room => room.building_id == 1).map(room => `<option value="${room.id}">${room.name} (Sức chứa: ${room.capacity})</option>`).join('')}
                                         </select>
                                     </div>
                                 </div>
@@ -1046,7 +1049,7 @@
                             roomSelect.html('');
                             rooms.forEach(room => {
                                 if (room.building_id == buildingId) {
-                                    const option = `<option value="${room.id}">${room.name}</option>`;
+                                    const option = `<option value="${room.id}">${room.name} (Sức chứa: ${room.capacity})</option>`;
                                     roomSelect.append(option);
                                 }
                             });
@@ -1130,7 +1133,7 @@
                                             <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Phòng học</label>
                                             <div class="col-md-7">
                                                 <select id="room-update-${classId}-${i}" name="room[]" class="form-select form-control fs-6">
-                                                    ${rooms.filter(room => room.building_id == rooms.find(room => room.id === sessionData.room_id).building_id).map(room => `<option value="${room.id}" ${room.id == sessionData.room_id ? 'selected' : ''}>${room.name}</option>`).join('')}
+                                                    ${rooms.filter(room => room.building_id == rooms.find(room => room.id === sessionData.room_id).building_id).map(room => `<option value="${room.id}" ${room.id == sessionData.room_id ? 'selected' : ''}>${room.name} (Sức chứa: ${room.capacity})</option>`).join('')}
                                                 </select>
                                             </div>
                                         </div>
@@ -1144,7 +1147,7 @@
                                         roomSelect.html('');
                                         rooms.forEach(room => {
                                             if (room.building_id == buildingId) {
-                                                const option = `<option value="${room.id}">${room.name}</option>`;
+                                                const option = `<option value="${room.id}">${room.name} (Sức chứa: ${room.capacity})</option>`;
                                                 roomSelect.append(option);
                                             }
                                         });
@@ -1214,7 +1217,7 @@
                                     <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Phòng học</label>
                                     <div class="col-md-7">
                                         <select id="room-create-${i}" name="room[]" class="form-select form-control fs-6">
-                                            ${rooms.filter(room => room.building_id == 1).map(room => `<option value="${room.id}">${room.name}</option>`).join('')}
+                                            ${rooms.filter(room => room.building_id == 1).map(room => `<option value="${room.id}">${room.name} (Sức chứa: ${room.capacity})</option>`).join('')}
                                         </select>
                                     </div>
                                 </div>
@@ -1228,7 +1231,7 @@
                                         roomSelect.html('');
                                         rooms.forEach(room => {
                                             if (room.building_id == buildingId) {
-                                                const option = `<option value="${room.id}">${room.name}</option>`;
+                                                const option = `<option value="${room.id}">${room.name} (Sức chứa: ${room.capacity})</option>`;
                                                 roomSelect.append(option);
                                             }
                                         });
@@ -1350,7 +1353,7 @@
                                         <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Phòng học</label>
                                         <div class="col-md-7">
                                             <select id="room-create" name="room[]" class="form-select form-control fs-6">
-                                                ${rooms.filter(room => room.building_id == 1).map(room => `<option value="${room.id}">${room.name}</option>`).join('')}
+                                                ${rooms.filter(room => room.building_id == 1).map(room => `<option value="${room.id}">${room.name} (Sức chứa: ${room.capacity})</option>`).join('')}
                                             </select>
                                         </div>
                                     </div>
