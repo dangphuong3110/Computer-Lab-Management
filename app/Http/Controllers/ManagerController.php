@@ -5,19 +5,21 @@ namespace App\Http\Controllers;
 use App\Models\Building;
 use App\Models\Computer;
 use App\Models\CreditClass;
+use App\Models\Lecturer;
 use App\Models\Report;
 use App\Models\Room;
 use App\Models\Statistic;
+use App\Models\Technician;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 
 class ManagerController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $title = 'Trang chủ';
@@ -126,51 +128,217 @@ class ManagerController extends Controller
             'daysOfWeek', 'schedule', 'buildings'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+    public function getListTechnician() {
+        $title = 'Quản lý tài khoản';
+        $user = Auth::user();
+
+        $renderTechnicians = $this->renderTechnicians();
+
+        return view('manager.list-technician', compact('title', 'user'))->with('technicians', $renderTechnicians['technicians']);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function storeTechnicianAPI(Request $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'full-name' => 'required|max:255',
+            'email' => 'required|email|max:255|unique:users,email',
+        ], [
+            'full-name.required' => 'Vui lòng nhập họ và tên!',
+            'full-name.max' => 'Họ và tên không được vượt quá 255 ký tự!',
+            'email.required' => 'Vui lòng nhập địa chỉ email!',
+            'email.email' => 'Địa chỉ email không hợp lệ!',
+            'email.unique' => 'Địa chỉ email đã được sử dụng!',
+            'email.max' => 'Địa chỉ email không được vượt quá 255 ký tự!',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()]);
+        }
+
+        $user = new User();
+
+        $user->email = $request->input('email');
+        $user->password = Hash::make('123456');
+        $user->phone = $request->input('phone');
+        $user->role_id = '2';
+
+        $user->save();
+
+        $technician = new Technician();
+
+        $technician->full_name = $request->input('full-name');
+        $technician->user_id = $user->id;
+
+        $technician->save();
+
+        $renderTechnicians = $this->renderTechnicians();
+
+        return response()->json(['success' => 'Thêm kỹ thuật viên thành công!', 'table_technician' => $renderTechnicians['table_technician'], 'links' => $renderTechnicians['technicians']->render('pagination::bootstrap-5')->toHtml()]);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function updatePasswordTechnicianAPI(Request $request, string $id)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'new-password' => 'required|min:6',
+            're-enter-new-password' => 'same:new-password',
+        ], [
+            'new-password.required' => 'Vui lòng nhập mật khẩu mới!',
+            'new-password.min' => 'Mật khẩu phải chứa ít nhất 6 ký tự!',
+            're-enter-new-password.same' => 'Mật khẩu nhập lại không khớp!',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()]);
+        }
+
+        $technician = Technician::findOrFail($id);
+
+        $user = User::findOrFail($technician->user_id);
+        $user->password = $request->input('new-password');
+
+        $user->save();
+
+        return response()->json(['success' => 'Đổi mật khẩu tài khoản của kỹ thuật viên thành công!']);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function updateTechnicianAPI(Request $request, string $id)
     {
-        //
+        $technician = Technician::findOrFail($id);
+
+        $validator = Validator::make($request->all(), [
+            'full-name' => 'required|max:255',
+            'email' => 'required|email|max:255|unique:users,email,' . $technician->user_id,
+        ], [
+            'full-name.required' => 'Vui lòng nhập họ và tên!',
+            'full-name.max' => 'Họ và tên không được vượt quá 255 ký tự!',
+            'email.required' => 'Vui lòng nhập địa chỉ email!',
+            'email.email' => 'Địa chỉ email không hợp lệ!',
+            'email.unique' => 'Địa chỉ email đã được sử dụng!',
+            'email.max' => 'Địa chỉ email không được vượt quá 255 ký tự!',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()]);
+        }
+
+        $user = User::findOrFail($technician->user_id);
+        if ($user->email != $request->input('email')) {
+            $user->email = $request->input('email');
+            $user->is_verified = false;
+        }
+        $user->phone = $request->input('phone');
+
+        $user->save();
+
+        $technician->full_name = $request->input('full-name');
+
+        $technician->save();
+
+        $renderTechnicians = $this->renderTechnicians();
+
+        return response()->json(['success' => 'Chỉnh sửa thông tin kỹ thuật viên thành công!', 'table_technician' => $renderTechnicians['table_technician'], 'links' => $renderTechnicians['technicians']->render('pagination::bootstrap-5')->toHtml()]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function destroyTechnicianAPI(string $id)
     {
-        //
+        $technician = Technician::findOrFail($id);
+
+        $reports = $technician->reports;
+        $reports->each(function ($report) {
+            $report->delete();
+        });
+
+        $technician->delete();
+
+        $user = User::findOrFail($technician->user_id);
+        $user->delete();
+
+        $renderTechnicians = $this->renderTechnicians();
+
+        return response()->json(['success' => 'Xóa kỹ thuật viên thành công!', 'table_technician' => $renderTechnicians['table_technician'], 'links' => $renderTechnicians['technicians']->render('pagination::bootstrap-5')->toHtml()]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function renderTechnicians()
     {
-        //
+        $technicians = Technician::with(['reports' => function($query) {
+            $query->selectRaw('technician_id, COUNT(*) as report_count, AVG(TIMESTAMPDIFF(SECOND, created_at, processed_at)) as avg_processing_time')
+                ->where('status', 'processed')
+                ->groupBy('technician_id');
+        }])->orderBy('technicians.updated_at', 'desc')->paginate(5);
+
+        foreach ($technicians as $technician) {
+            $firstReport = $technician->reports->first();
+            if ($firstReport) {
+                $reportAvgProcessingTime = $firstReport->avg_processing_time;
+                $hours = floor($reportAvgProcessingTime / 3600);
+                $minutes = floor(($reportAvgProcessingTime % 3600) / 60);
+                $seconds = $reportAvgProcessingTime % 60;
+
+                if ($hours > 0) {
+                    $avgTime = $hours . 'h' . $minutes . 'm';
+                } elseif ($minutes > 0) {
+                    $avgTime = $minutes . 'm' . $seconds . 's';
+                } else {
+                    $avgTime = $seconds . 's';
+                }
+                $technician->reports->first()->avg_processing_time = $avgTime;
+            }
+        }
+        $table_technician = view('manager.table-technician', compact('technicians'))->render();
+
+        return ['table_technician' => $table_technician, 'technicians' => $technicians];
+    }
+
+    public function sortTechnicianAPI(Request $request)
+    {
+        $sortField = $request->input('sortField', 'updated_at');
+        $sortOrder = $request->input('sortOrder', 'desc');
+
+        if ($sortField == 'full_name') {
+            $technicians = Technician::leftJoinSub(
+                DB::table('reports')
+                    ->selectRaw('technician_id, COUNT(*) as report_count, AVG(TIMESTAMPDIFF(SECOND, created_at, processed_at)) as avg_processing_time')
+                    ->where('status', 'processed')
+                    ->groupBy('technician_id'),
+                'report_summary',
+                'technicians.id',
+                'report_summary.technician_id'
+            )
+                ->select('technicians.*', 'report_summary.report_count', 'report_summary.avg_processing_time')
+                ->orderByRaw("SUBSTRING_INDEX(full_name, ' ', -1) $sortOrder")
+                ->paginate(5);
+        } else {
+            $technicians = Technician::leftJoinSub(
+                DB::table('reports')
+                    ->selectRaw('technician_id, COUNT(*) as report_count, AVG(TIMESTAMPDIFF(SECOND, created_at, processed_at)) as avg_processing_time')
+                    ->where('status', 'processed')
+                    ->groupBy('technician_id'),
+                'report_summary',
+                'technicians.id',
+                'report_summary.technician_id'
+            )
+                ->select('technicians.*', 'report_summary.report_count', 'report_summary.avg_processing_time')
+                ->orderBy($sortField, $sortOrder)
+                ->paginate(5);
+        }
+
+        foreach ($technicians as $technician) {
+            $reportAvgProcessingTime = $technician->avg_processing_time;
+            $hours = floor($reportAvgProcessingTime / 3600);
+            $minutes = floor(($reportAvgProcessingTime % 3600) / 60);
+            $seconds = $reportAvgProcessingTime % 60;
+
+            if ($hours > 0) {
+                $avgTime = $hours . 'h' . $minutes . 'm';
+            } elseif ($minutes > 0) {
+                $avgTime = $minutes . 'm' . $seconds . 's';
+            } else {
+                $avgTime = $seconds . 's';
+            }
+            $technician->avg_processing_time = $avgTime;
+        }
+        $table_technician = view('manager.table-technician', compact('technicians'))->render();
+
+        return response()->json(['table_technician' => $table_technician, 'links' => $technicians->render('pagination::bootstrap-5')->toHtml()]);
     }
 }

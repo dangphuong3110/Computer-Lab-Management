@@ -170,8 +170,17 @@ Route::middleware(['auth'])->group(function () {
    });
 });
 
-Route::middleware(['auth', 'check.role:manager'])->group(function () {
-    Route::resource('/manager', ManagerController::class);
+Route::middleware(['auth'])->group(function () {
+    Route::prefix('/manager')->group(function() {
+        Route::get('/', [ManagerController::class, 'index'])->name('manager.index')->middleware('check.role:manager');
+        Route::get('/get-list-technician', [ManagerController::class, 'getListTechnician'])->name('manager.get-list-technician');
+        Route::get('/get-list-technician-api', [ManagerController::class, 'getTechnicianAPI'])->name('manager.get-list-technician-api');
+        Route::post('/store-technician-api', [ManagerController::class, 'storeTechnicianAPI'])->name('manager.store-technician-api');
+        Route::put('/update-technician-api/{technician}', [ManagerController::class, 'updateTechnicianAPI'])->name('manager.update-technician-api');
+        Route::put('/update-password-lecturer-api/{technician}', [ManagerController::class, 'updatePasswordTechnicianAPI'])->name('manager.update-password-technician-api');
+        Route::delete('/delete-technician-api/{technician}', [ManagerController::class, 'destroyTechnicianAPI'])->name('manager.destroy-technician-api');
+        Route::get('/sort-technician-api', [ManagerController::class, 'sortTechnicianAPI'])->name('manager.sort-technician-api');
+    });
 });
 
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');

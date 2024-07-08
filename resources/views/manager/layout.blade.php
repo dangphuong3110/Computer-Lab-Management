@@ -46,16 +46,10 @@
                         <span class="text nav-text">Trang chủ</span>
                     </a>
                 </li>
-                <li class="nav-link {{ request()->routeIs('technician.get-list-lecturer') ? 'active' : '' }}">
-                    <a href="{{ route('technician.get-list-lecturer') }}">
-                        <i class='bx bx-user icon'></i>
-                        <span class="text nav-text">Quản lý tài khoản</span>
-                    </a>
-                </li>
-                <li class="nav-link {{ request()->routeIs('technician.get-list-student') ? 'active' : '' }}">
-                    <a href="{{ route('technician.get-list-student') }}">
+                <li class="nav-link {{ request()->routeIs('manager.get-list-technician') ? 'active' : '' }}">
+                    <a href="{{ route('manager.get-list-technician') }}">
                         <i class='bx bx-group icon'></i>
-                        <span class="text nav-text">Thông tin cá nhân</span>
+                        <span class="text nav-text">Quản lý tài khoản</span>
                     </a>
                 </li>
             </ul>

@@ -379,8 +379,8 @@ p.note span {
     width: 100px;
 }
 
-.table th, .table td {
-    /*white-space: nowrap;*/
+.table th {
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
