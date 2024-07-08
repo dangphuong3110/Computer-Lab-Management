@@ -684,7 +684,10 @@ class TechnicianController extends Controller
         }
 
         $user = User::findOrFail($lecturer->user_id);
-        $user->email = $request->input('email');
+        if ($user->email != $request->input('email')) {
+            $user->email = $request->input('email');
+            $user->is_verified = false;
+        }
         $user->phone = $request->input('phone');
 
         $user->save();
@@ -748,7 +751,10 @@ class TechnicianController extends Controller
         }
 
         $user = User::findOrFail($student->user_id);
-        $user->email = trim($request->input('student-code')) . '@e.tlu.edu.vn';
+        if ($student->student_code != $request->input('student-code')) {
+            $user->email = trim($request->input('student-code')) . '@e.tlu.edu.vn';
+            $user->is_verified = false;
+        }
         $user->phone = $request->input('phone');
 
         $user->save();

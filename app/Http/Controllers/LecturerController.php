@@ -492,7 +492,7 @@ class LecturerController extends Controller
             foreach ($students as $student) {
                 $student_reports = $student->reports()->orderBy($sortField, $sortOrder)->get();
                 foreach ($student_reports as $student_report) {
-                    if (!$reports->contains('id', $student_report->id)) {
+                    if (!$reports->contains('id', $student_report->id) && $student_report->status != 'processing' && $student_report->status != 'processed') {
                         $reports->push($student_report);
                     }
                 }

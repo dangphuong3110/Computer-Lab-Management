@@ -71,6 +71,9 @@
                                                 Không xác định
                                         @endswitch
                                     </span>
+                                    @if ($report->technician_id)
+                                        <br><span>({{ $report->technician->full_name }})</span>
+                                    @endif
                                 </td>
                                 <td class="text-center align-middle">{{ \Carbon\Carbon::parse($report->created_at)->format('H:i:s d-m-Y') }}</td>
                                 <td class="text-center align-middle">
