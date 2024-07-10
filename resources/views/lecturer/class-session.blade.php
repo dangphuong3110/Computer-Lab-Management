@@ -205,6 +205,7 @@
                             $('#view-report-history-modal').html(response.table_report);
                             $('#send-report-modal').modal('hide');
                             $('body').css('overflow', 'auto');
+                            $('body').css('padding', '0');
                         } else {
                             if (response.errors['content']) {
                                 showToastError(response.errors['content'])

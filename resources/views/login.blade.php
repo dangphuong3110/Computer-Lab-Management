@@ -209,6 +209,7 @@
                         form[0].reset();
                         $('#verification-email').modal('show');
                         $('body').css('overflow', 'auto');
+                        $('body').css('padding', '0');
                     } else {
                         if (response.errors['email']) {
                             showToastError(response.errors['email']);
@@ -245,6 +246,7 @@
                         form[0].reset();
                         $('#forgot-password').modal('hide');
                         $('body').css('overflow', 'auto');
+                        $('body').css('padding', '0');
                         $('div.modal-backdrop.fade.show').remove();
                     } else {
                         if (response.errors['email']) {
@@ -278,6 +280,7 @@
                         $('#verification-email').modal('hide');
                         $('#login').click();
                         $('body').css('overflow', 'auto');
+                        $('body').css('padding', '0');
                     } else {
                         if (response.errors['verification-code']) {
                             showToastError(response.errors['verification-code']);

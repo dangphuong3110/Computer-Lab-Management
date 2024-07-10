@@ -142,6 +142,7 @@
                             addEventForButtons();
                             $('#update-personal-info-modal').modal('hide');
                             $('body').css('overflow', 'auto');
+                            $('body').css('padding', '0');
                         } else {
                             if (response.errors['full-name']) {
                                 showToastError(response.errors['full-name']);
@@ -175,6 +176,7 @@
                             form[0].reset();
                             $('#update-password-modal').modal('hide');
                             $('body').css('overflow', 'auto');
+                            $('body').css('padding', '0');
                         } else {
                             if (response.errors['new-password']) {
                                 showToastError(response.errors['new-password']);

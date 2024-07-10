@@ -195,6 +195,7 @@
                             addEventForButtons();
                             $('#add-computer-modal-' + position).modal('hide');
                             $('body').css('overflow', 'auto');
+                            $('body').css('padding', '0');
                         } else {
                             if (response.errors['position']) {
                                 showToastError(response.errors['position']);
@@ -232,6 +233,7 @@
                             addEventForButtons();
                             $('#update-computer-modal-' + computerId).modal('hide');
                             $('body').css('overflow', 'auto');
+                            $('body').css('padding', '0');
                         } else {
                             if (response.errors['position']) {
                                 showToastError(response.errors['position'])
@@ -266,6 +268,7 @@
                             addEventForButtons();
                             $('#destroy-computer-modal-' + computerId).modal('hide');
                             $('body').css('overflow', 'auto');
+                            $('body').css('padding', '0');
                         }
 
                         overlay.classList.remove('show');

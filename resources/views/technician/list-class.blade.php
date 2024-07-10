@@ -138,7 +138,10 @@
                                     </form>
                                 </div>
                                 <div class="text-center">
-                                    <p class="ps-3 pe-3 note">*Chú ý: <a href="{{ route('technician.get-list-lecturer') }}" class="text-danger">Thêm giảng viên</a> trước khi tạo lớp</p>
+                                    <p class="ps-3 pe-3 note">
+                                        *Chú ý: <a href="{{ route('technician.get-list-lecturer') }}" class="text-danger">Thêm giảng viên</a>,
+                                        <a href="{{ route('technician.get-list-building') }}" class="text-danger">nhà thực hành và phòng máy</a> trước khi tạo lớp
+                                    </p>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary close-btn" data-bs-dismiss="modal">Đóng</button>
@@ -547,6 +550,7 @@
                             addEventForButtons();
                             $('#add-class-modal').modal('hide');
                             $('body').css('overflow', 'auto');
+                            $('body').css('padding', '0');
                         } else {
                             if (response.errors['class-name']) {
                                 showToastError(response.errors['class-session']);
@@ -606,6 +610,7 @@
                             addEventForButtons();
                             $('#update-class-modal-' + classId).modal('hide');
                             $('body').css('overflow', 'auto');
+                            $('body').css('padding', '0');
                         } else {
                             if (response.errors['class-name']) {
                                 showToastError(response.errors['class-session']);
@@ -658,6 +663,7 @@
 
                         $('#destroy-class-modal-' + classId).modal('hide');
                         $('body').css('overflow', 'auto');
+                        $('body').css('padding', '0');
                         overlay.classList.remove('show');
                     },
                     error: function (error) {
@@ -693,6 +699,7 @@
 
                             $('#update-lesson-modal').modal('hide');
                             $('body').css('overflow', 'auto');
+                            $('body').css('padding', '0');
                         } else {
                             if (response.errors['lesson']) {
                                 showToastError(response.errors['lesson']);

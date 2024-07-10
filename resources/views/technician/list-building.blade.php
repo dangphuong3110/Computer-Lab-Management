@@ -151,6 +151,7 @@
                             addEventForButtons();
                             $('#add-building-modal').modal('hide');
                             $('body').css('overflow', 'auto');
+                            $('body').css('padding', '0');
                         } else {
                             if (response.errors['building-name']) {
                                 showToastError(response.errors['building-name']);
@@ -183,6 +184,7 @@
                             addEventForButtons();
                             $('#update-building-modal-' + buildingId).modal('hide');
                             $('body').css('overflow', 'auto');
+                            $('body').css('padding', '0');
                         } else {
                             if (response.errors['building-name']) {
                                 showToastError(response.errors['building-name'])
@@ -218,6 +220,7 @@
 
                         $('#destroy-building-modal-' + buildingId).modal('hide');
                         $('body').css('overflow', 'auto');
+                        $('body').css('padding', '0');
                         overlay.classList.remove('show');
                     },
                     error: function (error) {

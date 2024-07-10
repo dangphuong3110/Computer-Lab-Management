@@ -49,13 +49,35 @@ navLinks.forEach(navLink => {
     });
 });
 
+window.addEventListener('load', () => {
+    if (localStorage.getItem('darkMode') === 'enabled') {
+        body.classList.add('dark');
+        modeText.innerText = "Chế độ sáng";
+    } else {
+        body.classList.remove('dark');
+        modeText.innerText = "Chế độ tối";
+    }
+});
+
+window.addEventListener('beforeunload', () => {
+    if (localStorage.getItem('darkMode') === 'enabled') {
+        body.classList.add('dark');
+        modeText.innerText = "Chế độ sáng";
+    } else {
+        body.classList.remove('dark');
+        modeText.innerText = "Chế độ tối";
+    }
+});
+
 modeSwitch.addEventListener("click", () => {
     body.classList.toggle('dark');
 
     if(body.classList.contains('dark')){
-        modeText.innerText = "Light Mode";
+        localStorage.setItem('darkMode', 'enabled');
+        modeText.innerText = "Chế độ sáng";
     }
     else {
-        modeText.innerText = "Dark Mode";
+        localStorage.setItem('darkMode', 'disabled');
+        modeText.innerText = "Chế độ tối";
     }
 });

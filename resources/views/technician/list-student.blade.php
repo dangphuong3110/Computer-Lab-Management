@@ -307,6 +307,7 @@
                             addEventForButtons();
                             $('#add-student-modal').modal('hide');
                             $('body').css('overflow', 'auto');
+                            $('body').css('padding', '0');
                         } else {
                             if (response.errors['full-name']) {
                                 showToastError(response.errors['full-name']);
@@ -350,6 +351,7 @@
                             addEventForButtons();
                             $('#update-student-modal-' + studentId).modal('hide');
                             $('body').css('overflow', 'auto');
+                            $('body').css('padding', '0');
                         } else {
                             if (response.errors['full-name']) {
                                 showToastError(response.errors['full-name']);
@@ -389,6 +391,7 @@
                             form[0].reset();
                             $('#update-password-student-modal-' + studentId).modal('hide');
                             $('body').css('overflow', 'auto');
+                            $('body').css('padding', '0');
                         } else {
                             if (response.errors['new-password']) {
                                 showToastError(response.errors['new-password']);
@@ -432,6 +435,7 @@
 
                         $('#destroy-student-modal-' + studentId).modal('hide');
                         $('body').css('overflow', 'auto');
+                        $('body').css('padding', '0');
                         overlay.classList.remove('show');
                     },
                     error: function (error) {
@@ -462,6 +466,7 @@
                             addEventForButtons();
                             $('#import-student-modal').modal('hide');
                             $('body').css('overflow', 'auto');
+                            $('body').css('padding', '0');
                         } else {
                             showToastError(response.errors['student-file']);
                             $('body').append('<div class="modal-backdrop fade show"></div>');

@@ -193,6 +193,7 @@
                             $('#view-report-history-modal').html(response.table_report);
                             $('#send-report-modal-' + computerId).modal('hide');
                             $('body').css('overflow', 'auto');
+                            $('body').css('padding', '0');
                         } else {
                             if (response.errors['content']) {
                                 showToastError(response.errors['content'])
@@ -256,6 +257,7 @@
                             $('.modal-backdrop').remove();
                             $('#attendance-modal-' + computerId).modal('hide');
                             $('body').css('overflow', 'auto');
+                            $('body').css('padding', '0');
                             addEventForButtons();
                             overlay.classList.remove('show');
                         },

@@ -170,6 +170,7 @@
                             addEventForButtons();
                             $('#add-room-modal').modal('hide');
                             $('body').css('overflow', 'auto');
+                            $('body').css('padding', '0');
                         } else {
                             if (response.errors['room-name']) {
                                 showToastError(response.errors['room-name']);
@@ -207,6 +208,7 @@
                             addEventForButtons();
                             $('#update-room-modal-' + roomId).modal('hide');
                             $('body').css('overflow', 'auto');
+                            $('body').css('padding', '0');
                         } else {
                             if (response.errors['room-name']) {
                                 showToastError(response.errors['room-name'])
@@ -250,6 +252,7 @@
 
                         $('#destroy-room-modal-' + roomId).modal('hide');
                         $('body').css('overflow', 'auto');
+                        $('body').css('padding', '0');
                         overlay.classList.remove('show');
                     },
                     error: function (error) {

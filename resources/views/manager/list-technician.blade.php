@@ -235,6 +235,7 @@
                             addEventForButtons();
                             $('#add-technician-modal').modal('hide');
                             $('body').css('overflow', 'auto');
+                            $('body').css('padding', '0');
                         } else {
                             if (response.errors['full-name']) {
                                 showToastError(response.errors['full-name']);
@@ -275,6 +276,7 @@
                             addEventForButtons();
                             $('#update-technician-modal-' + technicianId).modal('hide');
                             $('body').css('overflow', 'auto');
+                            $('body').css('padding', '0');
 
                             overlay.classList.remove('show');
                         } else {
@@ -312,6 +314,7 @@
                             form[0].reset();
                             $('#update-password-technician-modal-' + technicianId).modal('hide');
                             $('body').css('overflow', 'auto');
+                            $('body').css('padding', '0');
                         } else {
                             if (response.errors['new-password']) {
                                 showToastError(response.errors['new-password']);
@@ -355,6 +358,7 @@
 
                         $('#destroy-technician-modal-' + technicianId).modal('hide');
                         $('body').css('overflow', 'auto');
+                        $('body').css('padding', '0');
                         overlay.classList.remove('show');
                     },
                     error: function (error) {

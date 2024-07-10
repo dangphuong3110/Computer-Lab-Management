@@ -122,6 +122,7 @@
                             addEventForButtons();
                             $('#destroy-student-report-modal-' + reportId).modal('hide');
                             $('body').css('overflow', 'auto');
+                            $('body').css('padding', '0');
                         }
                         overlay.classList.remove('show');
                     },

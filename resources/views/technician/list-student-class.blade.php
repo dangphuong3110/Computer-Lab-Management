@@ -183,6 +183,7 @@
                             $('.info-student').html('');
                             $('#add-student-modal').modal('hide');
                             $('body').css('overflow', 'auto');
+                            $('body').css('padding', '0');
                         } else {
                             if (response.errors['student-code']) {
                                 showToastError(response.errors['student-code'])
@@ -261,6 +262,7 @@
                             addEventForButtons();
                             $('#destroy-student-modal-' + studentId).modal('hide');
                             $('body').css('overflow', 'auto');
+                            $('body').css('padding', '0');
                         }
 
                         overlay.classList.remove('show');
@@ -294,6 +296,7 @@
                             addEventForButtons();
                             $('#import-student-class-modal').modal('hide');
                             $('body').css('overflow', 'auto');
+                            $('body').css('padding', '0');
                         } else {
                             showToastError(response.errors['student-class-file']);
                             $('body').append('<div class="modal-backdrop fade show"></div>');

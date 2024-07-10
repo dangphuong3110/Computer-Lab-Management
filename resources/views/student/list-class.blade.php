@@ -110,6 +110,7 @@
                             updatePagination();
                             $('#join-class-modal').modal('hide');
                             $('body').css('overflow', 'auto');
+                            $('body').css('padding', '0');
                         } else {
                             if (response.errors['class-code']) {
                                 showToastError(response.errors['class-code']);
