@@ -48,7 +48,7 @@
                                     </form>
                                 </div>
                                 <div class="text-center">
-                                    <p class="ps-3 pe-3 note">*Chú ý: Tài khoản sẽ được tạo tự động với tên đăng nhập là <span>Email</span> và mật khẩu là <span>123456</span></p>
+                                    <p class="ps-3 pe-3 attention">*Chú ý: Tài khoản sẽ được tạo tự động với tên đăng nhập là <span>Email</span> và mật khẩu là <span>123456</span></p>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary close-btn" data-bs-dismiss="modal">Đóng</button>
@@ -69,8 +69,9 @@
                     </select>
                     <span class="small text-muted fw-bold" style="min-width: 130px;">kết quả mỗi trang</span>
                 </div>
-                <div class="col-2">
-                    <input class="form-control border-black" type="search" placeholder="Tìm kiếm">
+                <div class="col-5 d-flex align-items-center justify-content-end">
+                    <input class="form-control border-black me-2" type="search" id="search-input" placeholder="Tìm kiếm" style="min-width: 130px; max-width: 160px;">
+                    <button class="btn btn-outline-dark" type="submit" id="search-button"><i class='bx bx-search-alt'></i></button>
                 </div>
             </div>
             <div class="table-responsive" id="table-technician">
@@ -94,24 +95,8 @@
                                 <td class="text-center">{{ $technician->full_name }}</td>
                                 <td class="text-center">{{ $technician->user->email }}</td>
                                 <td class="text-center">{{ $technician->user->phone }}</td>
-                                <td class="text-center">
-                                    @if (optional($technician->reports->first())->report_count)
-                                        {{ optional($technician->reports->first())->report_count }}
-                                    @elseif ($technician->report_count)
-                                        {{ $technician->report_count }}
-                                    @else
-                                        0
-                                    @endif
-                                </td>
-                                <td class="text-center">
-                                    @if (optional($technician->reports->first())->avg_processing_time)
-                                        {{ optional($technician->reports->first())->avg_processing_time }}
-                                    @elseif ($technician->avg_processing_time)
-                                        {{ $technician->avg_processing_time }}
-                                    @else
-                                        0
-                                    @endif
-                                </td>
+                                <td class="text-center">{{ $technician->report_count ?? 0 }}</td>
+                                <td class="text-center">{{ $technician->avg_processing_time ?? 0 }}</td>
                                 <td class="text-center">
                                     <div class="d-flex justify-content-center">
                                         <div class="wrap-button m-1" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Đổi mật khẩu tài khoản">
@@ -219,7 +204,7 @@
                         @endforeach
                     @else
                         <tr>
-                            <td colspan="6" class="text-center">Không có dữ liệu kỹ thuật viên</td>
+                            <td colspan="7" class="text-center">Không có dữ liệu kỹ thuật viên</td>
                         </tr>
                     @endif
                     </tbody>
@@ -465,6 +450,34 @@
                         addEventForModalUpdate();
                         addEventForButtons();
                         overlay.classList.remove('show');
+                    }
+                });
+            });
+
+            $('#search-button').click(function() {
+                const query = $('#search-input').val();
+                const recordsPerPage = $('#records-per-page').val();
+                const currentUrl = new URL(window.location.href);
+                const sortField = currentUrl.searchParams.get('sort-field');
+                const sortOrder = currentUrl.searchParams.get('sort-order');
+                const data = {};
+                if (sortField && sortOrder) {
+                    data['sortField'] = sortField;
+                    data['sortOrder'] = sortOrder;
+                }
+                data['recordsPerPage'] = recordsPerPage;
+                data['query'] = query;
+
+                $.ajax({
+                    url: `{{ route('manager.search-technician-api') }}`,
+                    type: 'GET',
+                    data: data,
+                    success: function(response) {
+                        $('#table-technician tbody').html(response.table_technician);
+                        $('#paginate-technician').html(response.links);
+                        updatePagination();
+                        addEventForModalUpdate();
+                        addEventForButtons();
                     }
                 });
             });

@@ -52,19 +52,13 @@ navLinks.forEach(navLink => {
 window.addEventListener('load', () => {
     if (localStorage.getItem('darkMode') === 'enabled') {
         body.classList.add('dark');
+        document.getElementById('search-button').classList.remove('btn-outline-dark');
+        document.getElementById('search-button').classList.add('btn-outline-light');
         modeText.innerText = "Chế độ sáng";
     } else {
         body.classList.remove('dark');
-        modeText.innerText = "Chế độ tối";
-    }
-});
-
-window.addEventListener('beforeunload', () => {
-    if (localStorage.getItem('darkMode') === 'enabled') {
-        body.classList.add('dark');
-        modeText.innerText = "Chế độ sáng";
-    } else {
-        body.classList.remove('dark');
+        document.getElementById('search-button').classList.remove('btn-outline-light');
+        document.getElementById('search-button').classList.add('btn-outline-dark');
         modeText.innerText = "Chế độ tối";
     }
 });
@@ -74,10 +68,14 @@ modeSwitch.addEventListener("click", () => {
 
     if(body.classList.contains('dark')){
         localStorage.setItem('darkMode', 'enabled');
+        document.getElementById('search-button').classList.remove('btn-outline-dark');
+        document.getElementById('search-button').classList.add('btn-outline-light');
         modeText.innerText = "Chế độ sáng";
     }
     else {
         localStorage.setItem('darkMode', 'disabled');
+        document.getElementById('search-button').classList.remove('btn-outline-light');
+        document.getElementById('search-button').classList.add('btn-outline-dark');
         modeText.innerText = "Chế độ tối";
     }
 });

@@ -26,9 +26,6 @@
                     </select>
                     <span class="small text-muted fw-bold" style="min-width: 130px;">kết quả mỗi trang</span>
                 </div>
-                <div class="col-2">
-                    <input class="form-control border-black" type="search" placeholder="Tìm kiếm">
-                </div>
             </div>
             <div class="table-responsive" id="table-report">
                 <table class="table table-bordered border-black">

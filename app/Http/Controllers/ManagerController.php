@@ -13,10 +13,12 @@ use App\Models\Technician;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Ramsey\Collection\Collection;
 
 class ManagerController extends Controller
 {
@@ -132,7 +134,6 @@ class ManagerController extends Controller
         $title = 'Quản lý tài khoản';
         $user = Auth::user();
 
-//        $renderTechnicians = $this->renderTechnicians($request);
         $sortField = $request->input('sort-field', 'technicians.updated_at');
         $sortOrder = $request->input('sort-order', 'desc');
         $recordsPerPage = $request->input('records-per-page', 5);
@@ -147,9 +148,9 @@ class ManagerController extends Controller
                 'technicians.id',
                 'report_summary.technician_id'
             )
-                ->select('technicians.*', 'report_summary.report_count', 'report_summary.avg_processing_time')
-                ->orderByRaw("SUBSTRING_INDEX(full_name, ' ', -1) $sortOrder")
-                ->paginate($recordsPerPage);
+            ->select('technicians.*', 'report_summary.report_count', 'report_summary.avg_processing_time')
+            ->orderByRaw("SUBSTRING_INDEX(full_name, ' ', -1) $sortOrder")
+            ->paginate($recordsPerPage);
         } else {
             $technicians = Technician::leftJoinSub(
                 DB::table('reports')
@@ -160,28 +161,12 @@ class ManagerController extends Controller
                 'technicians.id',
                 'report_summary.technician_id'
             )
-                ->select('technicians.*', 'report_summary.report_count', 'report_summary.avg_processing_time')
-                ->orderBy($sortField, $sortOrder)
-                ->paginate($recordsPerPage);
+            ->select('technicians.*', 'report_summary.report_count', 'report_summary.avg_processing_time')
+            ->orderBy($sortField, $sortOrder)
+            ->paginate($recordsPerPage);
         }
 
-        foreach ($technicians as $technician) {
-            $reportAvgProcessingTime = $technician->avg_processing_time;
-
-            $hours = floor($reportAvgProcessingTime / 3600);
-            $minutes = floor(($reportAvgProcessingTime % 3600) / 60);
-            $seconds = $reportAvgProcessingTime % 60;
-
-            if ($hours > 0) {
-                $avgTime = $hours . 'h' . $minutes . 'm';
-            } elseif ($minutes > 0) {
-                $avgTime = $minutes . 'm' . $seconds . 's';
-            } else {
-                $avgTime = $seconds . 's';
-            }
-            $technician->avg_processing_time = $avgTime;
-        }
-
+        $technicians = $this->processingTimeFormat($technicians);
 
         return view('manager.list-technician', compact('title', 'user', 'technicians'));
     }
@@ -317,24 +302,8 @@ class ManagerController extends Controller
                 ->groupBy('technician_id');
         }])->orderBy('technicians.updated_at', 'desc')->paginate($recordsPerPage);
 
-        foreach ($technicians as $technician) {
-            $firstReport = $technician->reports->first();
-            if ($firstReport) {
-                $reportAvgProcessingTime = $firstReport->avg_processing_time;
-                $hours = floor($reportAvgProcessingTime / 3600);
-                $minutes = floor(($reportAvgProcessingTime % 3600) / 60);
-                $seconds = $reportAvgProcessingTime % 60;
+        $technicians = $this->processingTimeFormat($technicians);
 
-                if ($hours > 0) {
-                    $avgTime = $hours . 'h' . $minutes . 'm';
-                } elseif ($minutes > 0) {
-                    $avgTime = $minutes . 'm' . $seconds . 's';
-                } else {
-                    $avgTime = $seconds . 's';
-                }
-                $technician->reports->first()->avg_processing_time = $avgTime;
-            }
-        }
         $table_technician = view('manager.table-technician', compact('technicians'))->render();
 
         return ['table_technician' => $table_technician, 'technicians' => $technicians];
@@ -356,9 +325,9 @@ class ManagerController extends Controller
                 'technicians.id',
                 'report_summary.technician_id'
             )
-                ->select('technicians.*', 'report_summary.report_count', 'report_summary.avg_processing_time')
-                ->orderByRaw("SUBSTRING_INDEX(full_name, ' ', -1) $sortOrder")
-                ->paginate($recordsPerPage);
+            ->select('technicians.*', 'report_summary.report_count', 'report_summary.avg_processing_time')
+            ->orderByRaw("SUBSTRING_INDEX(full_name, ' ', -1) $sortOrder")
+            ->paginate($recordsPerPage);
         } else {
             $technicians = Technician::leftJoinSub(
                 DB::table('reports')
@@ -369,26 +338,13 @@ class ManagerController extends Controller
                 'technicians.id',
                 'report_summary.technician_id'
             )
-                ->select('technicians.*', 'report_summary.report_count', 'report_summary.avg_processing_time')
-                ->orderBy($sortField, $sortOrder)
-                ->paginate($recordsPerPage);
+            ->select('technicians.*', 'report_summary.report_count', 'report_summary.avg_processing_time')
+            ->orderBy($sortField, $sortOrder)
+            ->paginate($recordsPerPage);
         }
 
-        foreach ($technicians as $technician) {
-            $reportAvgProcessingTime = $technician->avg_processing_time;
-            $hours = floor($reportAvgProcessingTime / 3600);
-            $minutes = floor(($reportAvgProcessingTime % 3600) / 60);
-            $seconds = $reportAvgProcessingTime % 60;
+        $technicians = $this->processingTimeFormat($technicians);
 
-            if ($hours > 0) {
-                $avgTime = $hours . 'h' . $minutes . 'm';
-            } elseif ($minutes > 0) {
-                $avgTime = $minutes . 'm' . $seconds . 's';
-            } else {
-                $avgTime = $seconds . 's';
-            }
-            $technician->avg_processing_time = $avgTime;
-        }
         $table_technician = view('manager.table-technician', compact('technicians'))->render();
 
         return response()->json(['table_technician' => $table_technician, 'links' => $technicians->render('pagination::bootstrap-5')->toHtml()]);
@@ -410,9 +366,9 @@ class ManagerController extends Controller
                 'technicians.id',
                 'report_summary.technician_id'
             )
-                ->select('technicians.*', 'report_summary.report_count', 'report_summary.avg_processing_time')
-                ->orderByRaw("SUBSTRING_INDEX(full_name, ' ', -1) $sortOrder")
-                ->paginate($recordsPerPage);
+            ->select('technicians.*', 'report_summary.report_count', 'report_summary.avg_processing_time')
+            ->orderByRaw("SUBSTRING_INDEX(full_name, ' ', -1) $sortOrder")
+            ->paginate($recordsPerPage);
         } else {
             $technicians = Technician::leftJoinSub(
                 DB::table('reports')
@@ -423,11 +379,70 @@ class ManagerController extends Controller
                 'technicians.id',
                 'report_summary.technician_id'
             )
-                ->select('technicians.*', 'report_summary.report_count', 'report_summary.avg_processing_time')
-                ->orderBy($sortField, $sortOrder)
-                ->paginate($recordsPerPage);
+            ->select('technicians.*', 'report_summary.report_count', 'report_summary.avg_processing_time')
+            ->orderBy($sortField, $sortOrder)
+            ->paginate($recordsPerPage);
         }
 
+        $technicians = $this->processingTimeFormat($technicians);
+
+        $table_technician = view('manager.table-technician', compact('technicians'))->render();
+
+        return response()->json(['table_technician' => $table_technician, 'links' => $technicians->render('pagination::bootstrap-5')->toHtml()]);
+    }
+
+    public function searchTechnicianAPI(Request $request)
+    {
+        $sortField = $request->input('sortField', 'technicians.updated_at');
+        $sortOrder = $request->input('sortOrder', 'desc');
+        $recordsPerPage = $request->input('recordsPerPage', 5);
+        $query = $request->input('query');
+
+        if ($sortField == 'full_name') {
+            $technicians = Technician::leftJoinSub(
+                DB::table('reports')
+                    ->selectRaw('technician_id, COUNT(*) as report_count, AVG(TIMESTAMPDIFF(SECOND, created_at, processed_at)) as avg_processing_time')
+                    ->where('status', 'processed')
+                    ->groupBy('technician_id'),
+                'report_summary',
+                'technicians.id',
+                'report_summary.technician_id'
+            )
+            ->join('users', 'technicians.user_id', '=', 'users.id')
+            ->where('technicians.full_name', 'LIKE', "%{$query}%")
+            ->orWhere('email', 'LIKE', "%{$query}%")
+            ->orWhere('phone', 'LIKE', "%{$query}%")
+            ->select('technicians.*', 'report_summary.report_count', 'report_summary.avg_processing_time')
+            ->orderByRaw("SUBSTRING_INDEX(full_name, ' ', -1) $sortOrder")
+            ->paginate($recordsPerPage);
+        } else {
+            $technicians = Technician::leftJoinSub(
+                DB::table('reports')
+                    ->selectRaw('technician_id, COUNT(*) as report_count, AVG(TIMESTAMPDIFF(SECOND, created_at, processed_at)) as avg_processing_time')
+                    ->where('status', 'processed')
+                    ->groupBy('technician_id'),
+                'report_summary',
+                'technicians.id',
+                'report_summary.technician_id'
+            )
+            ->join('users', 'technicians.user_id', '=', 'users.id')
+            ->where('technicians.full_name', 'LIKE', "%{$query}%")
+            ->orWhere('email', 'LIKE', "%{$query}%")
+            ->orWhere('phone', 'LIKE', "%{$query}%")
+            ->select('technicians.*', 'report_summary.report_count', 'report_summary.avg_processing_time')
+            ->orderBy($sortField, $sortOrder)
+            ->paginate($recordsPerPage);
+        }
+
+        $technicians = $this->processingTimeFormat($technicians);
+
+        $table_technician = view('manager.table-technician', compact('technicians'))->render();
+
+        return response()->json(['table_technician' => $table_technician, 'links' => $technicians->render('pagination::bootstrap-5')->toHtml()]);
+    }
+
+    public function processingTimeFormat(LengthAwarePaginator $technicians)
+    {
         foreach ($technicians as $technician) {
             $reportAvgProcessingTime = $technician->avg_processing_time;
             $hours = floor($reportAvgProcessingTime / 3600);
@@ -443,8 +458,6 @@ class ManagerController extends Controller
             }
             $technician->avg_processing_time = $avgTime;
         }
-        $table_technician = view('manager.table-technician', compact('technicians'))->render();
-
-        return response()->json(['table_technician' => $table_technician, 'links' => $technicians->render('pagination::bootstrap-5')->toHtml()]);
+        return $technicians;
     }
 }
