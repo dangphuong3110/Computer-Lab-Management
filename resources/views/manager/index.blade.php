@@ -183,6 +183,9 @@
             const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
             const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 
+            $('#statistical-method-room').val('1');
+            $('#statistical-method-computer').val('1');
+
             const dataRooms = {
                 labels: [
                     'Thời gian sử dụng (%)',

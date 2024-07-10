@@ -428,6 +428,10 @@ td.schedule:hover {
     transform: scale(1.1);
 }
 
+.pagination .page-item .page-link {
+    border: 1px solid #000 !important;
+}
+
 /* ===== Notice when reload ===== */
 .overlay {
     display: none;

@@ -113,6 +113,20 @@
                     </div>
                 </div>
             </div>
+            <div class="d-flex justify-content-between mb-3">
+                <div class="col-2 d-flex align-items-center">
+                    <select class="form-select me-3 border-black" id="records-per-page" name="records-per-page" style="min-width: 70px;">
+                        <option value="5" selected>5</option>
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="100">100</option>
+                    </select>
+                    <span class="small text-muted fw-bold" style="min-width: 130px;">kết quả mỗi trang</span>
+                </div>
+                <div class="col-2">
+                    <input class="form-control border-black" type="search" placeholder="Tìm kiếm">
+                </div>
+            </div>
             <div class="table-responsive" id="table-lecturer">
                 <table class="table table-bordered border-black">
                     <thead>
@@ -280,6 +294,9 @@
 @section('scripts')
     <script>
         $(document).ready(function() {
+            const currentUrl = new URL(window.location.href);
+            $('#records-per-page').val(currentUrl.searchParams.get('records-per-page') ?? 5);
+
             $.ajaxSetup({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -291,6 +308,8 @@
                 form.find('input, select, textarea').each(function() {
                     formDataObj[$(this).attr('name')] = $(this).val();
                 });
+
+                formDataObj['records-per-page'] = $('#records-per-page').val();
 
                 $.ajax({
                     type: 'POST',
@@ -306,6 +325,9 @@
 
                             const currentUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
                             window.history.pushState({path: currentUrl}, '', currentUrl);
+                            const newUrl = new URL(window.location.href);
+                            newUrl.searchParams.set('records-per-page', $('#records-per-page').val());
+                            history.pushState(null, '', newUrl.toString());
                             updatePagination();
                             addEventForModalUpdate();
                             addEventForButtons();
@@ -331,6 +353,7 @@
 
             function submitFormUpdateLecturer (form, lecturerId, overlay) {
                 const formDataObj = Object.fromEntries(new FormData(form).entries());
+                formDataObj['records-per-page'] = $('#records-per-page').val();
 
                 let url = `{{ route("technician.update-lecturer-api", ":lecturerId") }}`;
                 url = url.replace(':lecturerId', lecturerId);
@@ -347,6 +370,9 @@
 
                             const currentUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
                             window.history.pushState({path: currentUrl}, '', currentUrl);
+                            const newUrl = new URL(window.location.href);
+                            newUrl.searchParams.set('records-per-page', $('#records-per-page').val());
+                            history.pushState(null, '', newUrl.toString());
                             updatePagination();
                             addEventForModalUpdate();
                             addEventForButtons();
@@ -415,6 +441,7 @@
                     type: 'DELETE',
                     contentType: 'application/json',
                     url: url,
+                    data: JSON.stringify({'records-per-page': $('#records-per-page').val()}),
                     success: function (response) {
                         if (response.success) {
                             showToastSuccess(response.success);
@@ -423,6 +450,9 @@
 
                             const currentUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
                             window.history.pushState({path: currentUrl}, '', currentUrl);
+                            const newUrl = new URL(window.location.href);
+                            newUrl.searchParams.set('records-per-page', $('#records-per-page').val());
+                            history.pushState(null, '', newUrl.toString());
                             updatePagination();
                             addEventForModalUpdate();
                             addEventForButtons();
@@ -445,6 +475,7 @@
 
             function submitFormImportLecturer (form, overlay) {
                 const formData = new FormData(form[0]);
+                formData.append('records-per-page', $('#records-per-page').val());
                 $.ajax({
                     type: 'POST',
                     data: formData,
@@ -460,6 +491,9 @@
 
                             const currentUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
                             window.history.pushState({path: currentUrl}, '', currentUrl);
+                            const newUrl = new URL(window.location.href);
+                            newUrl.searchParams.set('records-per-page', $('#records-per-page').val());
+                            history.pushState(null, '', newUrl.toString());
                             updatePagination();
                             addEventForModalUpdate();
                             addEventForButtons();
@@ -516,6 +550,28 @@
                 submitFormImportLecturer(form, overlay);
             });
 
+            $('#records-per-page').change(function() {
+                const overlay = document.getElementById('overlay');
+                overlay.classList.add('show');
+                const recordsPerPage = $(this).val();
+                const currentUrl = new URL(window.location.href);
+                currentUrl.searchParams.set('records-per-page', recordsPerPage);
+                history.pushState(null, '', currentUrl.toString());
+
+                $.ajax({
+                    url: `{{ route('technician.change-records-per-page-lecturer-api') }}`,
+                    type: 'GET',
+                    data: {sortField: currentUrl.searchParams.get('sort-field'), sortOrder: currentUrl.searchParams.get('sort-order'), recordsPerPage: recordsPerPage},
+                    success: function(response) {
+                        $('#table-lecturer tbody').html(response.table_lecturer);
+                        $('#paginate-lecturer').html(response.links);
+                        updatePagination();
+                        addEventForModalUpdate();
+                        addEventForButtons();
+                        overlay.classList.remove('show');
+                    }
+                });
+            });
 
             function addEventForButtons () {
                 const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
@@ -585,7 +641,7 @@
                     $.ajax({
                         url: `{{ route('technician.sort-lecturer-api') }}`,
                         type: 'GET',
-                        data: {sortField: field, sortOrder: order},
+                        data: {sortField: field, sortOrder: order, recordsPerPage: $('#records-per-page').val()},
                         success: function(response) {
                             $('#table-lecturer tbody').html(response.table_lecturer);
                             $('#paginate-lecturer').html(response.links);
