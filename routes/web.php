@@ -188,6 +188,7 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/update-password-lecturer-api/{technician}', [ManagerController::class, 'updatePasswordTechnicianAPI'])->name('manager.update-password-technician-api');
         Route::delete('/delete-technician-api/{technician}', [ManagerController::class, 'destroyTechnicianAPI'])->name('manager.destroy-technician-api');
         Route::get('/sort-technician-api', [ManagerController::class, 'sortTechnicianAPI'])->name('manager.sort-technician-api');
+        Route::get('/change-records-per-page-technician-api', [ManagerController::class, 'changeRecordsPerPageTechnicianAPI'])->name('manager.change-records-per-page-technician-api');
     });
 });
 

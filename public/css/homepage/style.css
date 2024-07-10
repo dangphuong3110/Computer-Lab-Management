@@ -366,12 +366,12 @@ span.required {
     color: darkred;
 }
 
-p.note {
+p.attention {
     font-style: italic;
     color: red;
 }
 
-p.note span {
+p.attention span {
     font-weight: 600;
 }
 

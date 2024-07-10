@@ -70,7 +70,7 @@
                                 </div>
                                 <div class="text-center">
                                     <p class="ps-3 pe-3">File mẫu: <a href="{{ asset('file/import-student-into-class.xlsx') }}" download>mau-nhap.xlsx</a></p>
-                                    <p class="ps-3 pe-3 note">*Chú ý: Thông tin tối thiểu cần có: <span>Mã sinh viên</span>.<br> Những sinh viên có tài khoản trên hệ thống sẽ được thêm vào lớp học phần.</p>
+                                    <p class="ps-3 pe-3 attention">*Chú ý: Thông tin tối thiểu cần có: <span>Mã sinh viên</span>.<br> Những sinh viên có tài khoản trên hệ thống sẽ được thêm vào lớp học phần.</p>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary close-btn" data-bs-dismiss="modal">Đóng</button>

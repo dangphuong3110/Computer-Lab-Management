@@ -69,7 +69,7 @@
                                     </form>
                                 </div>
                                 <div class="text-center">
-                                    <p class="ps-3 pe-3 note">*Chú ý: Tài khoản sẽ được tạo tự động với tên đăng nhập là <span>Ma_sinh_vien@e.tlu.edu.vn</span> và mật khẩu là <span>123456</span></p>
+                                    <p class="ps-3 pe-3 attention">*Chú ý: Tài khoản sẽ được tạo tự động với tên đăng nhập là <span>Ma_sinh_vien@e.tlu.edu.vn</span> và mật khẩu là <span>123456</span></p>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary close-btn" data-bs-dismiss="modal">Đóng</button>
@@ -99,7 +99,7 @@
                                 </div>
                                 <div class="text-center">
                                     <p class="ps-3 pe-3">File mẫu: <a href="{{ asset('file/import-student.xlsx') }}" download>mau-nhap.xlsx</a></p>
-                                    <p class="ps-3 pe-3 note">*Chú ý: Tài khoản sẽ được tạo tự động với tên đăng nhập là <span>Ma_sinh_vien@e.tlu.edu.vn</span> và mật khẩu là <span>123456</span>.<br> Thông tin tối thiểu cần có: <span>Họ và tên</span> + <span>Mã sinh viên</span></p>
+                                    <p class="ps-3 pe-3 attention">*Chú ý: Tài khoản sẽ được tạo tự động với tên đăng nhập là <span>Ma_sinh_vien@e.tlu.edu.vn</span> và mật khẩu là <span>123456</span>.<br> Thông tin tối thiểu cần có: <span>Họ và tên</span> + <span>Mã sinh viên</span></p>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary close-btn" data-bs-dismiss="modal">Đóng</button>

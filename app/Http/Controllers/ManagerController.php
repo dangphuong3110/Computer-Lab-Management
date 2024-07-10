@@ -128,13 +128,62 @@ class ManagerController extends Controller
             'daysOfWeek', 'schedule', 'buildings'));
     }
 
-    public function getListTechnician() {
+    public function getListTechnician(Request $request) {
         $title = 'Quản lý tài khoản';
         $user = Auth::user();
 
-        $renderTechnicians = $this->renderTechnicians();
+//        $renderTechnicians = $this->renderTechnicians($request);
+        $sortField = $request->input('sort-field', 'technicians.updated_at');
+        $sortOrder = $request->input('sort-order', 'desc');
+        $recordsPerPage = $request->input('records-per-page', 5);
 
-        return view('manager.list-technician', compact('title', 'user'))->with('technicians', $renderTechnicians['technicians']);
+        if ($sortField == 'full_name') {
+            $technicians = Technician::leftJoinSub(
+                DB::table('reports')
+                    ->selectRaw('technician_id, COUNT(*) as report_count, AVG(TIMESTAMPDIFF(SECOND, created_at, processed_at)) as avg_processing_time')
+                    ->where('status', 'processed')
+                    ->groupBy('technician_id'),
+                'report_summary',
+                'technicians.id',
+                'report_summary.technician_id'
+            )
+                ->select('technicians.*', 'report_summary.report_count', 'report_summary.avg_processing_time')
+                ->orderByRaw("SUBSTRING_INDEX(full_name, ' ', -1) $sortOrder")
+                ->paginate($recordsPerPage);
+        } else {
+            $technicians = Technician::leftJoinSub(
+                DB::table('reports')
+                    ->selectRaw('technician_id, COUNT(*) as report_count, AVG(TIMESTAMPDIFF(SECOND, created_at, processed_at)) as avg_processing_time')
+                    ->where('status', 'processed')
+                    ->groupBy('technician_id'),
+                'report_summary',
+                'technicians.id',
+                'report_summary.technician_id'
+            )
+                ->select('technicians.*', 'report_summary.report_count', 'report_summary.avg_processing_time')
+                ->orderBy($sortField, $sortOrder)
+                ->paginate($recordsPerPage);
+        }
+
+        foreach ($technicians as $technician) {
+            $reportAvgProcessingTime = $technician->avg_processing_time;
+
+            $hours = floor($reportAvgProcessingTime / 3600);
+            $minutes = floor(($reportAvgProcessingTime % 3600) / 60);
+            $seconds = $reportAvgProcessingTime % 60;
+
+            if ($hours > 0) {
+                $avgTime = $hours . 'h' . $minutes . 'm';
+            } elseif ($minutes > 0) {
+                $avgTime = $minutes . 'm' . $seconds . 's';
+            } else {
+                $avgTime = $seconds . 's';
+            }
+            $technician->avg_processing_time = $avgTime;
+        }
+
+
+        return view('manager.list-technician', compact('title', 'user', 'technicians'));
     }
 
     public function storeTechnicianAPI(Request $request)
@@ -171,7 +220,7 @@ class ManagerController extends Controller
 
         $technician->save();
 
-        $renderTechnicians = $this->renderTechnicians();
+        $renderTechnicians = $this->renderTechnicians($request);
 
         return response()->json(['success' => 'Thêm kỹ thuật viên thành công!', 'table_technician' => $renderTechnicians['table_technician'], 'links' => $renderTechnicians['technicians']->render('pagination::bootstrap-5')->toHtml()]);
     }
@@ -234,12 +283,12 @@ class ManagerController extends Controller
 
         $technician->save();
 
-        $renderTechnicians = $this->renderTechnicians();
+        $renderTechnicians = $this->renderTechnicians($request);
 
         return response()->json(['success' => 'Chỉnh sửa thông tin kỹ thuật viên thành công!', 'table_technician' => $renderTechnicians['table_technician'], 'links' => $renderTechnicians['technicians']->render('pagination::bootstrap-5')->toHtml()]);
     }
 
-    public function destroyTechnicianAPI(string $id)
+    public function destroyTechnicianAPI(Request $request, string $id)
     {
         $technician = Technician::findOrFail($id);
 
@@ -253,18 +302,20 @@ class ManagerController extends Controller
         $user = User::findOrFail($technician->user_id);
         $user->delete();
 
-        $renderTechnicians = $this->renderTechnicians();
+        $renderTechnicians = $this->renderTechnicians($request);
 
         return response()->json(['success' => 'Xóa kỹ thuật viên thành công!', 'table_technician' => $renderTechnicians['table_technician'], 'links' => $renderTechnicians['technicians']->render('pagination::bootstrap-5')->toHtml()]);
     }
 
-    public function renderTechnicians()
+    public function renderTechnicians(Request $request)
     {
+        $recordsPerPage = $request->input('records-per-page', 5);
+
         $technicians = Technician::with(['reports' => function($query) {
             $query->selectRaw('technician_id, COUNT(*) as report_count, AVG(TIMESTAMPDIFF(SECOND, created_at, processed_at)) as avg_processing_time')
                 ->where('status', 'processed')
                 ->groupBy('technician_id');
-        }])->orderBy('technicians.updated_at', 'desc')->paginate(5);
+        }])->orderBy('technicians.updated_at', 'desc')->paginate($recordsPerPage);
 
         foreach ($technicians as $technician) {
             $firstReport = $technician->reports->first();
@@ -293,6 +344,7 @@ class ManagerController extends Controller
     {
         $sortField = $request->input('sortField', 'updated_at');
         $sortOrder = $request->input('sortOrder', 'desc');
+        $recordsPerPage = $request->input('recordsPerPage', 5);
 
         if ($sortField == 'full_name') {
             $technicians = Technician::leftJoinSub(
@@ -306,7 +358,7 @@ class ManagerController extends Controller
             )
                 ->select('technicians.*', 'report_summary.report_count', 'report_summary.avg_processing_time')
                 ->orderByRaw("SUBSTRING_INDEX(full_name, ' ', -1) $sortOrder")
-                ->paginate(5);
+                ->paginate($recordsPerPage);
         } else {
             $technicians = Technician::leftJoinSub(
                 DB::table('reports')
@@ -319,7 +371,61 @@ class ManagerController extends Controller
             )
                 ->select('technicians.*', 'report_summary.report_count', 'report_summary.avg_processing_time')
                 ->orderBy($sortField, $sortOrder)
-                ->paginate(5);
+                ->paginate($recordsPerPage);
+        }
+
+        foreach ($technicians as $technician) {
+            $reportAvgProcessingTime = $technician->avg_processing_time;
+            $hours = floor($reportAvgProcessingTime / 3600);
+            $minutes = floor(($reportAvgProcessingTime % 3600) / 60);
+            $seconds = $reportAvgProcessingTime % 60;
+
+            if ($hours > 0) {
+                $avgTime = $hours . 'h' . $minutes . 'm';
+            } elseif ($minutes > 0) {
+                $avgTime = $minutes . 'm' . $seconds . 's';
+            } else {
+                $avgTime = $seconds . 's';
+            }
+            $technician->avg_processing_time = $avgTime;
+        }
+        $table_technician = view('manager.table-technician', compact('technicians'))->render();
+
+        return response()->json(['table_technician' => $table_technician, 'links' => $technicians->render('pagination::bootstrap-5')->toHtml()]);
+    }
+
+    public function changeRecordsPerPageTechnicianAPI(Request $request)
+    {
+        $sortField = $request->input('sortField', 'updated_at');
+        $sortOrder = $request->input('sortOrder', 'desc');
+        $recordsPerPage = $request->input('recordsPerPage', 5);
+
+        if ($sortField == 'full_name') {
+            $technicians = Technician::leftJoinSub(
+                DB::table('reports')
+                    ->selectRaw('technician_id, COUNT(*) as report_count, AVG(TIMESTAMPDIFF(SECOND, created_at, processed_at)) as avg_processing_time')
+                    ->where('status', 'processed')
+                    ->groupBy('technician_id'),
+                'report_summary',
+                'technicians.id',
+                'report_summary.technician_id'
+            )
+                ->select('technicians.*', 'report_summary.report_count', 'report_summary.avg_processing_time')
+                ->orderByRaw("SUBSTRING_INDEX(full_name, ' ', -1) $sortOrder")
+                ->paginate($recordsPerPage);
+        } else {
+            $technicians = Technician::leftJoinSub(
+                DB::table('reports')
+                    ->selectRaw('technician_id, COUNT(*) as report_count, AVG(TIMESTAMPDIFF(SECOND, created_at, processed_at)) as avg_processing_time')
+                    ->where('status', 'processed')
+                    ->groupBy('technician_id'),
+                'report_summary',
+                'technicians.id',
+                'report_summary.technician_id'
+            )
+                ->select('technicians.*', 'report_summary.report_count', 'report_summary.avg_processing_time')
+                ->orderBy($sortField, $sortOrder)
+                ->paginate($recordsPerPage);
         }
 
         foreach ($technicians as $technician) {

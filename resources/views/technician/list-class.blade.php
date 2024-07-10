@@ -138,7 +138,7 @@
                                     </form>
                                 </div>
                                 <div class="text-center">
-                                    <p class="ps-3 pe-3 note">
+                                    <p class="ps-3 pe-3 attention">
                                         *Chú ý: <a href="{{ route('technician.get-list-lecturer') }}" class="text-danger">Thêm giảng viên</a>,
                                         <a href="{{ route('technician.get-list-building') }}" class="text-danger">nhà thực hành và phòng máy</a> trước khi tạo lớp
                                     </p>

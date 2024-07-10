@@ -59,6 +59,20 @@
                     </div>
                 </div>
             </div>
+            <div class="d-flex justify-content-between mb-3">
+                <div class="col-2 d-flex align-items-center">
+                    <select class="form-select me-3 border-black" id="records-per-page" name="records-per-page" style="min-width: 70px;">
+                        <option value="5" selected>5</option>
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="100">100</option>
+                    </select>
+                    <span class="small text-muted fw-bold" style="min-width: 130px;">kết quả mỗi trang</span>
+                </div>
+                <div class="col-2">
+                    <input class="form-control border-black" type="search" placeholder="Tìm kiếm">
+                </div>
+            </div>
             <div class="table-responsive" id="table-technician">
                 <table class="table table-bordered border-black">
                     <thead>
@@ -80,8 +94,24 @@
                                 <td class="text-center">{{ $technician->full_name }}</td>
                                 <td class="text-center">{{ $technician->user->email }}</td>
                                 <td class="text-center">{{ $technician->user->phone }}</td>
-                                <td class="text-center">{{ optional($technician->reports->first())->report_count ?? 0 }}</td>
-                                <td class="text-center">{{ optional($technician->reports->first())->avg_processing_time ?? 0 }}</td>
+                                <td class="text-center">
+                                    @if (optional($technician->reports->first())->report_count)
+                                        {{ optional($technician->reports->first())->report_count }}
+                                    @elseif ($technician->report_count)
+                                        {{ $technician->report_count }}
+                                    @else
+                                        0
+                                    @endif
+                                </td>
+                                <td class="text-center">
+                                    @if (optional($technician->reports->first())->avg_processing_time)
+                                        {{ optional($technician->reports->first())->avg_processing_time }}
+                                    @elseif ($technician->avg_processing_time)
+                                        {{ $technician->avg_processing_time }}
+                                    @else
+                                        0
+                                    @endif
+                                </td>
                                 <td class="text-center">
                                     <div class="d-flex justify-content-center">
                                         <div class="wrap-button m-1" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Đổi mật khẩu tài khoản">
@@ -204,6 +234,9 @@
 @section('scripts')
     <script>
         $(document).ready(function() {
+            const currentUrl = new URL(window.location.href);
+            $('#records-per-page').val(currentUrl.searchParams.get('records-per-page') ?? 5);
+
             $.ajaxSetup({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -215,6 +248,8 @@
                 form.find('input, select, textarea').each(function() {
                     formDataObj[$(this).attr('name')] = $(this).val();
                 });
+
+                formDataObj['records-per-page'] = $('#records-per-page').val();
 
                 $.ajax({
                     type: 'POST',
@@ -230,6 +265,9 @@
 
                             const currentUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
                             window.history.pushState({path: currentUrl}, '', currentUrl);
+                            const newUrl = new URL(window.location.href);
+                            newUrl.searchParams.set('records-per-page', $('#records-per-page').val());
+                            history.pushState(null, '', newUrl.toString());
                             updatePagination();
                             addEventForModalUpdate();
                             addEventForButtons();
@@ -255,6 +293,7 @@
 
             function submitFormUpdateTechnician (form, technicianId, overlay) {
                 const formDataObj = Object.fromEntries(new FormData(form).entries());
+                formDataObj['records-per-page'] = $('#records-per-page').val();
 
                 let url = `{{ route("manager.update-technician-api", ":technicianId") }}`;
                 url = url.replace(':technicianId', technicianId);
@@ -271,6 +310,9 @@
 
                             const currentUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
                             window.history.pushState({path: currentUrl}, '', currentUrl);
+                            const newUrl = new URL(window.location.href);
+                            newUrl.searchParams.set('records-per-page', $('#records-per-page').val());
+                            history.pushState(null, '', newUrl.toString());
                             updatePagination();
                             addEventForModalUpdate();
                             addEventForButtons();
@@ -339,6 +381,7 @@
                     type: 'DELETE',
                     contentType: 'application/json',
                     url: url,
+                    data: JSON.stringify({'records-per-page': $('#records-per-page').val()}),
                     success: function (response) {
                         if (response.success) {
                             showToastSuccess(response.success);
@@ -392,6 +435,38 @@
 
                 const form = $('#add-technician-form');
                 submitFormCreateTechnician(form, overlay);
+            });
+
+            $('#records-per-page').change(function() {
+                const overlay = document.getElementById('overlay');
+                overlay.classList.add('show');
+                const recordsPerPage = $(this).val();
+                const currentUrl = new URL(window.location.href);
+                currentUrl.searchParams.set('records-per-page', recordsPerPage);
+                history.pushState(null, '', currentUrl.toString());
+
+                const sortField = currentUrl.searchParams.get('sort-field');
+                const sortOrder = currentUrl.searchParams.get('sort-order');
+                const data = {};
+                if (sortField && sortOrder) {
+                    data['sortField'] = sortField;
+                    data['sortOrder'] = sortOrder;
+                }
+                data['recordsPerPage'] = recordsPerPage;
+
+                $.ajax({
+                    url: `{{ route('manager.change-records-per-page-technician-api') }}`,
+                    type: 'GET',
+                    data: data,
+                    success: function(response) {
+                        $('#table-technician tbody').html(response.table_technician);
+                        $('#paginate-technician').html(response.links);
+                        updatePagination();
+                        addEventForModalUpdate();
+                        addEventForButtons();
+                        overlay.classList.remove('show');
+                    }
+                });
             });
 
             function addEventForButtons () {
@@ -462,7 +537,7 @@
                     $.ajax({
                         url: `{{ route('manager.sort-technician-api') }}`,
                         type: 'GET',
-                        data: {sortField: field, sortOrder: order},
+                        data: {sortField: field, sortOrder: order, recordsPerPage: $('#records-per-page').val()},
                         success: function(response) {
                             console.log(response);
                             $('#table-technician tbody').html(response.table_technician);
