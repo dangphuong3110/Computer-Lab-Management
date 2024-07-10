@@ -1493,9 +1493,11 @@ class TechnicianController extends Controller
         $report->technician_id = Auth::user()->technician->id;
         $report->save();
 
-        $recordsPerPage = $request->input('records-per-page', 5);
+        $sortField = $request->input('sortField', 'created_at');
+        $sortOrder = $request->input('sortOrder', 'desc');
+        $recordsPerPage = $request->input('recordsPerPage', 5);
 
-        $reports = Report::where('is_approved', 1)->orderBy('created_at', 'desc')->paginate($recordsPerPage);
+        $reports = Report::where('is_approved', 1)->orderBy($sortField, $sortOrder)->paginate($recordsPerPage);
         $table_report = view('technician.table-report', compact('reports', 'user'))->render();
 
         return response()->json(['success' => 'Cập nhật trạng thái báo cáo thành công!', 'table_report' => $table_report, 'links' => $reports->render('pagination::bootstrap-5')->toHtml()]);
@@ -1510,9 +1512,11 @@ class TechnicianController extends Controller
         $report->technician_id = null;
         $report->save();
 
-        $recordsPerPage = $request->input('records-per-page', 5);
+        $sortField = $request->input('sortField', 'created_at');
+        $sortOrder = $request->input('sortOrder', 'desc');
+        $recordsPerPage = $request->input('recordsPerPage', 5);
 
-        $reports = Report::where('is_approved', 1)->orderBy('created_at', 'desc')->paginate($recordsPerPage);
+        $reports = Report::where('is_approved', 1)->orderBy($sortField, $sortOrder)->paginate($recordsPerPage);
         $table_report = view('technician.table-report', compact('reports', 'user'))->render();
 
         return response()->json(['success' => 'Cập nhật trạng thái báo cáo thành công!', 'table_report' => $table_report, 'links' => $reports->render('pagination::bootstrap-5')->toHtml()]);
@@ -1527,9 +1531,11 @@ class TechnicianController extends Controller
         $report->processed_at = Carbon::now();
         $report->save();
 
-        $recordsPerPage = $request->input('records-per-page', 5);
+        $sortField = $request->input('sortField', 'created_at');
+        $sortOrder = $request->input('sortOrder', 'desc');
+        $recordsPerPage = $request->input('recordsPerPage', 5);
 
-        $reports = Report::where('is_approved', 1)->orderBy('created_at', 'desc')->paginate($recordsPerPage);
+        $reports = Report::where('is_approved', 1)->orderBy($sortField, $sortOrder)->paginate($recordsPerPage);
         $table_report = view('technician.table-report', compact('reports', 'user'))->render();
 
         return response()->json(['success' => 'Cập nhật trạng thái báo cáo thành công!', 'table_report' => $table_report, 'links' => $reports->render('pagination::bootstrap-5')->toHtml()]);
@@ -1754,6 +1760,6 @@ class TechnicianController extends Controller
         $reports = Report::where('is_approved', 1)->orderBy($sortField, $sortOrder)->paginate($recordsPerPage);
         $table_report = view('technician.table-report', compact('reports', 'user'))->render();
 
-        return response()->json(['success' => 'Xóa báo cáo thành công!', 'table_report' => $table_report, 'links' => $reports->render('pagination::bootstrap-5')->toHtml()]);
+        return response()->json(['table_report' => $table_report, 'links' => $reports->render('pagination::bootstrap-5')->toHtml()]);
     }
 }

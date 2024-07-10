@@ -19,8 +19,6 @@
         <div class="col col-1">
             <div class="image-layer">
                 <img src="{{ asset('images/logo-dhtl.png') }}" class="form-image-main logo">
-                <img src="{{ asset('images/cloud.png') }}" class="form-image cloud">
-                <img src="{{ asset('images/stars.png') }}" class="form-image stars">
             </div>
             <p class="featured-words">Hệ thống Quản lý phòng máy tính thực hành<br><span>Đại học Thủy lợi</span></p>
         </div>

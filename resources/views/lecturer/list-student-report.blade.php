@@ -16,6 +16,20 @@
             <div class="d-flex mb-3">
                 <div class="text fs-4">Danh sách báo cáo sự cố của sinh viên lớp học tiếp quản</div>
             </div>
+            <div class="d-flex justify-content-between mb-3">
+                <div class="col-2 d-flex align-items-center">
+                    <select class="form-select me-3 border-black" id="records-per-page" name="records-per-page" style="min-width: 70px;">
+                        <option value="5" selected>5</option>
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="100">100</option>
+                    </select>
+                    <span class="small text-muted fw-bold" style="min-width: 130px;">kết quả mỗi trang</span>
+                </div>
+                <div class="col-2">
+                    <input class="form-control border-black" type="search" placeholder="Tìm kiếm">
+                </div>
+            </div>
             <div class="table-responsive" id="table-report">
                 <table class="table table-bordered border-black">
                     <thead>
@@ -97,6 +111,9 @@
 @section('scripts')
     <script>
         $(document).ready(function() {
+            const currentUrl = new URL(window.location.href);
+            $('#records-per-page').val(currentUrl.searchParams.get('records-per-page') ?? 5);
+
             $.ajaxSetup({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -110,6 +127,7 @@
                     type: 'DELETE',
                     contentType: 'application/json',
                     url: url,
+                    data: JSON.stringify({'records-per-page': $('#records-per-page').val()}),
                     success: function (response) {
                         if (response.success) {
                             showToastSuccess(response.success);
@@ -118,6 +136,9 @@
 
                             const currentUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
                             window.history.pushState({path: currentUrl}, '', currentUrl);
+                            const newUrl = new URL(window.location.href);
+                            newUrl.searchParams.set('records-per-page', $('#records-per-page').val());
+                            history.pushState(null, '', newUrl.toString());
                             updatePagination();
                             addEventForButtons();
                             $('#destroy-student-report-modal-' + reportId).modal('hide');
@@ -148,6 +169,37 @@
                     }
                 });
             }
+
+            $('#records-per-page').change(function() {
+                const overlay = document.getElementById('overlay');
+                overlay.classList.add('show');
+                const recordsPerPage = $(this).val();
+                const currentUrl = new URL(window.location.href);
+                currentUrl.searchParams.set('records-per-page', recordsPerPage);
+                history.pushState(null, '', currentUrl.toString());
+
+                const sortField = currentUrl.searchParams.get('sort-field');
+                const sortOrder = currentUrl.searchParams.get('sort-order');
+                const data = {};
+                if (sortField && sortOrder) {
+                    data['sortField'] = sortField;
+                    data['sortOrder'] = sortOrder;
+                }
+                data['recordsPerPage'] = recordsPerPage;
+
+                $.ajax({
+                    url: `{{ route('lecturer.change-records-per-page-report-api') }}`,
+                    type: 'GET',
+                    data: data,
+                    success: function(response) {
+                        $('#table-report tbody').html(response.table_report);
+                        $('#paginate-report').html(response.links);
+                        updatePagination();
+                        addEventForButtons();
+                        overlay.classList.remove('show');
+                    }
+                });
+            });
 
             function addEventForButtons () {
                 const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
@@ -190,18 +242,27 @@
 
                     const reportId = $(this).data('report-id');
 
+                    const recordsPerPage = $('#records-per-page').val();
+                    const currentUrl = new URL(window.location.href);
+                    const sortField = currentUrl.searchParams.get('sort-field');
+                    const sortOrder = currentUrl.searchParams.get('sort-order');
+                    const data = {};
+                    if (sortField && sortOrder) {
+                        data['sort-field'] = sortField;
+                        data['sort-order'] = sortOrder;
+                    }
+                    data['records-per-page'] = recordsPerPage;
+
                     $.ajax({
                         type: 'PUT',
                         contentType: 'application/json',
                         url: `{{ route("lecturer.approve-report-api", ":reportId") }}`.replace(':reportId', reportId),
+                        data: JSON.stringify(data),
                         success: function (response) {
                             if (response.success) {
                                 showToastSuccess(response.success);
                                 $('#table-report tbody').html(response.table_report);
                                 $('#paginate-report').html(response.links);
-
-                                const currentUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
-                                window.history.pushState({path: currentUrl}, '', currentUrl);
                                 updatePagination();
                                 addEventForButtons();
                             }
@@ -223,18 +284,27 @@
 
                     const reportId = $(this).data('report-id');
 
+                    const recordsPerPage = $('#records-per-page').val();
+                    const currentUrl = new URL(window.location.href);
+                    const sortField = currentUrl.searchParams.get('sort-field');
+                    const sortOrder = currentUrl.searchParams.get('sort-order');
+                    const data = {};
+                    if (sortField && sortOrder) {
+                        data['sort-field'] = sortField;
+                        data['sort-order'] = sortOrder;
+                    }
+                    data['records-per-page'] = recordsPerPage;
+
                     $.ajax({
                         type: 'PUT',
                         contentType: 'application/json',
                         url: `{{ route("lecturer.disapprove-report-api", ":reportId") }}`.replace(':reportId', reportId),
+                        data: JSON.stringify(data),
                         success: function (response) {
                             if (response.success) {
                                 showToastSuccess(response.success);
                                 $('#table-report tbody').html(response.table_report);
                                 $('#paginate-report').html(response.links);
-
-                                const currentUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
-                                window.history.pushState({path: currentUrl}, '', currentUrl);
                                 updatePagination();
                                 addEventForButtons();
                             }
@@ -259,7 +329,7 @@
                     $.ajax({
                         url: `{{ route('lecturer.sort-student-report-api') }}`,
                         type: 'GET',
-                        data: {sortField: field, sortOrder: order},
+                        data: {sortField: field, sortOrder: order, recordsPerPage: $('#records-per-page').val()},
                         success: function(response) {
                             $('#table-report tbody').html(response.table_report);
                             $('#paginate-report').html(response.links);

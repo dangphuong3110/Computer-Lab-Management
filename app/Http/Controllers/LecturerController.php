@@ -206,6 +206,7 @@ class LecturerController extends Controller
     {
         $sortField = $request->input('sort-field', 'submitted_at');
         $sortOrder = $request->input('sort-order', 'desc');
+        $recordsPerPage = $request->input('records-per-page', 5);
 
         $lecturer = $user->lecturer;
 
@@ -230,7 +231,7 @@ class LecturerController extends Controller
         }
 
         $currentPage = LengthAwarePaginator::resolveCurrentPage();
-        $perPage = 5;
+        $perPage = $recordsPerPage;
         $currentItems = $reports->slice(($currentPage * $perPage) - $perPage, $perPage)->all();
         $reports = new LengthAwarePaginator($currentItems, count($reports), $perPage, $currentPage, ['path' => LengthAwarePaginator::resolveCurrentPath()]);
         $table_report = view('lecturer.table-student-report', compact('reports'))->render();
@@ -260,12 +261,13 @@ class LecturerController extends Controller
 
         $sortField = $request->input('sort-field', 'created_at');
         $sortOrder = $request->input('sort-order', 'desc');
+        $recordsPerPage = $request->input('records-per-page', 5);
 
         $class = CreditClass::where('id', $class_id)->first();
         if ($sortField == 'full_name') {
-            $students = $class->students()->orderByRaw("SUBSTRING_INDEX(full_name, ' ', -1) $sortOrder")->paginate(5);
+            $students = $class->students()->orderByRaw("SUBSTRING_INDEX(full_name, ' ', -1) $sortOrder")->paginate($recordsPerPage);
         } else {
-            $students = $class->students()->orderBy($sortField, $sortOrder)->paginate(5);
+            $students = $class->students()->orderBy($sortField, $sortOrder)->paginate($recordsPerPage);
         }
 
         return view('lecturer.list-student-class', compact('title','user', 'students', 'class'));
@@ -345,8 +347,10 @@ class LecturerController extends Controller
 
             $student->creditClasses()->attach($class_id, ['created_at' => now(), 'updated_at' => now()]);
 
+            $recordsPerPage = $request->input('records-per-page', 5);
+
             $class = CreditClass::where('id', $class_id)->first();
-            $students = $class->students()->orderBy('class_student.created_at', 'desc')->paginate(5);
+            $students = $class->students()->orderBy('class_student.created_at', 'desc')->paginate($recordsPerPage);
             $table_student_class = view('lecturer.table-student-class', compact('students', 'class'))->render();
 
             return response()->json(['success' => 'Đã thêm sinh viên vào lớp học!', 'table_student_class' => $table_student_class, 'links' => $students->render('pagination::bootstrap-5')->toHtml()]);
@@ -359,8 +363,9 @@ class LecturerController extends Controller
 
         $student->creditClasses()->detach($request->input('class_id'));
 
+        $recordsPerPage = $request->input('records-per-page', 5);
         $class = CreditClass::where('id', $request->input('class_id'))->first();
-        $students = $class->students()->orderBy('class_student.created_at', 'desc')->paginate(5);
+        $students = $class->students()->orderBy('class_student.created_at', 'desc')->paginate($recordsPerPage);
         $table_student_class = view('lecturer.table-student-class', compact('students', 'class'))->render();
 
         return response()->json(['success' => 'Xóa sinh viên khỏi lớp học phần thành công!', 'table_student_class' => $table_student_class, 'links' => $students->render('pagination::bootstrap-5')->toHtml()]);
@@ -385,8 +390,10 @@ class LecturerController extends Controller
         $import = new StudentClassImport($class_id);
         Excel::import($import, $file);
 
+        $recordsPerPage = $request->input('records-per-page', 5);
+
         $class = CreditClass::where('id', $class_id)->first();
-        $students = $class->students()->orderBy('class_student.created_at', 'desc')->paginate(5);
+        $students = $class->students()->orderBy('class_student.created_at', 'desc')->paginate($recordsPerPage);
         $table_student_class = view('lecturer.table-student-class', compact('students', 'class'))->render();
 
         return response()->json(['success' => 'Nhập file sinh viên vào lớp học phần thành công!', 'table_student_class' => $table_student_class, 'links' => $students->render('pagination::bootstrap-5')->toHtml()]);
@@ -459,12 +466,13 @@ class LecturerController extends Controller
     {
         $sortField = $request->input('sortField', 'created_at');
         $sortOrder = $request->input('sortOrder', 'desc');
+        $recordsPerPage = $request->input('recordsPerPage', 5);
 
         $class = CreditClass::where('id', $request->input('classId'))->first();
         if ($sortField == 'full_name') {
-            $students = $class->students()->orderByRaw("SUBSTRING_INDEX(full_name, ' ', -1) $sortOrder")->paginate(5);
+            $students = $class->students()->orderByRaw("SUBSTRING_INDEX(full_name, ' ', -1) $sortOrder")->paginate($recordsPerPage);
         } else {
-            $students = $class->students()->orderBy($sortField, $sortOrder)->paginate(5);
+            $students = $class->students()->orderBy($sortField, $sortOrder)->paginate($recordsPerPage);
         }
         $table_student_class = view('lecturer.table-student-class', compact('students', 'class'))->render();
 
@@ -475,6 +483,7 @@ class LecturerController extends Controller
     {
         $sortField = $request->input('sortField', 'submitted_at');
         $sortOrder = $request->input('sortOrder', 'desc');
+        $recordsPerPage = $request->input('recordsPerPage', 5);
 
         $user = Auth::user();
         $lecturer = $user->lecturer;
@@ -500,7 +509,63 @@ class LecturerController extends Controller
         }
 
         $currentPage = LengthAwarePaginator::resolveCurrentPage();
-        $perPage = 5;
+        $perPage = $recordsPerPage;
+        $currentItems = $reports->slice(($currentPage * $perPage) - $perPage, $perPage)->all();
+        $reports = new LengthAwarePaginator($currentItems, count($reports), $perPage, $currentPage, ['path' => LengthAwarePaginator::resolveCurrentPath()]);
+        $table_report = view('lecturer.table-student-report', compact('reports'))->render();
+
+        return response()->json(['table_report' => $table_report, 'links' => $reports->render('pagination::bootstrap-5')->toHtml()]);
+    }
+
+    public function changeRecordsPerPageStudentClassAPI(Request $request)
+    {
+        $sortField = $request->input('sortField', 'updated_at');
+        $sortOrder = $request->input('sortOrder', 'desc');
+        $recordsPerPage = $request->input('recordsPerPage', 5);
+
+        $class = CreditClass::where('id', $request->input('classId'))->first();
+        if ($sortField == 'full_name') {
+            $students = $class->students()->orderByRaw("SUBSTRING_INDEX(full_name, ' ', -1) $sortOrder")->paginate($recordsPerPage);
+        } else {
+            $students = $class->students()->orderBy($sortField, $sortOrder)->paginate($recordsPerPage);
+        }
+        $table_student_class = view('lecturer.table-student-class', compact('students', 'class'))->render();
+
+        return response()->json(['table_student_class' => $table_student_class, 'links' => $students->render('pagination::bootstrap-5')->toHtml()]);
+    }
+
+    public function changeRecordsPerPageReportAPI(Request $request)
+    {
+        $sortField = $request->input('sortField', 'created_at');
+        $sortOrder = $request->input('sortOrder', 'desc');
+        $recordsPerPage = $request->input('recordsPerPage', 5);
+
+        $user = Auth::user();
+
+        $lecturer = $user->lecturer;
+
+        $creditClasses = $lecturer->creditClasses()
+            ->where('status', 'active')
+            ->where('start_date', '<=', now())
+            ->where('end_date', '>=', now())
+            ->get();
+
+        $reports = collect();
+
+        foreach ($creditClasses as $creditClass) {
+            $students = $creditClass->students;
+            foreach ($students as $student) {
+                $student_reports = $student->reports()->orderBy($sortField, $sortOrder)->get();
+                foreach ($student_reports as $student_report) {
+                    if (!$reports->contains('id', $student_report->id) && $student_report->status != 'processing' && $student_report->status != 'processed') {
+                        $reports->push($student_report);
+                    }
+                }
+            }
+        }
+
+        $currentPage = LengthAwarePaginator::resolveCurrentPage();
+        $perPage = $recordsPerPage;
         $currentItems = $reports->slice(($currentPage * $perPage) - $perPage, $perPage)->all();
         $reports = new LengthAwarePaginator($currentItems, count($reports), $perPage, $currentPage, ['path' => LengthAwarePaginator::resolveCurrentPath()]);
         $table_report = view('lecturer.table-student-report', compact('reports'))->render();

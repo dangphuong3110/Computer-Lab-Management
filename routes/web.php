@@ -74,6 +74,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/import-student-class-api', [LecturerController::class, 'importStudentClassAPI'])->name('lecturer.import-student-class-api');
         Route::get('/export-attendances/{class}', [LecturerController::class, 'getExportAttendances'])->name('lecturer.export-attendances')->middleware('check.role:lecturer');
         Route::get('/sort-student-class-api', [LecturerController::class, 'sortStudentClassAPI'])->name('lecturer.sort-student-class-api');
+        Route::get('/change-records-per-page-student-class-api', [LecturerController::class, 'changeRecordsPerPageStudentClassAPI'])->name('lecturer.change-records-per-page-student-class-api');
 
         // Report
         Route::get('/get-list-student-report', [LecturerController::class, 'getListStudentReport'])->name('lecturer.get-list-student-report')->middleware('check.role:lecturer');
@@ -81,6 +82,7 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/disapprove-report-api/{report}', [LecturerController::class, 'disapproveReportAPI'])->name('lecturer.disapprove-report-api');
         Route::delete('/delete-report-api/{report}', [LecturerController::class, 'destroyReportAPI'])->name('lecturer.destroy-report-api');
         Route::get('/sort-student-report-api', [LecturerController::class, 'sortStudentReportAPI'])->name('lecturer.sort-student-report-api');
+        Route::get('/change-records-per-page-report-api', [LecturerController::class, 'changeRecordsPerPageReportAPI'])->name('lecturer.change-records-per-page-report-api');
 
         // Personal Info
         Route::get('/get-personal-info', [LecturerController::class, 'getPersonalInfo'])->name('lecturer.get-personal-info')->middleware('check.role:lecturer');

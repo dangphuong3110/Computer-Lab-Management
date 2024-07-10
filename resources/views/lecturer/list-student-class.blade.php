@@ -81,6 +81,20 @@
                     </div>
                 </div>
             </div>
+            <div class="d-flex justify-content-between mb-3">
+                <div class="col-2 d-flex align-items-center">
+                    <select class="form-select me-3 border-black" id="records-per-page" name="records-per-page" style="min-width: 70px;">
+                        <option value="5" selected>5</option>
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="100">100</option>
+                    </select>
+                    <span class="small text-muted fw-bold" style="min-width: 130px;">kết quả mỗi trang</span>
+                </div>
+                <div class="col-2">
+                    <input class="form-control border-black" type="search" placeholder="Tìm kiếm">
+                </div>
+            </div>
             <div class="table-responsive" id="table-student-class">
                 <table class="table table-bordered border-black">
                     <thead>
@@ -149,6 +163,9 @@
 @section('scripts')
     <script>
         $(document).ready(function() {
+            const currentUrl = new URL(window.location.href);
+            $('#records-per-page').val(currentUrl.searchParams.get('records-per-page') ?? 5);
+
             $.ajaxSetup({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -161,6 +178,7 @@
                     formDataObj[$(this).attr('name')] = $(this).val();
                 });
 
+                formDataObj['records-per-page'] = $('#records-per-page').val();
                 formDataObj['class_id'] = '{{ $class->id }}';
 
                 $.ajax({
@@ -177,6 +195,9 @@
 
                             const currentUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
                             window.history.pushState({path: currentUrl}, '', currentUrl);
+                            const newUrl = new URL(window.location.href);
+                            newUrl.searchParams.set('records-per-page', $('#records-per-page').val());
+                            history.pushState(null, '', newUrl.toString());
                             updatePagination();
                             addEventForModalUpdate();
                             addEventForButtons();
@@ -240,6 +261,7 @@
             function submitFormDestroyStudentClass (studentId, overlay) {
                 const formDataObj = {};
 
+                formDataObj['records-per-page'] = $('#records-per-page').val();
                 formDataObj['class_id'] = '{{ $class->id }}';
 
                 let url = `{{ route("lecturer.destroy-student-class-api", ":studentId") }}`;
@@ -257,6 +279,9 @@
 
                             const currentUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
                             window.history.pushState({path: currentUrl}, '', currentUrl);
+                            const newUrl = new URL(window.location.href);
+                            newUrl.searchParams.set('records-per-page', $('#records-per-page').val());
+                            history.pushState(null, '', newUrl.toString());
                             updatePagination();
                             addEventForModalUpdate();
                             addEventForButtons();
@@ -275,6 +300,7 @@
 
             function submitFormImportStudentClass (form, overlay) {
                 const formData = new FormData(form[0]);
+                formData.append('records-per-page', $('#records-per-page').val());
                 formData.append('class_id', '{{ $class->id }}');
                 $.ajax({
                     type: 'POST',
@@ -291,6 +317,9 @@
 
                             const currentUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
                             window.history.pushState({path: currentUrl}, '', currentUrl);
+                            const newUrl = new URL(window.location.href);
+                            newUrl.searchParams.set('records-per-page', $('#records-per-page').val());
+                            history.pushState(null, '', newUrl.toString());
                             updatePagination();
                             addEventForModalUpdate();
                             addEventForButtons();
@@ -357,6 +386,39 @@
                 submitFormImportStudentClass(form, overlay);
             });
 
+            $('#records-per-page').change(function() {
+                const overlay = document.getElementById('overlay');
+                overlay.classList.add('show');
+                const recordsPerPage = $(this).val();
+                const currentUrl = new URL(window.location.href);
+                currentUrl.searchParams.set('records-per-page', recordsPerPage);
+                history.pushState(null, '', currentUrl.toString());
+
+                const sortField = currentUrl.searchParams.get('sort-field');
+                const sortOrder = currentUrl.searchParams.get('sort-order');
+                const data = {};
+                if (sortField && sortOrder) {
+                    data['sortField'] = sortField;
+                    data['sortOrder'] = sortOrder;
+                }
+                data['recordsPerPage'] = recordsPerPage;
+                data['classId'] = {{ $class->id }};
+
+                $.ajax({
+                    url: `{{ route('lecturer.change-records-per-page-student-class-api') }}`,
+                    type: 'GET',
+                    data: data,
+                    success: function(response) {
+                        $('#table-student-class tbody').html(response.table_student_class);
+                        $('#paginate-student-class').html(response.links);
+                        updatePagination();
+                        addEventForModalUpdate();
+                        addEventForButtons();
+                        overlay.classList.remove('show');
+                    }
+                });
+            });
+
             function addEventForButtons () {
                 const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
                 const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
@@ -401,13 +463,10 @@
                     $.ajax({
                         url: `{{ route('lecturer.sort-student-class-api') }}`,
                         type: 'GET',
-                        data: {sortField: field, sortOrder: order, classId: {{ $class->id }}},
+                        data: {sortField: field, sortOrder: order, classId: {{ $class->id }}, recordsPerPage: $('#records-per-page').val()},
                         success: function(response) {
                             $('#table-student-class tbody').html(response.table_student_class);
                             $('#paginate-student-class').html(response.links);
-
-                            const currentUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
-                            window.history.pushState({path: currentUrl}, '', currentUrl);
                             updatePagination();
                             addEventForModalUpdate();
                             addEventForButtons();

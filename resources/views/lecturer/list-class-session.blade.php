@@ -100,6 +100,9 @@
             });
 
             $('.is-class-session').click(function() {
+                const overlay = document.getElementById('overlay');
+                overlay.classList.add('show');
+
                 const classSessionId = $(this).data('class-session-id');
                 const dayOfWeek = $(this).data('day-of-week');
                 const formDataObj = {};
@@ -118,6 +121,7 @@
                                 showToastError(response.errors['class-session']);
                             }
                         }
+                        overlay.classList.remove('show');
                     },
                     error: function(error) {
                         console.error(error);

@@ -51,43 +51,6 @@ body {
     width: 250px;
 }
 
-.form-image {
-    position: absolute;
-    width: 300px;
-}
-
-.form-image.cloud {
-    top: -25%;
-    left: 15%;
-}
-
-.form-image.stars {
-    top: -25%;
-    left: -25%;
-}
-
-/* ===== Form Image Animation ===== */
-.cloud,
-.stars {
-    animation: left-right 2s ease-in-out alternate infinite;
-}
-
-.logo {
-    animation: up-down 2s ease-in-out alternate infinite;
-}
-
-@keyframes left-right {
-    to {
-        transform: translateX(10px);
-    }
-}
-
-@keyframes up-down {
-    to {
-        transform: translateY(10px);
-    }
-}
-
 /* ====== Featured Words ===== */
 .featured-words {
     text-align: center;

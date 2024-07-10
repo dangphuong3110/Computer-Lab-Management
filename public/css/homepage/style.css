@@ -409,12 +409,6 @@ p.note span {
     display: none;
 }
 
-/*.is-class-session:hover {*/
-/*    opacity: 0.85;*/
-/*    background-color: rgba(0, 0, 0, 0.2);*/
-/*    cursor: pointer;*/
-/*}*/
-
 th[data-sort]:hover {
     cursor: pointer;
 }
@@ -430,6 +424,11 @@ td.schedule:hover {
 
 .pagination .page-item .page-link {
     border: 1px solid #000 !important;
+}
+
+.note span,
+.small.text-muted {
+    color: var(--text-color) !important;
 }
 
 /* ===== Notice when reload ===== */

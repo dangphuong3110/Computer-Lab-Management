@@ -277,22 +277,28 @@
 
                     const reportId = $(this).data('report-id');
 
+                    const recordsPerPage = $('#records-per-page').val();
+                    const currentUrl = new URL(window.location.href);
+                    const sortField = currentUrl.searchParams.get('sort-field');
+                    const sortOrder = currentUrl.searchParams.get('sort-order');
+                    const data = {};
+                    if (sortField && sortOrder) {
+                        data['sortField'] = sortField;
+                        data['sortOrder'] = sortOrder;
+                    }
+                    data['recordsPerPage'] = recordsPerPage;
+                    console.log(data);
+
                     $.ajax({
                         type: 'PUT',
                         contentType: 'application/json',
                         url: `{{ route("technician.processing-report-api", ":reportId") }}`.replace(':reportId', reportId),
-                        data: JSON.stringify({'records-per-page': $('#records-per-page').val()}),
+                        data: JSON.stringify(data),
                         success: function (response) {
                             if (response.success) {
                                 showToastSuccess(response.success);
                                 $('#table-report tbody').html(response.table_report);
                                 $('#paginate-report').html(response.links);
-
-                                const currentUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
-                                window.history.pushState({path: currentUrl}, '', currentUrl);
-                                const newUrl = new URL(window.location.href);
-                                newUrl.searchParams.set('records-per-page', $('#records-per-page').val());
-                                history.pushState(null, '', newUrl.toString());
                                 updatePagination();
                                 addEventForButtons();
                             }
@@ -314,22 +320,27 @@
 
                     const reportId = $(this).data('report-id');
 
+                    const recordsPerPage = $('#records-per-page').val();
+                    const currentUrl = new URL(window.location.href);
+                    const sortField = currentUrl.searchParams.get('sort-field');
+                    const sortOrder = currentUrl.searchParams.get('sort-order');
+                    const data = {};
+                    if (sortField && sortOrder) {
+                        data['sortField'] = sortField;
+                        data['sortOrder'] = sortOrder;
+                    }
+                    data['recordsPerPage'] = recordsPerPage;
+
                     $.ajax({
                         type: 'PUT',
                         contentType: 'application/json',
                         url: `{{ route("technician.pending-report-api", ":reportId") }}`.replace(':reportId', reportId),
-                        data: JSON.stringify({'records-per-page': $('#records-per-page').val()}),
+                        data: JSON.stringify(data),
                         success: function (response) {
                             if (response.success) {
                                 showToastSuccess(response.success);
                                 $('#table-report tbody').html(response.table_report);
                                 $('#paginate-report').html(response.links);
-
-                                const currentUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
-                                window.history.pushState({path: currentUrl}, '', currentUrl);
-                                const newUrl = new URL(window.location.href);
-                                newUrl.searchParams.set('records-per-page', $('#records-per-page').val());
-                                history.pushState(null, '', newUrl.toString());
                                 updatePagination();
                                 addEventForButtons();
                             }
@@ -351,22 +362,27 @@
 
                     const reportId = $(this).data('report-id');
 
+                    const recordsPerPage = $('#records-per-page').val();
+                    const currentUrl = new URL(window.location.href);
+                    const sortField = currentUrl.searchParams.get('sort-field');
+                    const sortOrder = currentUrl.searchParams.get('sort-order');
+                    const data = {};
+                    if (sortField && sortOrder) {
+                        data['sortField'] = sortField;
+                        data['sortOrder'] = sortOrder;
+                    }
+                    data['recordsPerPage'] = recordsPerPage;
+
                     $.ajax({
                         type: 'PUT',
                         contentType: 'application/json',
                         url: `{{ route("technician.processed-report-api", ":reportId") }}`.replace(':reportId', reportId),
-                        data: JSON.stringify({'records-per-page': $('#records-per-page').val()}),
+                        data: JSON.stringify(data),
                         success: function (response) {
                             if (response.success) {
                                 showToastSuccess(response.success);
                                 $('#table-report tbody').html(response.table_report);
                                 $('#paginate-report').html(response.links);
-
-                                const currentUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
-                                window.history.pushState({path: currentUrl}, '', currentUrl);
-                                const newUrl = new URL(window.location.href);
-                                newUrl.searchParams.set('records-per-page', $('#records-per-page').val());
-                                history.pushState(null, '', newUrl.toString());
                                 updatePagination();
                                 addEventForButtons();
                             }
