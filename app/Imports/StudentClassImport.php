@@ -52,7 +52,7 @@ class StudentClassImport implements ToCollection, WithHeadingRow
                 $newClass = CreditClass::findOrFail($this->class_id);
                 $newClassSessions = $newClass->classSessions;
                 $studentsCount = $newClass->students()->count();
-                $minRoomCapacity = $newClassSessions->room()->min('capacity');
+                $minRoomCapacity = $newClassSessions->pluck('room.capacity')->min();
 
                 if ($studentsCount == $minRoomCapacity) {
                     continue;
