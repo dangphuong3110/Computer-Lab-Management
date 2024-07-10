@@ -104,6 +104,7 @@ Route::middleware(['auth'])->group(function () {
        Route::post('/import-lecturer-api', [TechnicianController::class, 'importLecturerAPI'])->name('technician.import-lecturer-api');
        Route::get('/sort-lecturer-api', [TechnicianController::class, 'sortLecturerAPI'])->name('technician.sort-lecturer-api');
        Route::get('/change-records-per-page-lecturer-api', [TechnicianController::class, 'changeRecordsPerPageLecturerAPI'])->name('technician.change-records-per-page-lecturer-api');
+       Route::get('/search-lecturer-api', [TechnicianController::class, 'searchLecturerAPI'])->name('technician.search-lecturer-api');
 
        // Student
        Route::get('/get-list-student', [TechnicianController::class, 'getListStudent'])->name('technician.get-list-student')->middleware('check.role:technician');
@@ -116,6 +117,7 @@ Route::middleware(['auth'])->group(function () {
        Route::post('/import-student-api', [TechnicianController::class, 'importStudentAPI'])->name('technician.import-student-api');
        Route::get('/sort-student-api', [TechnicianController::class, 'sortStudentAPI'])->name('technician.sort-student-api');
        Route::get('/change-records-per-page-student-api', [TechnicianController::class, 'changeRecordsPerPageStudentAPI'])->name('technician.change-records-per-page-student-api');
+       Route::get('/search-student-api', [TechnicianController::class, 'searchStudentAPI'])->name('technician.search-student-api');
 
        // Class
        Route::get('/get-list-class', [TechnicianController::class, 'getListClass'])->name('technician.get-list-class')->middleware('check.role:technician');
@@ -134,6 +136,8 @@ Route::middleware(['auth'])->group(function () {
        Route::get('/sort-student-class-api', [TechnicianController::class, 'sortStudentClassAPI'])->name('technician.sort-student-class-api');
        Route::get('/change-records-per-page-class-api', [TechnicianController::class, 'changeRecordsPerPageClassAPI'])->name('technician.change-records-per-page-class-api');
        Route::get('/change-records-per-page-student-class-api', [TechnicianController::class, 'changeRecordsPerPageStudentClassAPI'])->name('technician.change-records-per-page-student-class-api');
+       Route::get('/search-class-api', [TechnicianController::class, 'searchClassAPI'])->name('technician.search-class-api');
+       Route::get('/search-student-class-api', [TechnicianController::class, 'searchStudentClassAPI'])->name('technician.search-student-class-api');
 
        // Lesson
        Route::put('/update-lesson-api', [TechnicianController::class, 'updateLessonAPI'])->name('technician.update-lesson-api');
@@ -169,7 +173,6 @@ Route::middleware(['auth'])->group(function () {
        Route::delete('/delete-report-api/{report}', [TechnicianController::class, 'destroyReportAPI'])->name('technician.destroy-report-api');
        Route::get('/sort-report-api', [TechnicianController::class, 'sortReportAPI'])->name('technician.sort-report-api');
        Route::get('/change-records-per-page-report-api', [TechnicianController::class, 'changeRecordsPerPageReportAPI'])->name('technician.change-records-per-page-report-api');
-
 
        // Personal Info
        Route::get('/get-personal-info', [TechnicianController::class, 'getPersonalInfo'])->name('technician.get-personal-info')->middleware('check.role:technician');

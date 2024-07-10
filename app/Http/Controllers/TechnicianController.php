@@ -1762,4 +1762,159 @@ class TechnicianController extends Controller
 
         return response()->json(['table_report' => $table_report, 'links' => $reports->render('pagination::bootstrap-5')->toHtml()]);
     }
+
+    public function searchLecturerAPI(Request $request)
+    {
+        $sortField = $request->input('sortField', 'lecturers.updated_at');
+        $sortOrder = $request->input('sortOrder', 'desc');
+        $recordsPerPage = $request->input('recordsPerPage', 5);
+        $query = $request->input('query');
+
+        if ($sortField == 'full_name') {
+            $lecturers = Lecturer::join('users', 'lecturers.user_id', '=', 'users.id')
+                ->where('full_name', 'LIKE', "%{$query}%")
+                ->orWhere('faculty', 'LIKE', "%{$query}%")
+                ->orWhere('email', 'LIKE', "%{$query}%")
+                ->orWhere('phone', 'LIKE', "%{$query}%")
+                ->orderByRaw("SUBSTRING_INDEX(full_name, ' ', -1) $sortOrder")
+                ->paginate($recordsPerPage);
+        } else {
+            $lecturers = Lecturer::join('users', 'lecturers.user_id', '=', 'users.id')
+                ->where('full_name', 'LIKE', "%{$query}%")
+                ->orWhere('faculty', 'LIKE', "%{$query}%")
+                ->orWhere('email', 'LIKE', "%{$query}%")
+                ->orWhere('phone', 'LIKE', "%{$query}%")
+                ->orderBy($sortField, $sortOrder)
+                ->paginate($recordsPerPage);
+        }
+
+        $table_lecturer = view('technician.table-lecturer', compact('lecturers'))->render();
+
+        return response()->json(['table_lecturer' => $table_lecturer, 'links' => $lecturers->render('pagination::bootstrap-5')->toHtml()]);
+    }
+
+    public function searchStudentAPI(Request $request)
+    {
+        $sortField = $request->input('sortField', 'students.updated_at');
+        $sortOrder = $request->input('sortOrder', 'desc');
+        $recordsPerPage = $request->input('recordsPerPage', 5);
+        $query = $request->input('query');
+
+        if ($sortField == 'full_name') {
+            $students = Student::join('users', 'students.user_id', '=', 'users.id')
+                ->where('full_name', 'LIKE', "%{$query}%")
+                ->orWhere('student_code', 'LIKE', "%{$query}%")
+                ->orWhere('class', 'LIKE', "%{$query}%")
+                ->orWhere('email', 'LIKE', "%{$query}%")
+                ->orWhere('phone', 'LIKE', "%{$query}%")
+                ->orderByRaw("SUBSTRING_INDEX(full_name, ' ', -1) $sortOrder")
+                ->paginate($recordsPerPage);
+        } else {
+            $students = Student::join('users', 'students.user_id', '=', 'users.id')
+                ->where('full_name', 'LIKE', "%{$query}%")
+                ->orWhere('student_code', 'LIKE', "%{$query}%")
+                ->orWhere('class', 'LIKE', "%{$query}%")
+                ->orWhere('email', 'LIKE', "%{$query}%")
+                ->orWhere('phone', 'LIKE', "%{$query}%")
+                ->orderBy($sortField, $sortOrder)
+                ->paginate($recordsPerPage);
+        }
+
+        $table_student = view('technician.table-student', compact('students'))->render();
+
+        return response()->json(['table_student' => $table_student, 'links' => $students->render('pagination::bootstrap-5')->toHtml()]);
+    }
+
+    public function searchClassAPI(Request $request)
+    {
+        $sortField = $request->input('sortField', 'classes.updated_at');
+        $sortOrder = $request->input('sortOrder', 'desc');
+        $recordsPerPage = $request->input('recordsPerPage', 5);
+        $query = $request->input('query');
+
+        if ($sortField == 'lecturer') {
+            $classes = CreditClass::withCount('classSessions')
+                ->join('lecturers', 'classes.lecturer_id', '=', 'lecturers.id')
+                ->where('classes.name', 'LIKE', "%{$query}%")
+                ->orWhere('lecturers.full_name', 'LIKE', "%{$query}%")
+                ->orderByRaw("SUBSTRING_INDEX(lecturers.full_name, ' ', -1) $sortOrder")
+                ->paginate($recordsPerPage);
+        } else {
+            $classes = CreditClass::withCount('classSessions')
+                ->join('lecturers', 'classes.lecturer_id', '=', 'lecturers.id')
+                ->where('classes.name', 'LIKE', "%{$query}%")
+                ->orWhere('lecturers.full_name', 'LIKE', "%{$query}%")
+                ->orderBy($sortField, $sortOrder)
+                ->paginate($recordsPerPage);
+        }
+
+        $classes->transform(function ($class) {
+            $class->start_date = Carbon::parse($class->start_date)->format('d-m-Y');
+            $class->end_date = Carbon::parse($class->end_date)->format('d-m-Y');
+
+            return $class;
+        });
+
+        $lecturers = Lecturer::all();
+        $buildings = Building::all();
+        $rooms = Room::all();
+        $classSessions = $classes->map(function ($class) {
+            return $class->classSessions;
+        });
+        $lessons = $classSessions->map(function ($sessions) {
+            return $sessions->map(function ($session) {
+                return $session->lessons;
+            });
+        });
+
+        $table_class = view('technician.table-class', compact('classes', 'lecturers', 'buildings', 'rooms'))->render();
+
+        return response()->json([
+            'table_class' => $table_class,
+            'links' => $classes->render('pagination::bootstrap-5')->toHtml(),
+            'class_sessions' => $classSessions,
+            'lessons' => $lessons,
+        ]);
+    }
+
+    public function searchStudentClassAPI(Request $request)
+    {
+        $sortField = $request->input('sortField', 'students.updated_at');
+        $sortOrder = $request->input('sortOrder', 'desc');
+        $recordsPerPage = $request->input('recordsPerPage', 5);
+        $query = $request->input('query');
+
+        $class = CreditClass::where('id', $request->input('classId'))->first();
+        if ($sortField == 'full_name') {
+            $students = Student::select('students.*')
+                ->join('users', 'students.user_id', '=', 'users.id')
+                ->join('class_student', 'students.id', '=', 'class_student.student_id')
+                ->where('class_id', $class->id)
+                ->where('full_name', 'LIKE', "%{$query}%")
+                ->orWhere('student_code', 'LIKE', "%{$query}%")
+                ->orWhere('class', 'LIKE', "%{$query}%")
+                ->orWhere('email', 'LIKE', "%{$query}%")
+                ->orWhere('phone', 'LIKE', "%{$query}%")
+                ->groupBy('students.id')
+                ->orderByRaw("SUBSTRING_INDEX(full_name, ' ', -1) $sortOrder")
+                ->paginate($recordsPerPage);
+        } else {
+            $students = Student::select('students.*')
+                ->join('users', 'students.user_id', '=', 'users.id')
+                ->join('class_student', 'students.id', '=', 'class_student.student_id')
+                ->where('class_id', $class->id)
+                ->where('full_name', 'LIKE', "%{$query}%")
+                ->orWhere('student_code', 'LIKE', "%{$query}%")
+                ->orWhere('class', 'LIKE', "%{$query}%")
+                ->orWhere('email', 'LIKE', "%{$query}%")
+                ->orWhere('phone', 'LIKE', "%{$query}%")
+                ->groupBy('students.id')
+                ->orderBy($sortField, $sortOrder)
+                ->paginate($recordsPerPage);
+        }
+
+        $table_student_class = view('technician.table-student-class', compact('students', 'class'))->render();
+
+        return response()->json(['table_student_class' => $table_student_class, 'links' => $students->render('pagination::bootstrap-5')->toHtml()]);
+    }
 }

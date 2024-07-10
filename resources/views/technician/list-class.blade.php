@@ -192,7 +192,7 @@
             </div>
             <div class="d-flex justify-content-between mb-3">
                 <div class="col-2 d-flex align-items-center">
-                    <select class="form-select me-3 border-black" id="records-per-page" name="records-per-page" style="min-width: 70px;">
+                    <select class="form-select me-3 border-black" id="records-per-page" name="records-per-page" style="min-width: 80px;">
                         <option value="5" selected>5</option>
                         <option value="10">10</option>
                         <option value="25">25</option>
@@ -200,8 +200,9 @@
                     </select>
                     <span class="small text-muted fw-bold" style="min-width: 130px;">kết quả mỗi trang</span>
                 </div>
-                <div class="col-2">
-                    <input class="form-control border-black" type="search" placeholder="Tìm kiếm">
+                <div class="col-5 d-flex align-items-center justify-content-end">
+                    <input class="form-control border-black me-2" type="search" id="search-input" placeholder="Tìm kiếm" style="min-width: 130px; max-width: 160px;">
+                    <button class="btn btn-outline-dark" type="submit" id="search-button"><i class='bx bx-search-alt'></i></button>
                 </div>
             </div>
             <div class="table-responsive" id="table-class">
@@ -211,7 +212,7 @@
                         <th scope="col" class="text-center" width="5%">STT</th>
                         <th scope="col" class="text-center" data-sort="name" width="30%">Lớp học phần <i class="bx bx-sort-alt-2"></i></th>
                         <th scope="col" class="text-center" data-sort="lecturer" width="20%">Giảng viên <i class="bx bx-sort-alt-2"></i></th>
-                        <th scope="col" class="text-center" width="20%">Bắt đầu - kết thúc</th>
+                        <th scope="col" class="text-center" data-sort="start_date" width="20%">Bắt đầu - kết thúc <i class="bx bx-sort-alt-2"></i></th>
                         <th scope="col" class="text-center" data-sort="status" width="15%">Đóng/mở lớp <i class="bx bx-sort-alt-2"></i></th>
                         <th scope="col" class="text-center">Hành động</th>
                     </tr>
@@ -814,6 +815,37 @@
                         addEventForModalUpdate();
                         addEventForButtons();
                         overlay.classList.remove('show');
+                    }
+                });
+            });
+
+            $('#search-button').click(function() {
+                const query = $('#search-input').val();
+                const recordsPerPage = $('#records-per-page').val();
+                const currentUrl = new URL(window.location.href);
+                const sortField = currentUrl.searchParams.get('sort-field');
+                const sortOrder = currentUrl.searchParams.get('sort-order');
+                const data = {};
+                if (sortField && sortOrder) {
+                    data['sortField'] = sortField;
+                    data['sortOrder'] = sortOrder;
+                }
+                data['recordsPerPage'] = recordsPerPage;
+                data['query'] = query;
+
+                $.ajax({
+                    url: `{{ route('technician.search-class-api') }}`,
+                    type: 'GET',
+                    data: data,
+                    success: function(response) {
+                        $('#table-class tbody').html(response.table_class);
+                        $('#paginate-class').html(response.links);
+                        classSessions = response.class_sessions;
+                        lessons = response.lessons;
+
+                        updatePagination();
+                        addEventForModalUpdate();
+                        addEventForButtons();
                     }
                 });
             });

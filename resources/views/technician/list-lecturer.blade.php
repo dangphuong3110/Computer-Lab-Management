@@ -115,7 +115,7 @@
             </div>
             <div class="d-flex justify-content-between mb-3">
                 <div class="col-2 d-flex align-items-center">
-                    <select class="form-select me-3 border-black" id="records-per-page" name="records-per-page" style="min-width: 70px;">
+                    <select class="form-select me-3 border-black" id="records-per-page" name="records-per-page" style="min-width: 80px;">
                         <option value="5" selected>5</option>
                         <option value="10">10</option>
                         <option value="25">25</option>
@@ -123,8 +123,9 @@
                     </select>
                     <span class="small text-muted fw-bold" style="min-width: 130px;">kết quả mỗi trang</span>
                 </div>
-                <div class="col-2">
-                    <input class="form-control border-black" type="search" placeholder="Tìm kiếm">
+                <div class="col-5 d-flex align-items-center justify-content-end">
+                    <input class="form-control border-black me-2" type="search" id="search-input" placeholder="Tìm kiếm" style="min-width: 130px; max-width: 160px;">
+                    <button class="btn btn-outline-dark" type="submit" id="search-button"><i class='bx bx-search-alt'></i></button>
                 </div>
             </div>
             <div class="table-responsive" id="table-lecturer">
@@ -578,6 +579,34 @@
                         addEventForModalUpdate();
                         addEventForButtons();
                         overlay.classList.remove('show');
+                    }
+                });
+            });
+
+            $('#search-button').click(function() {
+                const query = $('#search-input').val();
+                const recordsPerPage = $('#records-per-page').val();
+                const currentUrl = new URL(window.location.href);
+                const sortField = currentUrl.searchParams.get('sort-field');
+                const sortOrder = currentUrl.searchParams.get('sort-order');
+                const data = {};
+                if (sortField && sortOrder) {
+                    data['sortField'] = sortField;
+                    data['sortOrder'] = sortOrder;
+                }
+                data['recordsPerPage'] = recordsPerPage;
+                data['query'] = query;
+
+                $.ajax({
+                    url: `{{ route('technician.search-lecturer-api') }}`,
+                    type: 'GET',
+                    data: data,
+                    success: function(response) {
+                        $('#table-lecturer tbody').html(response.table_lecturer);
+                        $('#paginate-lecturer').html(response.links);
+                        updatePagination();
+                        addEventForModalUpdate();
+                        addEventForButtons();
                     }
                 });
             });
