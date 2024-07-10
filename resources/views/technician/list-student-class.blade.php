@@ -12,7 +12,7 @@
             </nav>
         </div>
     </div>
-    <div class="row p-4 ms-5 me-5 mt-5 mb-0 main-content">
+    <div class="row p-4 ms-5 me-5 mt-5 mb-5 main-content">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <div class="text fs-4">Danh sách sinh viên lớp:<br> {{ $class->name }}</div>
@@ -394,10 +394,20 @@
                 currentUrl.searchParams.set('records-per-page', recordsPerPage);
                 history.pushState(null, '', currentUrl.toString());
 
+                const sortField = currentUrl.searchParams.get('sort-field');
+                const sortOrder = currentUrl.searchParams.get('sort-order');
+                const data = {};
+                if (sortField && sortOrder) {
+                    data['sortField'] = sortField;
+                    data['sortOrder'] = sortOrder;
+                }
+                data['recordsPerPage'] = recordsPerPage;
+                data['classId'] = {{ $class->id }};
+
                 $.ajax({
                     url: `{{ route('technician.change-records-per-page-student-class-api') }}`,
                     type: 'GET',
-                    data: {sortField: currentUrl.searchParams.get('sort-field'), sortOrder: currentUrl.searchParams.get('sort-order'), classId: {{ $class->id }}, recordsPerPage: recordsPerPage},
+                    data: data,
                     success: function(response) {
                         $('#table-student-class tbody').html(response.table_student_class);
                         $('#paginate-student-class').html(response.links);

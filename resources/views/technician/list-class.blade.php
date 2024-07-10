@@ -791,10 +791,19 @@
                 currentUrl.searchParams.set('records-per-page', recordsPerPage);
                 history.pushState(null, '', currentUrl.toString());
 
+                const sortField = currentUrl.searchParams.get('sort-field');
+                const sortOrder = currentUrl.searchParams.get('sort-order');
+                const data = {};
+                if (sortField && sortOrder) {
+                    data['sortField'] = sortField;
+                    data['sortOrder'] = sortOrder;
+                }
+                data['recordsPerPage'] = recordsPerPage;
+
                 $.ajax({
                     url: `{{ route('technician.change-records-per-page-class-api') }}`,
                     type: 'GET',
-                    data: {sortField: currentUrl.searchParams.get('sort-field'), sortOrder: currentUrl.searchParams.get('sort-order'), recordsPerPage: recordsPerPage},
+                    data: data,
                     success: function(response) {
                         $('#table-class tbody').html(response.table_class);
                         $('#paginate-class').html(response.links);

@@ -11,7 +11,7 @@
             </nav>
         </div>
     </div>
-    <div class="row p-4 ms-5 me-5 mt-5 mb-0 main-content">
+    <div class="row p-4 ms-5 me-5 mt-5 mb-5 main-content">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <div class="text fs-4">Danh sách giảng viên</div>
@@ -558,10 +558,19 @@
                 currentUrl.searchParams.set('records-per-page', recordsPerPage);
                 history.pushState(null, '', currentUrl.toString());
 
+                const sortField = currentUrl.searchParams.get('sort-field');
+                const sortOrder = currentUrl.searchParams.get('sort-order');
+                const data = {};
+                if (sortField && sortOrder) {
+                    data['sortField'] = sortField;
+                    data['sortOrder'] = sortOrder;
+                }
+                data['recordsPerPage'] = recordsPerPage;
+
                 $.ajax({
                     url: `{{ route('technician.change-records-per-page-lecturer-api') }}`,
                     type: 'GET',
-                    data: {sortField: currentUrl.searchParams.get('sort-field'), sortOrder: currentUrl.searchParams.get('sort-order'), recordsPerPage: recordsPerPage},
+                    data: data,
                     success: function(response) {
                         $('#table-lecturer tbody').html(response.table_lecturer);
                         $('#paginate-lecturer').html(response.links);
