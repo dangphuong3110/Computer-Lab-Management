@@ -96,8 +96,8 @@ class TechnicianController extends Controller
         });
 
         $lecturers = Lecturer::all();
-        $buildings = Building::all();
-        $rooms = Room::all();
+        $buildings = Building::orderBy('name', 'asc')->get();
+        $rooms = Room::orderBy('name', 'asc')->get();
         $classSessions = $classes->map(function ($class) {
             return $class->classSessions;
         });
@@ -175,7 +175,7 @@ class TechnicianController extends Controller
         $title = 'Nhà thực hành';
         $user = Auth::user();
 
-        $buildings = Building::orderBy('updated_at', 'desc')->get();
+        $buildings = Building::orderBy('name', 'asc')->get();
 
         return view('technician.list-building', compact('title','user', 'buildings'));
     }
@@ -184,7 +184,7 @@ class TechnicianController extends Controller
         $title = 'Phòng máy';
         $user = Auth::user();
 
-        $rooms = Room::where('building_id', $building_id)->orderBy('updated_at', 'desc')->get();
+        $rooms = Room::where('building_id', $building_id)->orderBy('name', 'asc')->get();
 
         return view('technician.list-room', compact('title','user', 'rooms', 'building_id'));
     }
@@ -427,8 +427,8 @@ class TechnicianController extends Controller
                         ->where('day_of_week', $daysOfWeek)
                         ->where('room_id', $room_id);
                 })->whereHas('creditClass', function ($query) use ($startDate, $endDate) {
-                        $query->whereBetween('start_date', [$startDate, $endDate])
-                            ->orWhereBetween('end_date', [$startDate, $endDate]);
+                    $query->whereBetween('start_date', [$startDate, $endDate])
+                        ->orWhereBetween('end_date', [$startDate, $endDate]);
                 })->first();
 
                 if ($conflictingClass) {
@@ -497,8 +497,8 @@ class TechnicianController extends Controller
         });
 
         $lecturers = Lecturer::all();
-        $buildings = Building::all();
-        $rooms = Room::all();
+        $buildings = Building::orderBy('name', 'asc')->get();
+        $rooms = Room::orderBy('name', 'asc')->get();
         $classSessions = $classes->map(function ($class) {
             return $class->classSessions;
         });
@@ -604,7 +604,7 @@ class TechnicianController extends Controller
 
         $building->save();
 
-        $buildings = Building::orderBy('updated_at', 'desc')->get();
+        $buildings = Building::orderBy('name', 'asc')->get();
         $table_building = view('technician.table-building', compact('buildings'))->render();
 
         return response()->json(['success' => 'Thêm nhà thực hành thành công!', 'table_building' => $table_building]);
@@ -636,7 +636,7 @@ class TechnicianController extends Controller
 
         $building_id = $request->input('building_id');
 
-        $rooms = Room::where('building_id', $building_id)->orderBy('updated_at', 'desc')->get();
+        $rooms = Room::where('building_id', $building_id)->orderBy('name', 'asc')->get();
         $table_room = view('technician.table-room', compact('rooms', 'building_id'))->render();
 
         return response()->json(['success' => 'Thêm phòng máy thành công!', 'table_room' => $table_room]);
@@ -968,8 +968,8 @@ class TechnicianController extends Controller
         });
 
         $lecturers = Lecturer::all();
-        $buildings = Building::all();
-        $rooms = Room::all();
+        $buildings = Building::orderBy('name', 'asc')->get();
+        $rooms = Room::orderBy('name', 'asc')->get();
         $classSessions = $classes->map(function ($class) {
             return $class->classSessions;
         });
@@ -1007,8 +1007,8 @@ class TechnicianController extends Controller
 
         $class->save();
 
-        $buildings = Building::all();
-        $rooms = Room::all();
+        $buildings = Building::orderBy('name', 'asc')->get();
+        $rooms = Room::orderBy('name', 'asc')->get();
         $schedule = $this->getSchedule();
         $table_schedule = view('technician.table-schedule', compact('buildings', 'rooms'))->with('schedule', $schedule['schedule'])->with('daysOfWeek', $schedule['daysOfWeek'])->render();
 
@@ -1033,7 +1033,7 @@ class TechnicianController extends Controller
 
         $building->save();
 
-        $buildings = Building::orderBy('updated_at', 'desc')->get();
+        $buildings = Building::orderBy('name', 'asc')->get();
         $table_building = view('technician.table-building', compact('buildings'))->render();
 
         return response()->json(['success' => 'Chỉnh sửa thông tin nhà thực hành thành công!', 'table_building' => $table_building]);
@@ -1070,7 +1070,7 @@ class TechnicianController extends Controller
 
         $building_id = $request->input('building_id');
 
-        $rooms = Room::where('building_id', $building_id)->orderBy('updated_at', 'desc')->get();
+        $rooms = Room::where('building_id', $building_id)->orderBy('name', 'asc')->get();
         $table_room = view('technician.table-room', compact('rooms', 'building_id'))->render();
 
         return response()->json(['success' => 'Chỉnh sửa thông tin phòng máy thành công!', 'table_room' => $table_room]);
@@ -1304,8 +1304,8 @@ class TechnicianController extends Controller
         });
 
         $lecturers = Lecturer::all();
-        $buildings = Building::all();
-        $rooms = Room::all();
+        $buildings = Building::orderBy('name', 'asc')->get();
+        $rooms = Room::orderBy('name', 'asc')->get();
         $classSessions = $classes->map(function ($class) {
             return $class->classSessions;
         });
@@ -1354,7 +1354,7 @@ class TechnicianController extends Controller
 
         $building->delete();
 
-        $buildings = Building::orderBy('updated_at', 'desc')->get();
+        $buildings = Building::orderBy('name', 'asc')->get();
         $table_building = view('technician.table-building', compact('buildings'))->render();
 
         return response()->json(['success' => 'Xóa nhà thực hành thành công!', 'table_building' => $table_building]);
@@ -1372,7 +1372,7 @@ class TechnicianController extends Controller
 
         $building_id = $request->input('building_id');
 
-        $rooms = Room::where('building_id', $building_id)->orderBy('updated_at', 'desc')->get();
+        $rooms = Room::where('building_id', $building_id)->orderBy('name', 'asc')->get();
         $table_room = view('technician.table-room', compact('rooms', 'building_id'))->render();
 
         return response()->json(['success' => 'Xóa phòng máy thành công!', 'table_room' => $table_room]);
@@ -1607,8 +1607,8 @@ class TechnicianController extends Controller
         });
 
         $lecturers = Lecturer::all();
-        $buildings = Building::all();
-        $rooms = Room::all();
+        $buildings = Building::orderBy('name', 'asc')->get();
+        $rooms = Room::orderBy('name', 'asc')->get();
 
         $table_class = view('technician.table-class', compact('classes', 'lecturers', 'buildings', 'rooms'))->render();
 
@@ -1711,8 +1711,8 @@ class TechnicianController extends Controller
         });
 
         $lecturers = Lecturer::all();
-        $buildings = Building::all();
-        $rooms = Room::all();
+        $buildings = Building::orderBy('name', 'asc')->get();
+        $rooms = Room::orderBy('name', 'asc')->get();
         $classSessions = $classes->map(function ($class) {
             return $class->classSessions;
         });
@@ -1856,8 +1856,8 @@ class TechnicianController extends Controller
         });
 
         $lecturers = Lecturer::all();
-        $buildings = Building::all();
-        $rooms = Room::all();
+        $buildings = Building::orderBy('name', 'asc')->get();
+        $rooms = Room::orderBy('name', 'asc')->get();
         $classSessions = $classes->map(function ($class) {
             return $class->classSessions;
         });

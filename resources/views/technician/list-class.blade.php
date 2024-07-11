@@ -405,7 +405,7 @@
             </div>
         </div>
     </div>
-    <div class="row p-4 ms-5 me-5 mb-0 main-content">
+    <div class="row p-4 ms-5 me-5 mb-5 main-content">
         <div class="fs-6 fw-bold mb-3">Thời khóa biểu các lớp học thực hành</div>
         <div class="table-responsive">
             <table class="table table-bordered border-black" id="table-schedule">
@@ -489,6 +489,10 @@
 
             const buildings = @json($buildings);
             const rooms = @json($rooms);
+            const roomDict = {};
+            rooms.forEach(room => {
+                roomDict[room.id] = room;
+            });
             let classSessions = @json($classSessions);
             let lessons = @json($lessons);
 
@@ -571,6 +575,7 @@
                             updatePagination();
                             addEventForModalUpdate();
                             addEventForButtons();
+                            addEventForSelectOption();
                             $('#add-class-modal').modal('hide');
                             $('body').css('overflow', 'auto');
                             $('body').css('padding', '0');
@@ -949,7 +954,7 @@
                                     <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Tòa nhà</label>
                                     <div class="col-md-7">
                                         <select id="building-update-${classId}-${i}" name="building[]" class="form-select form-control fs-6">
-                                            ${buildings.map(building => `<option value="${building.id}" ${building.id == rooms.find(room => room.id === sessionData.room_id).building_id ? 'selected' : ''}>${building.name}</option>`).join('')}
+                                            ${buildings.map(building => `<option value="${building.id}" ${building.id == roomDict[sessionData.room_id].building_id ? 'selected' : ''}>${building.name}</option>`).join('')}
                                         </select>
                                     </div>
                                 </div>
@@ -968,7 +973,7 @@
                                     <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Phòng học</label>
                                     <div class="col-md-7">
                                         <select id="room-update-${classId}-${i}" name="room[]" class="form-select form-control fs-6">
-                                            ${rooms.filter(room => room.building_id == rooms.find(room => room.id === sessionData.room_id).building_id).map(room => `<option value="${room.id}" ${room.id == sessionData.room_id ? 'selected' : ''}>${room.name} (Sức chứa: ${room.capacity})</option>`).join('')}
+                                            ${rooms.filter(room => room.building_id == roomDict[sessionData.room_id].building_id).map(room => `<option value="${room.id}" ${room.id == sessionData.room_id ? 'selected' : ''}>${room.name} (Sức chứa: ${room.capacity})</option>`).join('')}
                                         </select>
                                     </div>
                                 </div>
@@ -1219,7 +1224,7 @@
                                             <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Tòa nhà</label>
                                             <div class="col-md-7">
                                                 <select id="building-update-${classId}-${i}" name="building[]" class="form-select form-control fs-6">
-                                                    ${buildings.map(building => `<option value="${building.id}" ${building.id == rooms.find(room => room.id === sessionData.room_id).building_id ? 'selected' : ''}>${building.name}</option>`).join('')}
+                                                    ${buildings.map(building => `<option value="${building.id}" ${building.id == roomDict[sessionData.room_id].building_id ? 'selected' : ''}>${building.name}</option>`).join('')}
                                                 </select>
                                             </div>
                                         </div>
@@ -1238,7 +1243,7 @@
                                             <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Phòng học</label>
                                             <div class="col-md-7">
                                                 <select id="room-update-${classId}-${i}" name="room[]" class="form-select form-control fs-6">
-                                                    ${rooms.filter(room => room.building_id == rooms.find(room => room.id === sessionData.room_id).building_id).map(room => `<option value="${room.id}" ${room.id == sessionData.room_id ? 'selected' : ''}>${room.name} (Sức chứa: ${room.capacity})</option>`).join('')}
+                                                    ${rooms.filter(room => room.building_id == roomDict[sessionData.room_id].building_id).map(room => `<option value="${room.id}" ${room.id == sessionData.room_id ? 'selected' : ''}>${room.name} (Sức chứa: ${room.capacity})</option>`).join('')}
                                                 </select>
                                             </div>
                                         </div>

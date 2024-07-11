@@ -97,7 +97,7 @@
             </div>
         </div>
     </div>
-    <div class="row ms-5 me-5 mt-0 mb-0">
+    <div class="row ms-5 me-5 mt-0 mb-5">
         <div class="col-md-12 mt-md-0 mt-3 ps-0">
             <div class="card-statistics p-4">
                 <div class="fs-6 fw-bold mb-3">Thời khóa biểu các lớp học thực hành</div>

@@ -115,7 +115,7 @@
     @yield('content')
 </section>
 
-<div id="overlay" class="overlay">
+<div id="overlay" class="overlay show">
     <div class="overlay-content">
         <div class="spinner-border spinner-border-sm" role="status">
             <span class="visually-hidden"></span>
@@ -135,6 +135,10 @@
     function confirmLogout() {
         document.getElementById('logout-form').submit();
     }
+
+    $(document).ready(function() {
+        $('#overlay').removeClass('show');
+    });
 </script>
 @yield('scripts')
 </body>

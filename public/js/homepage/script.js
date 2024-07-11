@@ -1,14 +1,3 @@
-window.addEventListener("beforeunload", function (event) {
-    const overlay = document.getElementById('overlay');
-    overlay.classList.add('show');
-    event.returnValue = '';
-});
-
-window.addEventListener("unload", function (event) {
-    const overlay = document.getElementById('overlay');
-    overlay.classList.remove('show');
-});
-
 const body = document.querySelector('body'),
     sidebar = body.querySelector('.sidebar'),
     toggle = body.querySelector('.toggle'),
