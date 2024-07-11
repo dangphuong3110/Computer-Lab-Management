@@ -12,7 +12,7 @@
             </nav>
         </div>
     </div>
-    <div class="row p-4 ms-5 me-5 mt-5 mb-0 main-content">
+    <div class="row p-4 ms-5 me-5 mt-5 mb-5 main-content">
         <div class="col-12">
             <div class="row d-flex justify-content-between align-items-center mb-3">
                 <div class="text fs-4 col-6">Danh sách phòng máy</div>

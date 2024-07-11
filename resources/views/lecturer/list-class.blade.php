@@ -11,7 +11,7 @@
             </nav>
         </div>
     </div>
-    <div class="row p-4 ms-5 me-5 mt-5 mb-0 main-content">
+    <div class="row p-4 ms-5 me-5 mt-5 mb-5 main-content">
         <div class="col-12">
             <div class="mb-3">
                 <div class="text fs-4">Danh sách lớp học phần tiếp quản</div>
