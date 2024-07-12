@@ -174,8 +174,7 @@
                         } else {
                             if (response.errors['room-name']) {
                                 showToastError(response.errors['room-name']);
-                            }
-                            if (response.errors['capacity']) {
+                            } else if (response.errors['capacity']) {
                                 showToastError(response.errors['capacity']);
                             }
                             $('body').append('<div class="modal-backdrop fade show"></div>');
@@ -212,8 +211,7 @@
                         } else {
                             if (response.errors['room-name']) {
                                 showToastError(response.errors['room-name'])
-                            }
-                            if (response.errors['capacity']) {
+                            } else if (response.errors['capacity']) {
                                 showToastError(response.errors['capacity']);
                             }
                             $('body').append('<div class="modal-backdrop fade show"></div>');

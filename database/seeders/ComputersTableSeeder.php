@@ -13,7 +13,7 @@ class ComputersTableSeeder extends Seeder
      */
     public function run(): void
     {
-        for ($i = 1; $i <= 16; $i++){
+        for ($i = 1; $i <= 14; $i++){
             for ($j = 1; $j <= 40; $j++){
                 $computer = [
                     'position' => $j,

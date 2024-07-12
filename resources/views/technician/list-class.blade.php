@@ -582,14 +582,11 @@
                         } else {
                             if (response.errors['class-name']) {
                                 showToastError(response.errors['class-session']);
-                            }
-                            if (response.errors['start-date']) {
+                            } else if (response.errors['start-date']) {
                                 showToastError(response.errors['start-date']);
-                            }
-                            if (response.errors['end-date']) {
+                            } else if (response.errors['end-date']) {
                                 showToastError(response.errors['end-date']);
-                            }
-                            if (response.errors['class-session']) {
+                            } else if (response.errors['class-session']) {
                                 showToastError(response.errors['class-session'], response.errors['class-id'] ?? '');
                             }
                             $('body').append('<div class="modal-backdrop fade show"></div>');
@@ -647,14 +644,11 @@
                         } else {
                             if (response.errors['class-name']) {
                                 showToastError(response.errors['class-session']);
-                            }
-                            if (response.errors['start-date']) {
+                            } else if (response.errors['start-date']) {
                                 showToastError(response.errors['start-date']);
-                            }
-                            if (response.errors['end-date']) {
+                            } else if (response.errors['end-date']) {
                                 showToastError(response.errors['end-date']);
-                            }
-                            if (response.errors['class-session']) {
+                            } else if (response.errors['class-session']) {
                                 showToastError(response.errors['class-session'], response.errors['class-id'] ?? '');
                             }
                             $('body').append('<div class="modal-backdrop fade show"></div>');

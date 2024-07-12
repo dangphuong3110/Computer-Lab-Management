@@ -228,8 +228,7 @@
                         } else {
                             if (response.errors['new-password']) {
                                 showToastError(response.errors['new-password']);
-                            }
-                            if (response.errors['re-enter-new-password']) {
+                            } else if (response.errors['re-enter-new-password']) {
                                 showToastError(response.errors['re-enter-new-password'])
                             }
                             $('body').append('<div class="modal-backdrop fade show"></div>');

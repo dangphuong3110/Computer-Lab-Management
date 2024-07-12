@@ -262,8 +262,7 @@
                         } else {
                             if (response.errors['full-name']) {
                                 showToastError(response.errors['full-name']);
-                            }
-                            if (response.errors['email']) {
+                            } else if (response.errors['email']) {
                                 showToastError(response.errors['email']);
                             }
                             $('body').append('<div class="modal-backdrop fade show"></div>');
@@ -309,8 +308,7 @@
                         } else {
                             if (response.errors['full-name']) {
                                 showToastError(response.errors['full-name']);
-                            }
-                            if (response.errors['email']) {
+                            } else if (response.errors['email']) {
                                 showToastError(response.errors['email']);
                             }
                             $('body').append('<div class="modal-backdrop fade show"></div>');
@@ -345,8 +343,7 @@
                         } else {
                             if (response.errors['new-password']) {
                                 showToastError(response.errors['new-password']);
-                            }
-                            if (response.errors['re-enter-new-password']) {
+                            } else if (response.errors['re-enter-new-password']) {
                                 showToastError(response.errors['re-enter-new-password'])
                             }
                             $('body').append('<div class="modal-backdrop fade show"></div>');

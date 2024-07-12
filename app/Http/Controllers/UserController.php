@@ -15,19 +15,16 @@ class UserController extends Controller
     public function registerAPI(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'email' => 'required|email|max:255',
-            'password' => 'required|string|min:6',
-            're-enter-password' => 'required|string|min:6|same:password',
+            'email' => 'required|email|unique:users,email|max:255',
+            'password' => 'required|min:6',
+            're-enter-password' => 'required|same:password',
         ], [
             'email.required' => 'Vui lòng nhập địa chỉ email!',
             'email.email' => 'Địa chỉ email không hợp lệ!',
             'email.max' => 'Địa chỉ email không được vượt quá 255 ký tự!',
+            'email.unique' => 'Địa chỉ email đã được sử dụng!',
             'password.required' => 'Vui lòng nhập mật khẩu!',
-            'password.string' => 'Mật khẩu phải là chuỗi!',
             'password.min' => 'Mật khẩu phải chứa ít nhất 6 ký tự!',
-            're-enter-password.required' => 'Vui lòng nhập lại mật khẩu!',
-            're-enter-password.string' => 'Mật khẩu phải là chuỗi!',
-            're-enter-password.min' => 'Mật khẩu phải chứa ít nhất 6 ký tự!',
             're-enter-password.same' => 'Mật khẩu nhập lại không khớp!',
         ]);
 

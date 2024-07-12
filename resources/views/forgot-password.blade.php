@@ -95,13 +95,8 @@
                     } else {
                         if (response.errors['new-password']) {
                             showToastError(response.errors['new-password']);
-                        }
-                        if (response.errors['re-enter-new-password']) {
+                        } else if (response.errors['re-enter-new-password']) {
                             showToastError(response.errors['re-enter-new-password']);
-                        }
-                        if (response.errors['is_verified']) {
-                            showToastError(response.errors['is_verified']);
-                            $('#verification-email').modal('show');
                         }
                         overlay.classList.remove('show');
                     }

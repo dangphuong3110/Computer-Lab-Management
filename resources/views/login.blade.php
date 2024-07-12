@@ -20,7 +20,7 @@
             <div class="image-layer">
                 <img src="{{ asset('images/logo-dhtl.png') }}" class="form-image-main logo">
             </div>
-            <p class="featured-words">Hệ thống Quản lý phòng máy tính thực hành<br><span>Đại học Thủy lợi</span></p>
+            <p class="featured-words">Hệ thống Quản lý phòng thực hành máy tính<br><span>Đại học Thủy lợi</span></p>
         </div>
         <div class="col col-2">
             <div class="btn-box">
@@ -211,11 +211,9 @@
                     } else {
                         if (response.errors['email']) {
                             showToastError(response.errors['email']);
-                        }
-                        if (response.errors['password']) {
+                        } else if (response.errors['password']) {
                             showToastError(response.errors['password']);
-                        }
-                        if (response.errors['re-enter-password']) {
+                        } else if (response.errors['re-enter-password']) {
                             showToastError(response.errors['re-enter-password']);
                         }
                     }

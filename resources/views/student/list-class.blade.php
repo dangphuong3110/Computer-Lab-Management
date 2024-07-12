@@ -114,8 +114,7 @@
                         } else {
                             if (response.errors['class-code']) {
                                 showToastError(response.errors['class-code']);
-                            }
-                            if (response.errors['student-class']) {
+                            } else if (response.errors['student-class']) {
                                 showToastError(response.errors['student-class']);
                             }
                             $('body').append('<div class="modal-backdrop fade show"></div>');
