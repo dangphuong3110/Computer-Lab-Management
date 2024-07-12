@@ -14,6 +14,8 @@
     --toggle-color: #DDD;
     --text-color: #707070;
     --text-day-inactive: #c9c9c9;
+    --table-color: #FFF;
+    --primary-text-color: #000;
 
     /* ===== Transition ===== */
     --tran-01: all 0.1s ease;
@@ -37,6 +39,8 @@ body.dark {
     --toggle-color: #FFF;
     --text-color: #CCC;
     --text-day-inactive: #818181;
+    --table-color: #3A3B3C;
+    --primary-text-color: #CCC;
 }
 
 /* ===== Sidebar ===== */
@@ -354,8 +358,37 @@ body.dark .switch::before {
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
 }
 
+.card {
+    background: var(--table-color) !important;
+}
+
+.modal-content {
+    background: var(--sidebar-color) !important;
+}
+
+.modal-content h1,
+.modal-content label,
+.modal-content p,
+.card h5,
+.card h6,
+.card-statistics div,
+#table-personal-info label {
+    color: var(--primary-text-color);
+}
+
+.pagination .page-item .page-link {
+    color: var(--primary-text-color);
+    background: var(--sidebar-color);
+}
+
+.pagination .page-item.active .page-link {
+    color: #FFF;
+    background: #0D6EFD;
+}
+
 .card-statistics {
-    background: #FFF;
+    /* background: #FFF; */
+    background: var(--sidebar-color);
     border-radius: 16px;
     box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1);
 }
@@ -368,7 +401,7 @@ span.required {
 
 p.attention {
     font-style: italic;
-    color: red;
+    color: red !important;
 }
 
 p.attention span {
@@ -429,6 +462,32 @@ td.schedule:hover {
 .note span,
 .small.text-muted {
     color: var(--text-color) !important;
+}
+
+.table > :not(caption) > * > *:not(.schedule),
+input:not(.status-class),
+select,
+textarea {
+    color: var(--primary-text-color) !important;
+    background: var(--table-color) !important;
+}
+
+select {
+    background-image: var(--bs-form-select-bg-img), var(--bs-form-select-bg-icon, none) !important;
+    background-repeat: no-repeat !important;
+    background-position: right .75rem center !important;
+    background-size: 16px 12px !important;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+table .schedule {
+    color: #000;
+}
+
+#search-button {
+    border: 1px solid #000 !important;
 }
 
 /* ===== Notice when reload ===== */

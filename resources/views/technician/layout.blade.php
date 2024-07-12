@@ -1,3 +1,10 @@
+<?php
+    $theme = '';
+    if (!empty($_COOKIE['theme']) && $_COOKIE['theme'] == 'dark') {
+        $theme = 'dark';
+    }
+?>
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -18,7 +25,7 @@
     <link rel="stylesheet" href="{{ asset('css/homepage/style.css') }}">
     @yield('css')
 </head>
-<body>
+<body class="{{ $theme }}">
 <nav class="sidebar close">
     <header>
         <div class="image-text">

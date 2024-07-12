@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Jobs\SendResetPassword;
 use App\Jobs\SendVerificationEmail;
+use App\Models\Lecturer;
+use App\Models\Student;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -15,14 +17,13 @@ class UserController extends Controller
     public function registerAPI(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'email' => 'required|email|unique:users,email|max:255',
+            'email' => 'required|email|max:255',
             'password' => 'required|min:6',
             're-enter-password' => 'required|same:password',
         ], [
             'email.required' => 'Vui lòng nhập địa chỉ email!',
             'email.email' => 'Địa chỉ email không hợp lệ!',
             'email.max' => 'Địa chỉ email không được vượt quá 255 ký tự!',
-            'email.unique' => 'Địa chỉ email đã được sử dụng!',
             'password.required' => 'Vui lòng nhập mật khẩu!',
             'password.min' => 'Mật khẩu phải chứa ít nhất 6 ký tự!',
             're-enter-password.same' => 'Mật khẩu nhập lại không khớp!',
@@ -36,26 +37,36 @@ class UserController extends Controller
         $user = User::where('email', $email)->get()->first();
 
         if (!$user) {
-            $user = new User();
-            $user->email = $email;
-            $user->password = Hash::make($request->input('password'));
-            $user->verification_code = mt_rand(100000, 999999);
+            $newUser = new User();
+            $newUser->email = $email;
+            $newUser->password = Hash::make($request->input('password'));
+            $newUser->verification_code = mt_rand(100000, 999999);
 
             if (str_contains($email, '@tlu.edu.vn')) {
-                $user->role_id = 4;
+                $newUser->role_id = 4;
+                $newUser->save();
+
+                $lecturer = new Lecturer();
+                $lecturer->full_name = '';
+                $lecturer->user_id = $newUser->id;
+                $lecturer->save();
             } else if (str_contains($email, '@e.tlu.edu.vn')) {
-                $user->role_id = 3;
+                $newUser->role_id = 3;
+                $newUser->save();
+
+                $student = new Student();
+                $student->full_name = '';
+                $student->user_id = $newUser->id;
+                $student->student_code = explode('@', $email)[0];
+                $student->save();
             } else {
                 return response()->json(['errors' => ['email' => "Phải sử dụng Email nhà trường đã cung cấp!"]]);
             }
 
-            $user->save();
-
-            SendVerificationEmail::dispatch($user);
-
+            SendVerificationEmail::dispatch($newUser);
         } else {
             if ($user->is_verified) {
-                return response()->json(['errors' => ['email' => "Email đã được sử dụng!"]]);
+                return response()->json(['errors' => ['email' => "Địa chỉ email đã được sử dụng!"]]);
             } else {
                 $user->password = Hash::make($request->input('password'));
                 $user->verification_code = mt_rand(100000, 999999);

@@ -1,3 +1,24 @@
+// window.addEventListener("beforeunload", function (event) {
+//     const overlay = document.getElementById('overlay');
+//     overlay.classList.add('show');
+//     event.returnValue = '';
+// });
+
+// window.addEventListener("unload", function (event) {
+//     const overlay = document.getElementById('overlay');
+//     overlay.classList.remove('show');
+// });
+
+// document.addEventListener('DOMContentLoaded', function () {
+//     const overlay = document.getElementById('overlay');
+//     overlay.classList.add('show');
+
+//     // Hide the overlay after 1 second
+//     setTimeout(function () {
+//         overlay.classList.remove('show');
+//     }, 1000);  // 1 second delay
+// });
+
 const body = document.querySelector('body'),
     sidebar = body.querySelector('.sidebar'),
     toggle = body.querySelector('.toggle'),
@@ -41,14 +62,12 @@ navLinks.forEach(navLink => {
 
 window.addEventListener('load', () => {
     if (localStorage.getItem('darkMode') === 'enabled') {
-        body.classList.add('dark');
         if (searchBtn) {
             searchBtn.classList.remove('btn-outline-dark');
             searchBtn.classList.add('btn-outline-light');
         }
         modeText.innerText = "Chế độ sáng";
     } else {
-        body.classList.remove('dark');
         if (searchBtn) {
             searchBtn.classList.remove('btn-outline-light');
             searchBtn.classList.add('btn-outline-dark');
@@ -60,7 +79,9 @@ window.addEventListener('load', () => {
 modeSwitch.addEventListener("click", () => {
     body.classList.toggle('dark');
 
-    if(body.classList.contains('dark')){
+    let theme = 'light';
+    if (body.classList.contains('dark')) {
+        theme = 'dark';
         localStorage.setItem('darkMode', 'enabled');
         if (searchBtn) {
             searchBtn.classList.remove('btn-outline-dark');
@@ -76,4 +97,6 @@ modeSwitch.addEventListener("click", () => {
         }
         modeText.innerText = "Chế độ tối";
     }
+
+    document.cookie = "theme=" + theme;
 });
