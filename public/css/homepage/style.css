@@ -146,9 +146,10 @@ header .image-text .header-text {
 
 .header-text .name {
     margin-top: -2px;
-    white-space: normal;
-    word-wrap: break-word;
     width: 165px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .sidebar header .toggle {
@@ -474,6 +475,11 @@ select,
 textarea {
     color: var(--primary-text-color) !important;
     background: var(--table-color) !important;
+}
+
+input:disabled {
+    background-color: #EEE !important;
+    color: #333333 !important;
 }
 
 select {

@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Building;
 use App\Models\Computer;
 use App\Models\CreditClass;
-use App\Models\Lecturer;
+use App\Models\Manager;
 use App\Models\Report;
 use App\Models\Room;
 use App\Models\Statistic;
@@ -459,5 +459,43 @@ class ManagerController extends Controller
             $technician->avg_processing_time = $avgTime;
         }
         return $technicians;
+    }
+
+    public function getPersonalInfo()
+    {
+        $title = 'Thông tin cá nhân';
+
+        $user = Auth::user();
+
+        return view('manager.personal-info', compact('title', 'user'));
+    }
+
+    public function updatePersonalInfoAPI(Request $request, string $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'full-name' => 'required|max:255',
+        ], [
+            'full-name.required' => 'Vui lòng nhập họ và tên!',
+            'full-name.max' => 'Họ và tên không được vượt quá 255 ký tự!',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()]);
+        }
+
+        $manager = Manager::findOrFail($id);
+
+        $user = $manager->user;
+        $user->phone = $request->input('phone');
+
+        $user->save();
+
+        $manager->full_name = $request->input('full-name');
+
+        $manager->save();
+
+        $table_personal_info = view('manager.table-personal-info', compact('user'))->render();
+
+        return response()->json(['success' => 'Cập nhật thông tin cá nhân thành công!', 'table_personal_info' => $table_personal_info]);
     }
 }

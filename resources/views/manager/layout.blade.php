@@ -59,6 +59,12 @@
                         <span class="text nav-text">Quản lý tài khoản</span>
                     </a>
                 </li>
+                <li class="nav-link {{ request()->routeIs('manager.get-personal-info') ? 'active' : '' }}">
+                    <a href="{{ route('manager.get-personal-info') }}">
+                        <i class='bx bxs-user-detail icon'></i>
+                        <span class="text nav-text">Thông tin cá nhân</span>
+                    </a>
+                </li>
             </ul>
         </div>
 

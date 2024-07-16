@@ -45,6 +45,11 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/sort-technician-api', [ManagerController::class, 'sortTechnicianAPI'])->name('manager.sort-technician-api');
         Route::get('/change-records-per-page-technician-api', [ManagerController::class, 'changeRecordsPerPageTechnicianAPI'])->name('manager.change-records-per-page-technician-api');
         Route::get('/search-technician-api', [ManagerController::class, 'searchTechnicianAPI'])->name('manager.search-technician-api');
+
+        // Personal Info
+        Route::get('/get-personal-info', [ManagerController::class, 'getPersonalInfo'])->name('manager.get-personal-info')->middleware('check.role:manager');
+        Route::put('/update-personal-info-api/{manager}', [ManagerController::class, 'updatePersonalInfoAPI'])->name('manager.update-personal-info-api');
+        Route::put('/update-password-api/{user}', [UserController::class, 'updatePasswordAPI'])->name('manager.update-password-api');
     });
     Route::prefix('/technician')->group(function () {
         Route::get('/', [TechnicianController::class, 'index'])->name('technician.index')->middleware('check.role:technician');
