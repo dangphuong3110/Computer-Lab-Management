@@ -61,42 +61,29 @@ navLinks.forEach(navLink => {
 });
 
 window.addEventListener('load', () => {
-    if (localStorage.getItem('darkMode') === 'enabled') {
-        if (searchBtn) {
-            searchBtn.classList.remove('btn-outline-dark');
-            searchBtn.classList.add('btn-outline-light');
-        }
-        modeText.innerText = "Chế độ sáng";
-    } else {
-        if (searchBtn) {
-            searchBtn.classList.remove('btn-outline-light');
-            searchBtn.classList.add('btn-outline-dark');
-        }
-        modeText.innerText = "Chế độ tối";
+    const isDarkMode = localStorage.getItem('darkMode') === 'enabled';
+
+    body.classList.toggle('dark', isDarkMode);
+
+    if (searchBtn) {
+        searchBtn.classList.toggle('btn-outline-dark', !isDarkMode);
+        searchBtn.classList.toggle('btn-outline-light', isDarkMode);
     }
+
+    modeText.innerText = isDarkMode ? "Chế độ sáng" : "Chế độ tối";
 });
 
 modeSwitch.addEventListener("click", () => {
     body.classList.toggle('dark');
+    const isDarkMode = body.classList.contains('dark');
 
-    let theme = 'light';
-    if (body.classList.contains('dark')) {
-        theme = 'dark';
-        localStorage.setItem('darkMode', 'enabled');
-        if (searchBtn) {
-            searchBtn.classList.remove('btn-outline-dark');
-            searchBtn.classList.add('btn-outline-light');
-        }
-        modeText.innerText = "Chế độ sáng";
-    }
-    else {
-        localStorage.setItem('darkMode', 'disabled');
-        if (searchBtn) {
-            searchBtn.classList.remove('btn-outline-light');
-            searchBtn.classList.add('btn-outline-dark');
-        }
-        modeText.innerText = "Chế độ tối";
+    localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
+    document.cookie = `theme=${isDarkMode ? 'dark' : 'light'}; path=/`;
+
+    if (searchBtn) {
+        searchBtn.classList.toggle('btn-outline-dark', !isDarkMode);
+        searchBtn.classList.toggle('btn-outline-light', isDarkMode);
     }
 
-    document.cookie = "theme=" + theme;
+    modeText.innerText = isDarkMode ? "Chế độ sáng" : "Chế độ tối";
 });
