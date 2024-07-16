@@ -16,6 +16,8 @@
     --text-day-inactive: #c9c9c9;
     --table-color: #FFF;
     --primary-text-color: #000;
+    --search-button-color: #000;
+    --search-button-hover-color: #FFF;
 
     /* ===== Transition ===== */
     --tran-01: all 0.1s ease;
@@ -41,6 +43,8 @@ body.dark {
     --text-day-inactive: #818181;
     --table-color: #3A3B3C;
     --primary-text-color: #CCC;
+    --search-button-color: #FFF;
+    --search-button-hover-color: #000;
 }
 
 /* ===== Sidebar ===== */
@@ -487,10 +491,15 @@ table .schedule {
 }
 
 #search-button {
+    color: var(--search-button-color);
     border: 1px solid #000 !important;
 }
 
-/* ===== Notice when reload ===== */
+#search-button:hover {
+    color: var(--search-button-hover-color);
+}
+
+    /* ===== Notice when reload ===== */
 .overlay {
     display: none;
     position: fixed;
