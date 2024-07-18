@@ -158,6 +158,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/sort-student-class-api', [LecturerController::class, 'sortStudentClassAPI'])->name('lecturer.sort-student-class-api');
         Route::get('/change-records-per-page-student-class-api', [LecturerController::class, 'changeRecordsPerPageStudentClassAPI'])->name('lecturer.change-records-per-page-student-class-api');
         Route::get('/search-student-class-api', [LecturerController::class, 'searchStudentClassAPI'])->name('lecturer.search-student-class-api');
+        Route::post('/update-class-code-api/{class}', [LecturerController::class, 'updateClassCodeAPI'])->name('lecturer.update-class-code-api');
 
         // Report
         Route::get('/get-list-student-report', [LecturerController::class, 'getListStudentReport'])->name('lecturer.get-list-student-report')->middleware('check.role:lecturer');

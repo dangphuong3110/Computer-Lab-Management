@@ -152,7 +152,7 @@
                     </div>
                     <a href="#" class="btn btn-outline-success ms-2" data-bs-toggle="modal" data-bs-target="#update-lesson-modal">Sửa tiết học</a>
                     <!----- Modal sửa tiết học ----->
-                    <div class="modal fade" id="update-lesson-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="updateLessonModalLabel" aria-hidden="true">
+                    <div class="modal fade modal-update" id="update-lesson-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="updateLessonModalLabel" aria-hidden="true">
                         <div class="modal-dialog modal-xl modal-dialog-centered">
                             <div class="modal-content">
                                 <div class="modal-header">
@@ -169,9 +169,9 @@
                                                             <div class="row mb-3 mt-4">
                                                                 <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Tiết học {{ $index + 1 }}:</label>
                                                                 <div class="col-md-7 text-center">
-                                                                    <input type="time" name="start-lesson[]" value="{{ \Carbon\Carbon::parse($lesson->start_time)->format('H:i') }}" class="form-control fs-6 text-center"/>
+                                                                    <input type="time" name="start-lesson[]" value="{{ \Carbon\Carbon::parse($lesson->start_time)->format('H:i') }}" class="form-control fs-6 text-center" data-initial-value="{{ \Carbon\Carbon::parse($lesson->start_time)->format('H:i') }}"/>
                                                                     <i class='bx bx-down-arrow-alt'></i>
-                                                                    <input type="time" name="end-lesson[]"  value="{{ \Carbon\Carbon::parse($lesson->end_time)->format('H:i') }}" class="form-control fs-6 text-center"/>
+                                                                    <input type="time" name="end-lesson[]"  value="{{ \Carbon\Carbon::parse($lesson->end_time)->format('H:i') }}" class="form-control fs-6 text-center" data-initial-value="{{ \Carbon\Carbon::parse($lesson->end_time)->format('H:i') }}"/>
                                                                 </div>
                                                             </div>
                                                         @endforeach

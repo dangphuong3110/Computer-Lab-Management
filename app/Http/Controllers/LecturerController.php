@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exports\AttendancesExport;
 use App\Imports\StudentClassImport;
+use App\Jobs\UpdateClassCode;
 use App\Models\Attendance;
 use App\Models\Building;
 use App\Models\ClassSession;
@@ -360,8 +361,15 @@ class LecturerController extends Controller
     public function destroyStudentClassAPI(Request $request, string $student_id)
     {
         $student = Student::findOrFail($student_id);
+        $class_id = $request->input('class_id');
 
-        $student->creditClasses()->detach($request->input('class_id'));
+        $classSessions = CreditClass::findOrFail($class_id)->classSessions;
+
+        foreach ($classSessions as $classSession) {
+            Attendance::where('student_id', $student_id)->where('session_id', $classSession->id)->delete();
+        }
+
+        $student->creditClasses()->detach($class_id);
 
         $recordsPerPage = $request->input('records-per-page', 5);
         $class = CreditClass::where('id', $request->input('class_id'))->first();
@@ -612,5 +620,11 @@ class LecturerController extends Controller
         $table_student_class = view('lecturer.table-student-class', compact('students', 'class'))->render();
 
         return response()->json(['table_student_class' => $table_student_class, 'links' => $students->render('pagination::bootstrap-5')->toHtml()]);
+    }
+
+    public function updateClassCodeAPI(string $class_id)
+    {
+        $class = CreditClass::findOrFail($class_id);
+        UpdateClassCode::dispatch($class)->delay(now()->addMinutes(15));
     }
 }

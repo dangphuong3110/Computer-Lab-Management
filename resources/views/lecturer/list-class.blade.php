@@ -44,7 +44,7 @@
                                             <a href="{{ route('lecturer.export-attendances', $class->id) }}" class="btn btn-sm btn-primary my-auto btn-export-attendances"><i class='bx bxs-file-export'></i></a>
                                         </div>
                                         <div class="wrap-button m-1" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Sao chép mã vào lớp">
-                                            <a href="#" class="btn btn-sm btn-secondary my-auto btn-student-class btn-copy-class-code" data-class-code="{{ $class->class_code }}"><i class='bx bx-log-in-circle'></i></a>
+                                            <a href="#" class="btn btn-sm btn-secondary my-auto btn-student-class btn-copy-class-code" data-class-code="{{ $class->class_code }}" data-class-id="{{ $class->id }}"><i class='bx bx-log-in-circle'></i></a>
                                         </div>
                                     </div>
                                 </td>
@@ -67,6 +67,12 @@
 @section('scripts')
     <script>
         $(document).ready(function() {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+
             function addEventForButtons() {
                 const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
                 const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
@@ -81,11 +87,19 @@
                 });
 
                 $('.btn-copy-class-code').off('click').click(function() {
+                    const classId = $(this).data('class-id');
                     const classCode = $(this).data('class-code');
                     navigator.clipboard.writeText(classCode).then(function() {
-                        showToastSuccess('Sao chép mã vào lớp thành công');
+                        showToastSuccess('Sao chép mã vào lớp thành công! Mã có hiệu lực trong vòng 10 phút.');
+
+                        let url = `{{ route("lecturer.update-class-code-api", ":classId") }}`;
+                        url = url.replace(':classId', classId);
+                        $.ajax({
+                            type: 'POST',
+                            url: url,
+                        });
                     }, function() {
-                        showToastError('Sao chép mã vào lớp thất bại');
+                        showToastError('Sao chép mã vào lớp thất bại!');
                     });
                     $('[data-bs-toggle="tooltip"]').tooltip('hide');
                 });

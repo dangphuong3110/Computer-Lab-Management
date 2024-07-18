@@ -14,6 +14,15 @@ class CreditClass extends Model
 
     protected $table = 'classes';
 
+    protected $fillable = [
+        'name',
+        'class_code',
+        'lecturer_id',
+        'status',
+        'start_date',
+        'end_date',
+    ];
+
     public function students()
     {
         return $this->belongsToMany(Student::class, 'class_student', 'class_id', 'student_id');
