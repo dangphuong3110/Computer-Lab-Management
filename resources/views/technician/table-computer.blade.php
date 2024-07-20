@@ -9,7 +9,7 @@
                 <div class="dropdown-center border border-black {{ $computerAtPosition->status == 'available' ? 'bg-info' : 'bg-danger' }} bg-opacity-50" style="width: 6.67%; height: 100px;">
                     <a href="#" class="dropdown-toggle position-relative" data-bs-toggle="dropdown">{{ $i }}</a>
                     <!----- Modal sửa máy tính ----->
-                    <div class="modal fade modal-update" id="update-computer-modal-{{ $computerAtPosition->id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addComputerModalLabel" aria-hidden="true">
+                    <div class="modal fade modal-update" id="update-computer-modal-{{ $computerAtPosition->id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="updateComputerModalLabel" aria-hidden="true">
                         <div class="modal-dialog modal-dialog-centered">
                             <div class="modal-content">
                                 <div class="modal-header">
@@ -67,11 +67,55 @@
                             </div>
                         </div>
                     </form>
+                    <!----- Modal xem lịch sử sử dụng máy tính ----->
+                    <div class="modal fade modal-update" id="search-usage-info-modal-{{ $computerAtPosition->id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="searchUsageInfoModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-xl">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h1 class="modal-title fs-5" id="exampleModalLabel">Lịch sử sử dụng máy tính</h1>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                            <tr>
+                                                <th scope="col" class="text-center">STT</th>
+                                                <th scope="col" class="text-center">Họ và tên</th>
+                                                <th scope="col" class="text-center">Mã sinh viên</th>
+                                                <th scope="col" class="text-center">Ngày sử dụng</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            @if(count($computerAtPosition->attendances) > 0)
+                                                @foreach ($computerAtPosition->attendances as $key => $attendance)
+                                                    <tr>
+                                                        <td class="text-center">{{ $key + 1 }}</td>
+                                                        <td class="text-center">{{ $attendance->student->full_name }}</td>
+                                                        <td class="text-center">{{ $attendance->student->student_code }}</td>
+                                                        <td class="text-center">{{ \Carbon\Carbon::parse($attendance->attendance_date)->format('d-m-Y') }}</td>
+                                                    </tr>
+                                                @endforeach
+                                            @else
+                                                <tr>
+                                                    <td colspan="4" class="text-center">Không có dữ liệu sử dụng.</td>
+                                                </tr>
+                                            @endif
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary close-update-btn" data-bs-dismiss="modal">Đóng</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#update-computer-modal-{{ $computerAtPosition->id }}">Sửa</a></li>
                         <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#destroy-computer-modal-{{ $computerAtPosition->id }}">Xóa</a></li>
                         <li><a class="dropdown-item btn-start-maintenance {{ $computerAtPosition->status == 'available' ? '' : 'd-none' }}" data-computer-id="{{ $computerAtPosition->id }}" href="#">Bảo trì</a></li>
                         <li><a class="dropdown-item btn-end-maintenance {{ $computerAtPosition->status == 'available' ? 'd-none' : '' }}" data-computer-id="{{ $computerAtPosition->id }}" href="#">Kết thúc bảo trì</a></li>
+                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#search-usage-info-modal-{{ $computerAtPosition->id }}">Lịch sử sử dụng</a></li>
                     </ul>
                 </div>
             @else
