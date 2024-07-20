@@ -97,6 +97,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/change-records-per-page-student-class-api', [TechnicianController::class, 'changeRecordsPerPageStudentClassAPI'])->name('technician.change-records-per-page-student-class-api');
         Route::get('/search-class-api', [TechnicianController::class, 'searchClassAPI'])->name('technician.search-class-api');
         Route::get('/search-student-class-api', [TechnicianController::class, 'searchStudentClassAPI'])->name('technician.search-student-class-api');
+        Route::get('/get-class-session-info-api', [TechnicianController::class, 'getClassSessionInfoAPI'])->name('technician.get-class-session-info-api');
 
         // Lesson
         Route::put('/update-lesson-api', [TechnicianController::class, 'updateLessonAPI'])->name('technician.update-lesson-api');

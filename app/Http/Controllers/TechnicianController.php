@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Imports\LecturersImport;
 use App\Imports\StudentClassImport;
 use App\Imports\StudentsImport;
+use App\Models\Attendance;
 use App\Models\Building;
 use App\Models\ClassSession;
 use App\Models\Computer;
@@ -91,6 +92,7 @@ class TechnicianController extends Controller
         $classes->transform(function ($class) {
             $class->start_date = Carbon::parse($class->start_date)->format('d-m-Y');
             $class->end_date = Carbon::parse($class->end_date)->format('d-m-Y');
+            $class->classInfo = $this->searchSessionsInfo($class);
 
             return $class;
         });
@@ -111,9 +113,71 @@ class TechnicianController extends Controller
 
         // Schedule
         $schedule = $this->getSchedule();
+        $classes_schedule = CreditClass::all();
+        $classes_schedule->transform(function ($class) {
+            $class->start_date = Carbon::parse($class->start_date)->format('d-m-Y');
+            $class->end_date = Carbon::parse($class->end_date)->format('d-m-Y');
+            $class->classInfo = $this->searchSessionsInfo($class);
+
+            return $class;
+        });
 
         return view('technician.list-class', compact('title','user', 'classes', 'lecturers', 'buildings', 'rooms', 'classSessions', 'lessons',
-            'fullLessons'))->with('schedule', $schedule['schedule'])->with('daysOfWeek', $schedule['daysOfWeek']);
+            'fullLessons', 'classes_schedule'))->with('schedule', $schedule['schedule'])->with('daysOfWeek', $schedule['daysOfWeek']);
+    }
+
+    public function getClassSessionInfoAPI(Request $request)
+    {
+        $session = ClassSession::findOrFail($request->input('sessionId'));
+        $selectedDate = Carbon::createFromFormat('d-m-Y', $request->input('selectedDate'))->format('Y-m-d');
+
+        $room = $session->room;
+        $building = $room->building;
+        $computers = $room->computers;
+        $attendances = Attendance::where('session_id', $session->id)
+            ->whereDate('attendance_date', $selectedDate)
+            ->get();
+        $sessionInfo = [
+            'session_id' => $session->id,
+            'building' => $building,
+            'room' => $room,
+            'computers' => $computers,
+            'attendances' => $attendances
+        ];
+
+        $table_class_session_info = view('technician.table-class-session-info', compact('sessionInfo'))->render();
+
+        return response()->json(['table_class_session_info' => $table_class_session_info]);
+    }
+
+    private function searchSessionsInfo($class) {
+        $sessionsInfo = [];
+        $startDate = Carbon::createFromFormat('d-m-Y', $class->start_date);
+        $endDate = Carbon::now();
+
+        foreach ($class->classSessions as $session) {
+            $currentDate = $startDate->copy();
+            while ($currentDate->lte($endDate)) {
+                if ($currentDate->dayOfWeekIso + 1 == $session->day_of_week) {
+                    $room = $session->room;
+                    $building = $room->building;
+                    $computers = $room->computers;
+                    $attendances = Attendance::where('session_id', $session->id)
+                        ->whereDate('attendance_date', $currentDate->format('Y-m-d'))
+                        ->get();
+                    $sessionsInfo[] = [
+                        'session_id' => $session->id,
+                        'date' => $currentDate->format('d-m-Y'),
+                        'building' => $building,
+                        'room' => $room,
+                        'computers' => $computers,
+                        'attendances' => $attendances
+                    ];
+                }
+                $currentDate->addDay();
+            }
+        }
+        return $sessionsInfo;
     }
 
     public function getSchedule() {
@@ -492,6 +556,7 @@ class TechnicianController extends Controller
         $classes->transform(function ($class) {
             $class->start_date = Carbon::parse($class->start_date)->format('d-m-Y');
             $class->end_date = Carbon::parse($class->end_date)->format('d-m-Y');
+            $class->classInfo = $this->searchSessionsInfo($class);
 
             return $class;
         });
@@ -511,7 +576,16 @@ class TechnicianController extends Controller
         $table_class = view('technician.table-class', compact('classes', 'lecturers', 'buildings', 'rooms'))->render();
 
         $schedule = $this->getSchedule();
-        $table_schedule = view('technician.table-schedule', compact('buildings', 'rooms'))->with('schedule', $schedule['schedule'])->with('daysOfWeek', $schedule['daysOfWeek'])->render();
+        $classes_schedule = CreditClass::all();
+        $classes_schedule->transform(function ($class) {
+            $class->start_date = Carbon::parse($class->start_date)->format('d-m-Y');
+            $class->end_date = Carbon::parse($class->end_date)->format('d-m-Y');
+            $class->classInfo = $this->searchSessionsInfo($class);
+
+            return $class;
+        });
+
+        $table_schedule = view('technician.table-schedule', compact('buildings', 'rooms', 'classes_schedule'))->with('schedule', $schedule['schedule'])->with('daysOfWeek', $schedule['daysOfWeek'])->render();
 
         return response()->json([
             'success' => 'Thêm lớp học phần thành công!',
@@ -963,6 +1037,7 @@ class TechnicianController extends Controller
         $classes->transform(function ($class) {
             $class->start_date = Carbon::parse($class->start_date)->format('d-m-Y');
             $class->end_date = Carbon::parse($class->end_date)->format('d-m-Y');
+            $class->classInfo = $this->searchSessionsInfo($class);
 
             return $class;
         });
@@ -982,7 +1057,16 @@ class TechnicianController extends Controller
         $table_class = view('technician.table-class', compact('classes', 'lecturers', 'buildings', 'rooms'))->render();
 
         $schedule = $this->getSchedule();
-        $table_schedule = view('technician.table-schedule', compact('buildings', 'rooms'))->with('schedule', $schedule['schedule'])->with('daysOfWeek', $schedule['daysOfWeek'])->render();
+        $classes_schedule = CreditClass::all();
+        $classes_schedule->transform(function ($class) {
+            $class->start_date = Carbon::parse($class->start_date)->format('d-m-Y');
+            $class->end_date = Carbon::parse($class->end_date)->format('d-m-Y');
+            $class->classInfo = $this->searchSessionsInfo($class);
+
+            return $class;
+        });
+
+        $table_schedule = view('technician.table-schedule', compact('buildings', 'rooms', 'classes_schedule'))->with('schedule', $schedule['schedule'])->with('daysOfWeek', $schedule['daysOfWeek'])->render();
 
         return response()->json([
             'success' => 'Chỉnh sửa thông tin lớp học phần thành công!',
@@ -1010,7 +1094,16 @@ class TechnicianController extends Controller
         $buildings = Building::orderBy('name', 'asc')->get();
         $rooms = Room::orderBy('name', 'asc')->get();
         $schedule = $this->getSchedule();
-        $table_schedule = view('technician.table-schedule', compact('buildings', 'rooms'))->with('schedule', $schedule['schedule'])->with('daysOfWeek', $schedule['daysOfWeek'])->render();
+        $classes_schedule = CreditClass::all();
+        $classes_schedule->transform(function ($class) {
+            $class->start_date = Carbon::parse($class->start_date)->format('d-m-Y');
+            $class->end_date = Carbon::parse($class->end_date)->format('d-m-Y');
+            $class->classInfo = $this->searchSessionsInfo($class);
+
+            return $class;
+        });
+
+        $table_schedule = view('technician.table-schedule', compact('buildings', 'rooms', 'classes_schedule'))->with('schedule', $schedule['schedule'])->with('daysOfWeek', $schedule['daysOfWeek'])->render();
 
         return response()->json(['success' => $message, 'table_schedule' => $table_schedule]);
     }
@@ -1299,6 +1392,7 @@ class TechnicianController extends Controller
         $classes->transform(function ($class) {
             $class->start_date = Carbon::parse($class->start_date)->format('d-m-Y');
             $class->end_date = Carbon::parse($class->end_date)->format('d-m-Y');
+            $class->classInfo = $this->searchSessionsInfo($class);
 
             return $class;
         });
@@ -1318,7 +1412,16 @@ class TechnicianController extends Controller
         $table_class = view('technician.table-class', compact('classes', 'lecturers', 'buildings', 'rooms'))->render();
 
         $schedule = $this->getSchedule();
-        $table_schedule = view('technician.table-schedule', compact('buildings', 'rooms'))->with('schedule', $schedule['schedule'])->with('daysOfWeek', $schedule['daysOfWeek'])->render();
+        $classes_schedule = CreditClass::all();
+        $classes_schedule->transform(function ($class) {
+            $class->start_date = Carbon::parse($class->start_date)->format('d-m-Y');
+            $class->end_date = Carbon::parse($class->end_date)->format('d-m-Y');
+            $class->classInfo = $this->searchSessionsInfo($class);
+
+            return $class;
+        });
+
+        $table_schedule = view('technician.table-schedule', compact('buildings', 'rooms', 'classes_schedule'))->with('schedule', $schedule['schedule'])->with('daysOfWeek', $schedule['daysOfWeek'])->render();
 
         return response()->json([
             'success' => 'Xóa lớp học phần thành công!',
@@ -1593,6 +1696,8 @@ class TechnicianController extends Controller
         $classes->transform(function ($class) {
             $class->start_date = Carbon::parse($class->start_date)->format('d-m-Y');
             $class->end_date = Carbon::parse($class->end_date)->format('d-m-Y');
+            $class->classInfo = $this->searchSessionsInfo($class);
+
             return $class;
         });
 
@@ -1706,6 +1811,7 @@ class TechnicianController extends Controller
         $classes->transform(function ($class) {
             $class->start_date = Carbon::parse($class->start_date)->format('d-m-Y');
             $class->end_date = Carbon::parse($class->end_date)->format('d-m-Y');
+            $class->classInfo = $this->searchSessionsInfo($class);
 
             return $class;
         });
@@ -1851,6 +1957,7 @@ class TechnicianController extends Controller
         $classes->transform(function ($class) {
             $class->start_date = Carbon::parse($class->start_date)->format('d-m-Y');
             $class->end_date = Carbon::parse($class->end_date)->format('d-m-Y');
+            $class->classInfo = $this->searchSessionsInfo($class);
 
             return $class;
         });
