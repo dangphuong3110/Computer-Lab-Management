@@ -356,10 +356,6 @@ class TechnicianController extends Controller
             return response()->json(['errors' => $validator->errors()]);
         }
 
-        if (!Str::endsWith($request->input('email'), '@tlu.edu.vn')) {
-            return response()->json(['errors' => ['email' => 'Email phải là email giảng viên của nhà trường!']]);
-        }
-
         $user = new User();
 
         $user->email = $request->input('email');
@@ -764,10 +760,6 @@ class TechnicianController extends Controller
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()]);
-        }
-
-        if (!Str::endsWith($request->input('email'), '@tlu.edu.vn')) {
-            return response()->json(['errors' => ['email' => 'Email phải là email giảng viên của nhà trường!']]);
         }
 
         $user = User::findOrFail($lecturer->user_id);

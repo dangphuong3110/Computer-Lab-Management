@@ -445,6 +445,10 @@ class ManagerController extends Controller
     {
         foreach ($technicians as $technician) {
             $reportAvgProcessingTime = $technician->avg_processing_time;
+            if ($technician->reports->first() && $technician->reports->first()->avg_processing_time !== null) {
+                $reportAvgProcessingTime = $technician->reports->first()->avg_processing_time;
+            }
+
             $hours = floor($reportAvgProcessingTime / 3600);
             $minutes = floor(($reportAvgProcessingTime % 3600) / 60);
             $seconds = $reportAvgProcessingTime % 60;

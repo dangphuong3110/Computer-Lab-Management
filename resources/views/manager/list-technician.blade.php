@@ -83,7 +83,7 @@
                         <th scope="col" class="text-center" width="15%">Email</th>
                         <th scope="col" class="text-center" width="15%">Số điện thoại</th>
                         <th scope="col" class="text-center" data-sort="report_count" width="17%">Báo cáo đã xử lý <i class="bx bx-sort-alt-2"></i></th>
-                        <th scope="col" class="text-center" data-sort="avg_processing_time" width="18%">TG xử lý trung bình <i class="bx bx-sort-alt-2"></i></th>
+                        <th scope="col" class="text-center" data-sort="avg_processing_time" width="18%">Thời gian xử lý trung bình <i class="bx bx-sort-alt-2"></i></th>
                         <th scope="col" class="text-center action-column">Hành động</th>
                     </tr>
                     </thead>
