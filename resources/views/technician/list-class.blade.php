@@ -125,7 +125,7 @@
                                                                 <select id="room-create" name="room[]" class="form-select form-control fs-6">
                                                                     @foreach($rooms as $room)
                                                                         @if ($room->building_id == 1)
-                                                                            <option value="{{ $room->id }}">{{ $room->name }} (Sức chứa: {{ $room->capacity }})</option>
+                                                                            <option value="{{ $room->id }}">{{ $room->name }} (Sức chứa: {{ $room->number_of_computer_rows * $room->max_computers_per_row }})</option>
                                                                         @endif
                                                                     @endforeach
                                                                 </select>
@@ -265,8 +265,8 @@
                                                                     @php
                                                                         $computerNumber = 1;
                                                                     @endphp
-                                                                    @for ($i = 1; $i <= $class->classInfo[0]['room']->capacity; $i++)
-                                                                        @if ($i % 15 == 1)
+                                                                    @for ($i = 1; $i <= $class->classInfo[0]['room']->number_of_computer_rows * $class->classInfo[0]['room']->max_computers_per_row; $i++)
+                                                                        @if ($i % $class->classInfo[0]['room']->max_computers_per_row == 1)
                                                                             <div class="col-12 d-flex justify-content-start p-0">
                                                                                 @endif
                                                                                 @php
@@ -277,7 +277,7 @@
                                                                                     }
                                                                                 @endphp
                                                                                 @if ($computerAtPosition)
-                                                                                    <div class="position-relative border border-black {{ $hasAttendance ? 'bg-warning' : 'bg-info' }} bg-opacity-50" style="width: 6.67%; height: 100px;">
+                                                                                    <div class="position-relative border border-black {{ $hasAttendance ? 'bg-warning' : 'bg-info' }} bg-opacity-50" style="width: {{ 100 / $class->classInfo[0]['room']->max_computers_per_row }}%; height: 100px;">
                                                                                         <div class="text-center d-flex justify-content-center align-items-center overflow-hidden h-100">
                                                                                             <span style="font-size: 12px;">{{ $hasAttendance ? $attendance->student->full_name : '' }}</span>
                                                                                         </div>
@@ -291,7 +291,7 @@
 
                                                                                     </div>
                                                                                 @endif
-                                                                                @if ($i % 15 == 0 || $i == $class->classInfo[0]['room']->capacity)
+                                                                                @if ($i % $class->classInfo[0]['room']->max_computers_per_row == 0 || $i == $class->classInfo[0]['room']->number_of_computer_rows * $class->classInfo[0]['room']->max_computers_per_row)
                                                                             </div>
                                                                         @endif
                                                                     @endfor
@@ -522,8 +522,8 @@
                                                                             @php
                                                                                 $computerNumber = 1;
                                                                             @endphp
-                                                                            @for ($i = 1; $i <= $selectedClass->classInfo[0]['room']->capacity; $i++)
-                                                                                @if ($i % 15 == 1)
+                                                                            @for ($i = 1; $i <= $selectedClass->classInfo[0]['room']->number_of_computer_rows * $selectedClass->classInfo[0]['room']->max_computers_per_row; $i++)
+                                                                                @if ($i % $selectedClass->classInfo[0]['room']->max_computers_per_row == 1)
                                                                                     <div class="col-12 d-flex justify-content-start p-0">
                                                                                         @endif
                                                                                         @php
@@ -534,7 +534,7 @@
                                                                                             }
                                                                                         @endphp
                                                                                         @if ($computerAtPosition)
-                                                                                            <div class="position-relative border border-black {{ $hasAttendance ? 'bg-warning' : 'bg-info' }} bg-opacity-50" style="width: 6.67%; height: 100px;">
+                                                                                            <div class="position-relative border border-black {{ $hasAttendance ? 'bg-warning' : 'bg-info' }} bg-opacity-50" style="width: {{ 100 / $selectedClass->classInfo[0]['room']->max_computers_per_row }}%; height: 100px;">
                                                                                                 <div class="text-center d-flex justify-content-center align-items-center overflow-hidden h-100">
                                                                                                     <span style="font-size: 12px;">{{ $hasAttendance ? $attendance->student->full_name : '' }}</span>
                                                                                                 </div>
@@ -548,7 +548,7 @@
 
                                                                                             </div>
                                                                                         @endif
-                                                                                        @if ($i % 15 == 0 || $i == $selectedClass->classInfo[0]['room']->capacity)
+                                                                                        @if ($i % $selectedClass->classInfo[0]['room']->max_computers_per_row == 0 || $i == $selectedClass->classInfo[0]['room']->number_of_computer_rows * $selectedClass->classInfo[0]['room']->max_computers_per_row)
                                                                                     </div>
                                                                                 @endif
                                                                             @endfor
@@ -1084,7 +1084,7 @@
                                     <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Phòng học</label>
                                     <div class="col-md-7">
                                         <select id="room-update-${classId}-${i}" name="room[]" class="form-select form-control fs-6">
-                                            ${rooms.filter(room => room.building_id == roomDict[sessionData.room_id].building_id).map(room => `<option value="${room.id}" ${room.id == sessionData.room_id ? 'selected' : ''}>${room.name} (Sức chứa: ${room.capacity})</option>`).join('')}
+                                            ${rooms.filter(room => room.building_id == roomDict[sessionData.room_id].building_id).map(room => `<option value="${room.id}" ${room.id == sessionData.room_id ? 'selected' : ''}>${room.name} (Sức chứa: ${room.number_of_computer_rows * room.max_computers_per_row})</option>`).join('')}
                                         </select>
                                     </div>
                                 </div>
@@ -1098,7 +1098,7 @@
                             roomSelect.html('');
                             rooms.forEach(room => {
                                 if (room.building_id == buildingId) {
-                                    const option = `<option value="${room.id}">${room.name} (Sức chứa: ${room.capacity})</option>`;
+                                    const option = `<option value="${room.id}">${room.name} (Sức chứa: ${room.number_of_computer_rows * room.max_computers_per_row})</option>`;
                                     roomSelect.append(option);
                                 }
                             });
@@ -1247,7 +1247,7 @@
                     roomSelect.html('');
                     rooms.forEach(room => {
                         if (room.building_id == buildingId) {
-                            const option = `<option value="${room.id}">${room.name} (Sức chứa: ${room.capacity})</option>`;
+                            const option = `<option value="${room.id}">${room.name} (Sức chứa: ${room.number_of_computer_rows * room.max_computers_per_row})</option>`;
                             roomSelect.append(option);
                         }
                     });
@@ -1301,7 +1301,7 @@
                                     <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Phòng học</label>
                                     <div class="col-md-7">
                                         <select id="room-create-${i}" name="room[]" class="form-select form-control fs-6">
-                                            ${rooms.filter(room => room.building_id == 1).map(room => `<option value="${room.id}">${room.name} (Sức chứa: ${room.capacity})</option>`).join('')}
+                                            ${rooms.filter(room => room.building_id == 1).map(room => `<option value="${room.id}">${room.name} (Sức chứa: ${room.number_of_computer_rows * room.max_computers_per_row})</option>`).join('')}
                                         </select>
                                     </div>
                                 </div>
@@ -1315,7 +1315,7 @@
                             roomSelect.html('');
                             rooms.forEach(room => {
                                 if (room.building_id == buildingId) {
-                                    const option = `<option value="${room.id}">${room.name} (Sức chứa: ${room.capacity})</option>`;
+                                    const option = `<option value="${room.id}">${room.name} (Sức chứa: ${room.number_of_computer_rows * room.max_computers_per_row})</option>`;
                                     roomSelect.append(option);
                                 }
                             });
@@ -1399,7 +1399,7 @@
                                             <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Phòng học</label>
                                             <div class="col-md-7">
                                                 <select id="room-update-${classId}-${i}" name="room[]" class="form-select form-control fs-6">
-                                                    ${rooms.filter(room => room.building_id == roomDict[sessionData.room_id].building_id).map(room => `<option value="${room.id}" ${room.id == sessionData.room_id ? 'selected' : ''}>${room.name} (Sức chứa: ${room.capacity})</option>`).join('')}
+                                                    ${rooms.filter(room => room.building_id == roomDict[sessionData.room_id].building_id).map(room => `<option value="${room.id}" ${room.id == sessionData.room_id ? 'selected' : ''}>${room.name} (Sức chứa: ${room.number_of_computer_rows * room.max_computers_per_row})</option>`).join('')}
                                                 </select>
                                             </div>
                                         </div>
@@ -1413,7 +1413,7 @@
                                         roomSelect.html('');
                                         rooms.forEach(room => {
                                             if (room.building_id == buildingId) {
-                                                const option = `<option value="${room.id}">${room.name} (Sức chứa: ${room.capacity})</option>`;
+                                                const option = `<option value="${room.id}">${room.name} (Sức chứa: ${room.number_of_computer_rows * room.max_computers_per_row})</option>`;
                                                 roomSelect.append(option);
                                             }
                                         });
@@ -1483,7 +1483,7 @@
                                     <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Phòng học</label>
                                     <div class="col-md-7">
                                         <select id="room-create-${i}" name="room[]" class="form-select form-control fs-6">
-                                            ${rooms.filter(room => room.building_id == 1).map(room => `<option value="${room.id}">${room.name} (Sức chứa: ${room.capacity})</option>`).join('')}
+                                            ${rooms.filter(room => room.building_id == 1).map(room => `<option value="${room.id}">${room.name} (Sức chứa: ${room.number_of_computer_rows * room.max_computers_per_row})</option>`).join('')}
                                         </select>
                                     </div>
                                 </div>
@@ -1497,7 +1497,7 @@
                                         roomSelect.html('');
                                         rooms.forEach(room => {
                                             if (room.building_id == buildingId) {
-                                                const option = `<option value="${room.id}">${room.name} (Sức chứa: ${room.capacity})</option>`;
+                                                const option = `<option value="${room.id}">${room.name} (Sức chứa: ${room.number_of_computer_rows * room.max_computers_per_row})</option>`;
                                                 roomSelect.append(option);
                                             }
                                         });
@@ -1623,7 +1623,7 @@
                                         <label class="col-md-4 col-label-form fs-6 fw-bold text-md-end">Phòng học</label>
                                         <div class="col-md-7">
                                             <select id="room-create" name="room[]" class="form-select form-control fs-6">
-                                                ${rooms.filter(room => room.building_id == 1).map(room => `<option value="${room.id}">${room.name} (Sức chứa: ${room.capacity})</option>`).join('')}
+                                                ${rooms.filter(room => room.building_id == 1).map(room => `<option value="${room.id}">${room.name} (Sức chứa: ${room.number_of_computer_rows * room.max_computers_per_row})</option>`).join('')}
                                             </select>
                                         </div>
                                     </div>

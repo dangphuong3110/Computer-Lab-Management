@@ -377,13 +377,19 @@ body.dark .switch::before {
 .card h5,
 .card h6,
 .card-statistics div,
-#table-personal-info label {
+#table-personal-info label,
+#label-lesson-of-class-session-create {
     color: var(--primary-text-color);
 }
 
-.pagination .page-item .page-link {
-    color: var(--primary-text-color);
-    background: var(--sidebar-color);
+.pagination .page-item .page-link,
+.dropdown-menu {
+    color: var(--primary-text-color) !important;
+    background: var(--sidebar-color) !important;
+}
+
+.dropdown-item {
+    color: var(--primary-text-color) !important;
 }
 
 .pagination .page-item.active .page-link {

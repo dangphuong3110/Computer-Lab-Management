@@ -35,9 +35,15 @@
                                             </div>
                                         </div>
                                         <div class="row mb-3 mt-4">
-                                            <label class="col-md-5 col-label-form fs-6 fw-bold text-md-end">Sức chứa<span class="required">*</span></label>
+                                            <label class="col-md-5 col-label-form fs-6 fw-bold text-md-end">Số hàng máy tính<span class="required">*</span></label>
                                             <div class="col-md-7">
-                                                <input type="text" name="capacity" class="form-control fs-6"/>
+                                                <input type="text" name="number-of-computer-rows" class="form-control fs-6"/>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3 mt-4">
+                                            <label class="col-md-5 col-label-form fs-6 fw-bold text-md-end">Số lượng máy tính tối đa mỗi hàng<span class="required">*</span></label>
+                                            <div class="col-md-7">
+                                                <input type="text" name="max-computers-per-row" class="form-control fs-6"/>
                                             </div>
                                         </div>
                                     </form>
@@ -60,7 +66,7 @@
                                     <h5 class="card-title m-0">{{ $room->name }}</h5>
                                 </div>
                                 <div class="card-body">
-                                    <h6 class="card-title mb-3">Sức chứa: {{ $room->capacity }} máy</h6>
+                                    <h6 class="card-title mb-3">Sức chứa: {{ $room->number_of_computer_rows * $room->max_computers_per_row }} máy</h6>
                                     <h6 class="card-title mb-3">Hiện có: {{ $room->computers->count() }} máy</h6>
                                     <div class="btn-group">
                                         <div class="wrap-button" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Sơ đồ phòng máy">
@@ -87,9 +93,15 @@
                                                                 </div>
                                                             </div>
                                                             <div class="row mb-3 mt-4">
-                                                                <label class="col-md-5 col-label-form fs-6 fw-bold text-md-end">Sức chứa<span class="required">*</span></label>
+                                                                <label class="col-md-5 col-label-form fs-6 fw-bold text-md-end">Số hàng máy tính<span class="required">*</span></label>
                                                                 <div class="col-md-7">
-                                                                    <input type="text" name="capacity" class="form-control fs-6" value="{{ $room->capacity }}" data-initial-value="{{ $room->capacity }}"/>
+                                                                    <input type="text" name="number-of-computer-rows" class="form-control fs-6" value="{{ $room->number_of_computer_rows }}" data-initial-value="{{ $room->number_of_computer_rows }}"/>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row mb-3 mt-4">
+                                                                <label class="col-md-5 col-label-form fs-6 fw-bold text-md-end">Số lượng máy tính tối đa mỗi hàng<span class="required">*</span></label>
+                                                                <div class="col-md-7">
+                                                                    <input type="text" name="max-computers-per-row" class="form-control fs-6" value="{{ $room->max_computers_per_row }}" data-initial-value="{{ $room->max_computers_per_row }}"/>
                                                                 </div>
                                                             </div>
                                                         </form>
@@ -174,8 +186,10 @@
                         } else {
                             if (response.errors['room-name']) {
                                 showToastError(response.errors['room-name']);
-                            } else if (response.errors['capacity']) {
-                                showToastError(response.errors['capacity']);
+                            } else if (response.errors['number-of-computer-rows']) {
+                                showToastError(response.errors['number-of-computer-rows']);
+                            } else if (response.errors['max-computers-per-row']) {
+                                showToastError(response.errors['max-computers-per-row']);
                             }
                             $('body').append('<div class="modal-backdrop fade show"></div>');
                         }
@@ -213,6 +227,10 @@
                                 showToastError(response.errors['room-name'])
                             } else if (response.errors['capacity']) {
                                 showToastError(response.errors['capacity']);
+                            } else if (response.errors['number-of-computer-rows']) {
+                                showToastError(response.errors['number-of-computer-rows']);
+                            } else if (response.errors['max-computers-per-row']) {
+                                showToastError(response.errors['max-computers-per-row']);
                             }
                             $('body').append('<div class="modal-backdrop fade show"></div>');
                         }

@@ -619,7 +619,9 @@ class TechnicianController extends Controller
             $newClass = CreditClass::findOrFail($class_id);
             $newClassSessions = $newClass->classSessions;
             $studentsCount = $newClass->students()->count();
-            $minRoomCapacity = $newClassSessions->pluck('room.capacity')->min();
+            $minRoomCapacity = $newClassSessions->map(function ($session) {
+                return $session->room->number_of_computer_rows * $session->room->max_computers_per_row;
+            })->min();
 
             if ($studentsCount == $minRoomCapacity) {
                 return response()->json(['errors' => ['student-class' => 'Lớp học đã hết chỗ ngồi!']]);
@@ -684,13 +686,17 @@ class TechnicianController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'room-name' => 'required|max:255',
-            'capacity' => 'required|numeric|min:1',
+            'number-of-computer-rows' => 'required|numeric|min:1',
+            'max-computers-per-row' => 'required|numeric|min:1',
         ], [
             'room-name.required' => 'Vui lòng nhập tên phòng máy!',
             'room-name.max' => 'Tên phòng máy không được vượt quá 255 ký tự!',
-            'capacity.required' => 'Vui lòng nhập sức chứa của phòng máy!',
-            'capacity.numeric' => 'Sức chứa của phòng máy phải là một số!',
-            'capacity.min' => 'Sức chứa của phòng máy phải lớn hơn 0!',
+            'number-of-computer-rows.required' => 'Vui lòng nhập số hàng máy tính!',
+            'number-of-computer-rows.numeric' => 'Số hàng máy tính phải là một số!',
+            'number-of-computer-rows.min' => 'Số hàng máy tính phải lớn hơn 0!',
+            'max-computers-per-row.required' => 'Vui lòng nhập số máy tính tối đa mỗi hàng!',
+            'max-computers-per-row.numeric' => 'Số máy tính tối đa mỗi hàng phải là một số!',
+            'max-computers-per-row.min' => 'Số máy tính tối đa mỗi hàng phải lớn hơn 0!',
         ]);
 
         if ($validator->fails()) {
@@ -699,7 +705,8 @@ class TechnicianController extends Controller
 
         $room = new Room();
         $room->name = $request->input('room-name');
-        $room->capacity = $request->input('capacity');
+        $room->number_of_computer_rows = $request->input('number-of-computer-rows');
+        $room->max_computers_per_row = $request->input('max-computers-per-row');
         $room->building_id = $request->input('building_id');
 
         $room->save();
@@ -1128,13 +1135,17 @@ class TechnicianController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'room-name' => 'required|max:255',
-            'capacity' => 'required|numeric|min:1',
+            'number-of-computer-rows' => 'required|numeric|min:1',
+            'max-computers-per-row' => 'required|numeric|min:1',
         ], [
             'room-name.required' => 'Vui lòng nhập tên phòng máy!',
             'room-name.max' => 'Tên phòng máy không được vượt quá 255 ký tự!',
-            'capacity.required' => 'Vui lòng nhập sức chứa của phòng máy!',
-            'capacity.numeric' => 'Sức chứa của phòng máy phải là một số!',
-            'capacity.min' => 'Sức chứa của phòng máy phải lớn hơn 0!',
+            'number-of-computer-rows.required' => 'Vui lòng nhập số hàng máy tính!',
+            'number-of-computer-rows.numeric' => 'Số hàng máy tính phải là một số!',
+            'number-of-computer-rows.min' => 'Số hàng máy tính phải lớn hơn 0!',
+            'max-computers-per-row.required' => 'Vui lòng nhập số máy tính tối đa mỗi hàng!',
+            'max-computers-per-row.numeric' => 'Số máy tính tối đa mỗi hàng phải là một số!',
+            'max-computers-per-row.min' => 'Số máy tính tối đa mỗi hàng phải lớn hơn 0!',
         ]);
 
         if ($validator->fails()) {
@@ -1143,13 +1154,14 @@ class TechnicianController extends Controller
 
         $maxPositionComputer = Room::findOrFail($id)->computers()->max('position');
 
-        if ($request->input('capacity') < $maxPositionComputer) {
-            return response()->json(['errors' => ['capacity' => 'Sức chứa của phòng máy không thể nhỏ hơn vị trí máy tính lớn nhất đã đặt!']]);
+        if ($request->input('number-of-computer-rows')*$request->input('max-computers-per-row') < $maxPositionComputer) {
+            return response()->json(['errors' => ['capacity' => 'Sức chứa của phòng máy không thể nhỏ hơn vị trí máy tính lớn nhất đã đặt. Vui lòng kiểm tra lại!']]);
         }
 
         $room = Room::findOrFail($id);
         $room->name = $request->input('room-name');
-        $room->capacity = $request->input('capacity');
+        $room->number_of_computer_rows = $request->input('number-of-computer-rows');
+        $room->max_computers_per_row = $request->input('max-computers-per-row');
 
         $room->save();
 

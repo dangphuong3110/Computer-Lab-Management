@@ -106,7 +106,7 @@
                                                 @endforeach
                                             @else
                                                 <tr>
-                                                    <td colspan="3" class="text-center">Không có dữ liệu báo cáo sự cố</td>
+                                                    <td colspan="4" class="text-center">Không có dữ liệu báo cáo sự cố</td>
                                                 </tr>
                                             @endif
                                             </tbody>
@@ -128,8 +128,8 @@
                 @php
                     $computerNumber = 1;
                 @endphp
-                @for ($i = 1; $i <= $room->capacity; $i++)
-                    @if ($i % 15 == 1)
+                @for ($i = 1; $i <= $room->number_of_computer_rows * $room->max_computers_per_row; $i++)
+                    @if ($i % $room->max_computers_per_row == 1)
                         <div class="col-12 d-flex justify-content-start p-0">
                             @endif
                             @php
@@ -140,7 +140,7 @@
                                 }
                             @endphp
                             @if ($computerAtPosition)
-                                <div class="position-relative border border-black {{ $hasAttendance ? 'bg-warning' : 'bg-info' }} bg-opacity-50" style="width: 6.67%; height: 100px;">
+                                <div class="position-relative border border-black {{ $hasAttendance ? 'bg-warning' : 'bg-info' }} bg-opacity-50" style="width: {{ 100 / $room->max_computers_per_row }}%; height: 100px;">
                                     <div class="text-center d-flex justify-content-center align-items-center overflow-hidden h-100">
                                         <span style="font-size: 12px;">{{ $hasAttendance ? $attendance->student->full_name : '' }}</span>
                                     </div>
@@ -154,7 +154,7 @@
 
                                 </div>
                             @endif
-                            @if ($i % 15 == 0 || $i == $room->capacity)
+                            @if ($i % $room->max_computers_per_row == 0 || $i == $room->number_of_computer_rows * $room->max_computers_per_row)
                         </div>
                     @endif
                 @endfor
