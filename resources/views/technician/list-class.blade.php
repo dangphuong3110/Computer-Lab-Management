@@ -287,7 +287,7 @@
                                                                                         $computerNumber++;
                                                                                     @endphp
                                                                                 @else
-                                                                                    <div class="border border-black bg-secondary" style="width: 6.67%; height: 100px;">
+                                                                                    <div class="border border-black bg-secondary" style="width: {{ 100 / $class->classInfo[0]['room']->max_computers_per_row }}%; height: 100px;">
 
                                                                                     </div>
                                                                                 @endif
@@ -465,7 +465,7 @@
                 <tbody>
                 @foreach($buildings as $building)
                     @php $firstRoom = true; @endphp
-                    @foreach($building->rooms as $index => $room)
+                    @foreach($building->rooms()->orderBy('name', 'asc')->get() as $index => $room)
 {{--                        @if ($room->classSessions()->count() == 0)--}}
 {{--                            @php continue; @endphp--}}
 {{--                        @endif--}}
@@ -544,7 +544,7 @@
                                                                                                 $computerNumber++;
                                                                                             @endphp
                                                                                         @else
-                                                                                            <div class="border border-black bg-secondary" style="width: 6.67%; height: 100px;">
+                                                                                            <div class="border border-black bg-secondary" style="width: {{ 100 / $selectedClass->classInfo[0]['room']->max_computers_per_row }}%; height: 100px;">
 
                                                                                             </div>
                                                                                         @endif

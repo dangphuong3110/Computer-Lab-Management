@@ -27,7 +27,7 @@
                         $computerNumber++;
                     @endphp
                 @else
-                    <div class="border border-black bg-secondary" style="width: 6.67%; height: 100px;">
+                    <div class="border border-black bg-secondary" style="width: {{ 100 / $sessionInfo['room']->max_computers_per_row }}%; height: 100px;">
 
                     </div>
                 @endif
