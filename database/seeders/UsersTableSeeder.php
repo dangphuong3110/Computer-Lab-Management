@@ -45,7 +45,70 @@ class UsersTableSeeder extends Seeder
                 'phone' => $faker->phoneNumber,
                 'is_verified' => true,
                 'role_id' => 4,
-            ]
+            ],
+            [
+                'email' => 'gv2@tlu.edu.vn',
+                'password' => Hash::make('123456'),
+                'phone' => $faker->phoneNumber,
+                'is_verified' => true,
+                'role_id' => 4,
+            ],
+            [
+                'email' => 'gv3@tlu.edu.vn',
+                'password' => Hash::make('123456'),
+                'phone' => $faker->phoneNumber,
+                'is_verified' => true,
+                'role_id' => 4,
+            ],
+            [
+                'email' => 'gv4@tlu.edu.vn',
+                'password' => Hash::make('123456'),
+                'phone' => $faker->phoneNumber,
+                'is_verified' => true,
+                'role_id' => 4,
+            ],
+            [
+                'email' => 'gv5@tlu.edu.vn',
+                'password' => Hash::make('123456'),
+                'phone' => $faker->phoneNumber,
+                'is_verified' => true,
+                'role_id' => 4,
+            ],
+            [
+                'email' => 'gv6@tlu.edu.vn',
+                'password' => Hash::make('123456'),
+                'phone' => $faker->phoneNumber,
+                'is_verified' => true,
+                'role_id' => 4,
+            ],
+            [
+                'email' => 'gv7@tlu.edu.vn',
+                'password' => Hash::make('123456'),
+                'phone' => $faker->phoneNumber,
+                'is_verified' => true,
+                'role_id' => 4,
+            ],
+            [
+                'email' => 'gv8@tlu.edu.vn',
+                'password' => Hash::make('123456'),
+                'phone' => $faker->phoneNumber,
+                'is_verified' => true,
+                'role_id' => 4,
+            ],
+            [
+                'email' => 'gv9@tlu.edu.vn',
+                'password' => Hash::make('123456'),
+                'phone' => $faker->phoneNumber,
+                'is_verified' => true,
+                'role_id' => 4,
+            ],
+            [
+                'email' => 'gv10@tlu.edu.vn',
+                'password' => Hash::make('123456'),
+                'phone' => $faker->phoneNumber,
+                'is_verified' => true,
+                'role_id' => 4,
+            ],
         ];
 
         DB::table('users')->insert($users);

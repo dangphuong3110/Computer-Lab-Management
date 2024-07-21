@@ -14,7 +14,7 @@ class ManagersTableSeeder extends Seeder
     public function run(): void
     {
         $manager = [
-            'full_name' => 'Cán bộ quản lý 1',
+            'full_name' => 'Cán bộ quản lý',
             'user_id' => 1,
         ];
 

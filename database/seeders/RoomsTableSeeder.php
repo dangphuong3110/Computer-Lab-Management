@@ -14,20 +14,20 @@ class RoomsTableSeeder extends Seeder
     public function run(): void
     {
         $rooms = [
-            ['name' => '205', 'capacity' => 45, 'building_id' => 1],
-            ['name' => '206', 'capacity' => 45, 'building_id' => 1],
-            ['name' => '207', 'capacity' => 45, 'building_id' => 1],
-            ['name' => '208', 'capacity' => 45, 'building_id' => 1],
-            ['name' => '209', 'capacity' => 45, 'building_id' => 1],
-            ['name' => '210', 'capacity' => 45, 'building_id' => 1],
-            ['name' => '102', 'capacity' => 45, 'building_id' => 2],
-            ['name' => '201', 'capacity' => 45, 'building_id' => 2],
-            ['name' => '202', 'capacity' => 45, 'building_id' => 2],
-            ['name' => '301', 'capacity' => 45, 'building_id' => 2],
-            ['name' => '302', 'capacity' => 45, 'building_id' => 2],
-            ['name' => '401', 'capacity' => 45, 'building_id' => 2],
-            ['name' => '402', 'capacity' => 45, 'building_id' => 2],
-            ['name' => '403', 'capacity' => 45, 'building_id' => 2],
+            ['name' => '205', 'number_of_computer_rows' => 4, 'max_computers_per_row' => 10, 'building_id' => 1],
+            ['name' => '206', 'number_of_computer_rows' => 4, 'max_computers_per_row' => 10, 'building_id' => 1],
+            ['name' => '207', 'number_of_computer_rows' => 4, 'max_computers_per_row' => 10, 'building_id' => 1],
+            ['name' => '208', 'number_of_computer_rows' => 4, 'max_computers_per_row' => 10, 'building_id' => 1],
+            ['name' => '209', 'number_of_computer_rows' => 4, 'max_computers_per_row' => 10, 'building_id' => 1],
+            ['name' => '210', 'number_of_computer_rows' => 4, 'max_computers_per_row' => 10, 'building_id' => 1],
+            ['name' => '102', 'number_of_computer_rows' => 4, 'max_computers_per_row' => 15, 'building_id' => 2],
+            ['name' => '201', 'number_of_computer_rows' => 4, 'max_computers_per_row' => 15, 'building_id' => 2],
+            ['name' => '202', 'number_of_computer_rows' => 4, 'max_computers_per_row' => 15, 'building_id' => 2],
+            ['name' => '301', 'number_of_computer_rows' => 4, 'max_computers_per_row' => 15, 'building_id' => 2],
+            ['name' => '302', 'number_of_computer_rows' => 4, 'max_computers_per_row' => 15, 'building_id' => 2],
+            ['name' => '401', 'number_of_computer_rows' => 4, 'max_computers_per_row' => 15, 'building_id' => 2],
+            ['name' => '402', 'number_of_computer_rows' => 4, 'max_computers_per_row' => 15, 'building_id' => 2],
+            ['name' => '403', 'number_of_computer_rows' => 4, 'max_computers_per_row' => 15, 'building_id' => 2],
         ];
 
         DB::table('rooms')->insert($rooms);

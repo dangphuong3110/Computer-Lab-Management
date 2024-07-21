@@ -14,7 +14,7 @@ class TechniciansTableSeeder extends Seeder
     public function run(): void
     {
         $technician = [
-            'full_name' => 'Kỹ thuật viên 1',
+            'full_name' => 'KTV Nguyễn Văn A',
             'user_id' => 2,
         ];
 
