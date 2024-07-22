@@ -2048,6 +2048,16 @@ class TechnicianController extends Controller
                     $newComputer->save();
                 }
             }
+        } else if ($positionOption === 'occupied') {
+            for ($i = 1; $i <= $roomCapacity; $i++) {
+                $oldComputer = Computer::where('room_id', $room->id)->where('position', $i)->first();
+                if ($oldComputer) {
+                    $oldComputer->configuration = $originalComputer->configuration;
+                    $oldComputer->purchase_date = $originalComputer->purchase_date;
+
+                    $oldComputer->save();
+                }
+            }
         } else if ($positionOption === 'all') {
             for ($i = 1; $i <= $roomCapacity; $i++) {
                 $oldComputer = Computer::where('room_id', $room->id)->where('position', $i)->first();

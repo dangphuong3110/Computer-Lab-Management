@@ -105,8 +105,12 @@
                                                     <label class="form-check-label">Sao chép cho các vị trí trống</label>
                                                 </div>
                                                 <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="position-option" value="occupied">
+                                                    <label class="form-check-label">Sao chép cho các vị trí đã có máy tính</label>
+                                                </div>
+                                                <div class="form-check">
                                                     <input class="form-check-input" type="radio" name="position-option" value="all">
-                                                    <label class="form-check-label">Sao chép cho tất cả máy tính trong phòng</label>
+                                                    <label class="form-check-label">Sao chép cho tất cả vị trí trong phòng</label>
                                                 </div>
                                             </form>
                                         </div>
