@@ -619,13 +619,6 @@
             addEventForButtons();
             addEventForSelectOption();
 
-            const urlParams = new URLSearchParams(window.location.search);
-            const classId = urlParams.get('conflict-session');
-            if (classId) {
-                const btnEditClass = document.getElementById(`btn-edit-class-${classId}`);
-                btnEditClass.click();
-            }
-
             $(function() {
                 $("#lesson-of-class-session-create").slider({
                     range: true,
@@ -704,7 +697,7 @@
                             } else if (response.errors['end-date']) {
                                 showToastError(response.errors['end-date']);
                             } else if (response.errors['class-session']) {
-                                showToastError(response.errors['class-session'], response.errors['class-id'] ?? '');
+                                showToastError(response.errors['class-session']);
                             }
                             $('body').append('<div class="modal-backdrop fade show"></div>');
                         }
@@ -766,7 +759,7 @@
                             } else if (response.errors['end-date']) {
                                 showToastError(response.errors['end-date']);
                             } else if (response.errors['class-session']) {
-                                showToastError(response.errors['class-session'], response.errors['class-id'] ?? '');
+                                showToastError(response.errors['class-session']);
                             }
                             $('body').append('<div class="modal-backdrop fade show"></div>');
                         }
@@ -1650,7 +1643,7 @@
                 }).showToast();
             }
 
-            function showToastError(text, classId='') {
+            function showToastError(text) {
                 Toastify({
                     text: text,
                     duration: 4000,
@@ -1666,12 +1659,7 @@
                         x: 50,
                         y: 60,
                     },
-                    onClick: function(){
-                        if (classId !== '') {
-                            const url = `{{ route('technician.get-list-class') }}?conflict-session=${classId}`;
-                            window.open(url, '_blank');
-                        }
-                    }
+                    onClick: function(){}
                 }).showToast();
             }
         });

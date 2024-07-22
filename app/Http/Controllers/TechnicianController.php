@@ -492,7 +492,7 @@ class TechnicianController extends Controller
                 })->first();
 
                 if ($conflictingClass) {
-                    return response()->json(['errors' => ['class-session' => "Buổi học vào thứ {$daysOfWeek} bị trùng tiết học với lớp học khác! (bấm để xem)", 'class-id' => $conflictingClass->class_id]]);
+                    return response()->json(['errors' => ['class-session' => "Buổi học vào thứ {$daysOfWeek} bị trùng tiết học với lớp học phần {$conflictingClass->creditClass->name}!"]]);
                 }
             }
         }
@@ -511,7 +511,7 @@ class TechnicianController extends Controller
                             if ($classSession->day_of_week == $dayOfWeek &&
                                 (($startLessonId >= $range[0] && $startLessonId <= $range[1]) ||
                                     ($endLessonId >= $range[0] && $endLessonId <= $range[1]))) {
-                                return response()->json(['errors' => ['class-session' => "Giảng viên đã có buổi học trùng với buổi học bạn đang cố gắng thêm! (bấm để xem)", 'class-id' => $classSession->class_id]]);
+                                return response()->json(['errors' => ['class-session' => "Giảng viên đã có buổi học trùng với buổi học bạn đang cố gắng thêm! Tên lớp học phần: {$classSession->creditClass->name}."]]);
                             }
                         }
                     }
@@ -950,7 +950,7 @@ class TechnicianController extends Controller
                 })->first();
 
                 if ($conflictingClass) {
-                    return response()->json(['errors' => ['class-session' => "Buổi học vào thứ {$daysOfWeek} bị trùng tiết học với lớp học khác! (bấm để xem)", 'class-id' => $conflictingClass->class_id]]);
+                    return response()->json(['errors' => ['class-session' => "Buổi học vào thứ {$daysOfWeek} bị trùng tiết học với lớp học phần {$conflictingClass->creditClass->name}!"]]);
                 }
             }
         }
@@ -969,7 +969,7 @@ class TechnicianController extends Controller
                             if ($classSession->day_of_week == $dayOfWeek &&
                                 (($startLessonId >= $range[0] && $startLessonId <= $range[1]) ||
                                     ($endLessonId >= $range[0] && $endLessonId <= $range[1]))) {
-                                return response()->json(['errors' => ['class-session' => "Giảng viên đã có buổi học trùng với buổi học bạn đang cố gắng thêm! (bấm để xem)", 'class-id' => $classSession->class_id]]);
+                                return response()->json(['errors' => ['class-session' => "Giảng viên đã có buổi học trùng với buổi học bạn đang cố gắng thêm! Tên lớp học phần: {$classSession->creditClass->name}."]]);
                             }
                         }
                     }
