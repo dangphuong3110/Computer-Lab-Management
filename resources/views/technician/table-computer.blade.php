@@ -67,6 +67,35 @@
                             </div>
                         </div>
                     </form>
+                    <!----- Modal sao chép máy tính ----->
+                    <div class="modal fade" id="computer-cloning-{{ $computerAtPosition->id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="attendanceModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h1 class="modal-title fs-5" id="exampleModalLabel">Sao chép thông tin máy tính</h1>
+                                </div>
+                                <div class="modal-body">
+                                    <form method="post" action="{{ route('technician.computer-cloning-api', $computerAtPosition->id) }}" id="computer-cloning-form-{{ $computerAtPosition->id }}">
+                                        @csrf
+                                        @method('PUT')
+                                        <p class="fs-6 m-0 p-3 text-center">Chọn một trong các phương thức sau:</p>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="position-option" value="empty" checked>
+                                            <label class="form-check-label">Sao chép cho các vị trí trống</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="position-option" value="all">
+                                            <label class="form-check-label">Sao chép cho tất cả máy tính trong phòng</label>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer d-flex justify-content-center">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Trở về</button>
+                                    <button type="button" class="btn btn-primary btn-clone-computer" data-computer-id="{{ $computerAtPosition->id }}">Sao chép</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <!----- Modal xem lịch sử sử dụng máy tính ----->
                     <div class="modal fade modal-update" id="search-usage-info-modal-{{ $computerAtPosition->id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="searchUsageInfoModalLabel" aria-hidden="true">
                         <div class="modal-dialog modal-dialog-centered modal-xl">
@@ -115,6 +144,7 @@
                         <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#destroy-computer-modal-{{ $computerAtPosition->id }}">Xóa</a></li>
                         <li><a class="dropdown-item btn-start-maintenance {{ $computerAtPosition->status == 'available' ? '' : 'd-none' }}" data-computer-id="{{ $computerAtPosition->id }}" href="#">Bảo trì</a></li>
                         <li><a class="dropdown-item btn-end-maintenance {{ $computerAtPosition->status == 'available' ? 'd-none' : '' }}" data-computer-id="{{ $computerAtPosition->id }}" href="#">Kết thúc bảo trì</a></li>
+                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#computer-cloning-{{ $computerAtPosition->id }}">Sao chép máy tính</a></li>
                         <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#search-usage-info-modal-{{ $computerAtPosition->id }}">Lịch sử sử dụng</a></li>
                     </ul>
                 </div>

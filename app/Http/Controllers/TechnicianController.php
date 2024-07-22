@@ -2028,4 +2028,49 @@ class TechnicianController extends Controller
 
         return response()->json(['table_student_class' => $table_student_class, 'links' => $students->render('pagination::bootstrap-5')->toHtml()]);
     }
+
+    public function computerCloningAPI(Request $request, string $computer_id)
+    {
+        $positionOption = $request->input('position-option');
+        $room = Room::findOrFail($request->input('room_id'));
+        $roomCapacity = $room->number_of_computer_rows * $room->max_computers_per_row;
+        $originalComputer = Computer::findOrFail($computer_id);
+
+        if ($positionOption === 'empty') {
+            for ($i = 1; $i <= $roomCapacity; $i++) {
+                if (!Computer::where('room_id', $room->id)->where('position', $i)->exists()) {
+                    $newComputer = new Computer();
+                    $newComputer->position = $i;
+                    $newComputer->configuration = $originalComputer->configuration;
+                    $newComputer->purchase_date = $originalComputer->purchase_date;
+                    $newComputer->room_id = $room->id;
+
+                    $newComputer->save();
+                }
+            }
+        } else if ($positionOption === 'all') {
+            for ($i = 1; $i <= $roomCapacity; $i++) {
+                $oldComputer = Computer::where('room_id', $room->id)->where('position', $i)->first();
+                if ($oldComputer) {
+                    $oldComputer->configuration = $originalComputer->configuration;
+                    $oldComputer->purchase_date = $originalComputer->purchase_date;
+
+                    $oldComputer->save();
+                } else {
+                    $newComputer = new Computer();
+                    $newComputer->position = $i;
+                    $newComputer->configuration = $originalComputer->configuration;
+                    $newComputer->purchase_date = $originalComputer->purchase_date;
+                    $newComputer->room_id = $room->id;
+
+                    $newComputer->save();
+                }
+            }
+        }
+
+        $computers = Computer::where('room_id', $room->id)->get();
+        $table_computer = view('technician.table-computer', compact('computers', 'room'))->render();
+
+        return response()->json(['success' => 'Sao chép thông tin máy tính thành công!', 'table_computer' => $table_computer]);
+    }
 }

@@ -124,6 +124,7 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/start-maintenance-computer-api/{computer}', [TechnicianController::class, 'startMaintenanceClassAPI'])->name('technician.start-maintenance-computer-api');
         Route::put('/end-maintenance-computer-api/{computer}', [TechnicianController::class, 'endMaintenanceClassAPI'])->name('technician.end-maintenance-computer-api');
         Route::delete('/delete-computer-api/{computer}', [TechnicianController::class, 'destroyComputerAPI'])->name('technician.destroy-computer-api');
+        Route::put('/computer-cloning-api/{computer}', [TechnicianController::class, 'computerCloningAPI'])->name('technician.computer-cloning-api');
 
         // Report
         Route::get('/get-list-report', [TechnicianController::class, 'getListReport'])->name('technician.get-list-report')->middleware('check.role:technician');
