@@ -115,7 +115,6 @@ class AttendancesExport implements FromCollection, WithHeadings, WithTitle, With
                     $sheet->getColumnDimension($column)->setAutoSize(true);
                 }
 
-
                 $sheet->getRowDimension(4)->setRowHeight(15);
                 $sheet->getRowDimension(5)->setRowHeight(45);
 
@@ -124,6 +123,7 @@ class AttendancesExport implements FromCollection, WithHeadings, WithTitle, With
                 for ($col = 'A'; $col !== $highestColumn; ++$col) {
                     $sheet->setCellValue($col.'6', $sheet->getCell($col.'5')->getValue());
                 }
+                $sheet->setCellValue($highestColumn.'6', $sheet->getCell($highestColumn.'5')->getValue());
 
                 $sheet->getRowDimension(6)->setRowHeight(15);
                 $sheet->getStyle('A6:' . $sheet->getHighestColumn() . '6')->getFont()->setBold(false);

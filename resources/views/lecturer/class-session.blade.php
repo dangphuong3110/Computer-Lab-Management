@@ -142,7 +142,7 @@
                             @if ($computerAtPosition)
                                 <div class="position-relative border border-black {{ $hasAttendance ? 'bg-warning' : 'bg-info' }} bg-opacity-50" style="width: {{ 100 / $room->max_computers_per_row }}%; height: 100px;">
                                     <div class="text-center d-flex justify-content-center align-items-center overflow-hidden h-100">
-                                        <span style="font-size: 12px;">{{ $hasAttendance ? $attendance->student->full_name : '' }}</span>
+                                        <span style="font-size: 12px;">{!! $hasAttendance ? $attendance->student->full_name . '<br>' . \Carbon\Carbon::parse($attendance->updated_at)->format('H:i:s') : '' !!}</span>
                                     </div>
                                     <div class="position-absolute top-0">{{ $computerNumber }}</div>
                                 </div>

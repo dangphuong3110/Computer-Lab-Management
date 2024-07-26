@@ -85,7 +85,7 @@
                             @endphp
                             @if ($computerAtPosition)
                                 <div class="position-relative dropdown-center border border-black {{ $hasAttendance ? 'bg-warning' : 'bg-info' }} bg-opacity-50" style="width: {{ 100 / $room->max_computers_per_row }}%; height: 100px;">
-                                    <div class="text-center d-flex justify-content-center align-items-center overflow-hidden h-100"><span style="font-size: 12px;">{{ $hasAttendance ? $attendance->student->full_name : '' }}</span></div>
+                                    <div class="text-center d-flex justify-content-center align-items-center overflow-hidden h-100"><span style="font-size: 12px;">{!! $hasAttendance ? $attendance->student->full_name . '<br>' . \Carbon\Carbon::parse($attendance->updated_at)->format('H:i:s') : '' !!}</span></div>
                                     <a href="#" class="position-absolute top-0 dropdown-toggle" data-bs-toggle="dropdown">{{ $computerNumber }}</a>
                                     <!----- Modal xác nhận thiết bị sử dụng (điểm danh) ----->
                                     <div class="modal fade" id="attendance-modal-{{ $computerAtPosition->id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="attendanceModalLabel" aria-hidden="true">

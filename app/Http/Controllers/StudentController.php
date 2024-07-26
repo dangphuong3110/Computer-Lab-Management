@@ -90,7 +90,19 @@ class StudentController extends Controller
             ->orderBy('class_student.created_at', 'desc')
             ->paginate(5);
 
-        return view('student.list-class', compact('title', 'user', 'classes'));
+        $attendances = [];
+
+        foreach ($classes as $class) {
+            $classSessions = $class->classSessions;
+            foreach ($classSessions as $classSession) {
+                $attendances[$class->id] = $classSession->attendances()
+                    ->where('student_id', $student->id)
+                    ->orderBy('updated_at', 'desc')
+                    ->get();
+            }
+        }
+
+        return view('student.list-class', compact('title', 'user', 'classes', 'attendances'));
     }
 
     public function getClassSessionAPI(Request $request, string $id)
@@ -331,7 +343,20 @@ class StudentController extends Controller
                     ->where('status', 'active')
                     ->orderBy('class_student.created_at', 'desc')
                     ->paginate(5);
-                $table_class = view('student.table-class', compact('classes'))->render();
+
+                $attendances = [];
+
+                foreach ($classes as $class) {
+                    $classSessions = $class->classSessions;
+                    foreach ($classSessions as $classSession) {
+                        $attendances[$class->id] = $classSession->attendances()
+                            ->where('student_id', $student->id)
+                            ->orderBy('updated_at', 'desc')
+                            ->get();
+                    }
+                }
+
+                $table_class = view('student.table-class', compact('classes', 'attendances'))->render();
 
                 return response()->json(['success' => 'Tham gia lớp học thành công!', 'table_class' => $table_class, 'links' => $classes->render('pagination::bootstrap-5')->toHtml()]);
             }

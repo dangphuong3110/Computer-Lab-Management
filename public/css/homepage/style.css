@@ -393,8 +393,8 @@ body.dark .switch::before {
 }
 
 .pagination .page-item.active .page-link {
-    color: #FFF;
-    background: #0D6EFD;
+    color: #FFF !important;
+    background: #0D6EFD !important;
 }
 
 .card-statistics {
